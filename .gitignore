@@ -1,9 +1,9 @@
 .DS_Store
 .idea/
 
+target/
+
 frontend/node_modules/
 frontend/dist/
 frontend/.env
 frontend/.env.local
-
-backend/target/
