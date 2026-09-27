@@ -8,6 +8,7 @@ import com.hardwarestore.hardwarestore.repository.CartItemRepository;
 import com.hardwarestore.hardwarestore.repository.CartRepository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -32,7 +33,12 @@ public class CartService {
         return cartItemRepository.findByCart(cart);
     }
 
-    public CartItem addItem(User customer, Product product, Integer quantity) {
+    public CartItem addItem(User customer,
+                            Product product,
+                            Integer quantity) {
+
+        validateQuantity(quantity);
+
         Cart cart = getOrCreateCart(customer);
 
         CartItem existingItem = cartItemRepository
@@ -40,32 +46,88 @@ public class CartService {
                 .orElse(null);
 
         if (existingItem != null) {
-            existingItem.setQuantity(existingItem.getQuantity() + quantity);
-            return cartItemRepository.save(existingItem);
+            int newQuantity = existingItem.getQuantity() + quantity;
+            validateQuantity(newQuantity);
+
+            existingItem.setQuantity(newQuantity);
+
+            CartItem savedItem = cartItemRepository.save(existingItem);
+            updateCartTotal(cart);
+
+            return savedItem;
         }
 
-        CartItem newItem = new CartItem(cart, product, quantity);
-        return cartItemRepository.save(newItem);
+        CartItem newItem = new CartItem(
+                cart,
+                product,
+                quantity,
+                product.getPrice()
+        );
+
+        CartItem savedItem = cartItemRepository.save(newItem);
+        updateCartTotal(cart);
+
+        return savedItem;
     }
 
-    public CartItem updateQuantity(User customer, Product product, Integer quantity) {
+    public CartItem updateQuantity(User customer,
+                                   Product product,
+                                   Integer quantity) {
+
+        validateQuantity(quantity);
+
         Cart cart = getOrCreateCart(customer);
 
         CartItem item = cartItemRepository
                 .findByCartAndProduct(cart, product)
-                .orElseThrow(() -> new RuntimeException("Product not found in cart"));
+                .orElseThrow(() ->
+                        new RuntimeException("Product not found in cart"));
 
         item.setQuantity(quantity);
-        return cartItemRepository.save(item);
+
+        CartItem savedItem = cartItemRepository.save(item);
+        updateCartTotal(cart);
+
+        return savedItem;
     }
 
     public void removeItem(User customer, Product product) {
+
         Cart cart = getOrCreateCart(customer);
 
         CartItem item = cartItemRepository
                 .findByCartAndProduct(cart, product)
-                .orElseThrow(() -> new RuntimeException("Product not found in cart"));
+                .orElseThrow(() ->
+                        new RuntimeException("Product not found in cart"));
 
         cartItemRepository.delete(item);
+
+        updateCartTotal(cart);
+    }
+
+    private void validateQuantity(Integer quantity) {
+        if (quantity == null || quantity <= 0) {
+            throw new IllegalArgumentException(
+                    "Quantity must be greater than zero"
+            );
+        }
+    }
+
+    private void updateCartTotal(Cart cart) {
+
+        List<CartItem> items = cartItemRepository.findByCart(cart);
+
+        BigDecimal total = BigDecimal.ZERO;
+
+        for (CartItem item : items) {
+
+            BigDecimal itemTotal = item.getUnitPrice()
+                    .multiply(BigDecimal.valueOf(item.getQuantity()));
+
+            total = total.add(itemTotal);
+        }
+
+        cart.setTotalAmount(total);
+        cartRepository.save(cart);
     }
 }

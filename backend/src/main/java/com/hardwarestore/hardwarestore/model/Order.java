@@ -2,6 +2,7 @@ package com.hardwarestore.hardwarestore.model;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -19,6 +20,9 @@ public class Order {
     @Column(nullable = false)
     private LocalDateTime orderDate;
 
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal totalAmount;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private OrderStatus status;
@@ -26,9 +30,13 @@ public class Order {
     public Order() {
     }
 
-    public Order(User customer, LocalDateTime orderDate, OrderStatus status) {
+    public Order(User customer,
+                 LocalDateTime orderDate,
+                 BigDecimal totalAmount,
+                 OrderStatus status) {
         this.customer = customer;
         this.orderDate = orderDate;
+        this.totalAmount = totalAmount;
         this.status = status;
     }
 
@@ -54,6 +62,14 @@ public class Order {
 
     public void setOrderDate(LocalDateTime orderDate) {
         this.orderDate = orderDate;
+    }
+
+    public BigDecimal getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(BigDecimal totalAmount) {
+        this.totalAmount = totalAmount;
     }
 
     public OrderStatus getStatus() {

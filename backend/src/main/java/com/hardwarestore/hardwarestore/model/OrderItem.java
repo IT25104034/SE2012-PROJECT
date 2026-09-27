@@ -24,16 +24,19 @@ public class OrderItem {
     private Integer quantity;
 
     @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal price;
+    private BigDecimal unitPrice;
 
     public OrderItem() {
     }
 
-    public OrderItem(Order order, Product product, Integer quantity, BigDecimal price) {
+    public OrderItem(Order order,
+                     Product product,
+                     Integer quantity,
+                     BigDecimal unitPrice) {
         this.order = order;
         this.product = product;
         this.quantity = quantity;
-        this.price = price;
+        this.unitPrice = unitPrice;
     }
 
     public Long getOrderItemId() {
@@ -68,11 +71,11 @@ public class OrderItem {
         this.quantity = quantity;
     }
 
-    public BigDecimal getPrice() {
-        return price;
+    public BigDecimal getUnitPrice() {
+        return unitPrice;
     }
 
-    public void setPrice(BigDecimal price) {
-        this.price = price;
+    public void setUnitPrice(BigDecimal unitPrice) {
+        this.unitPrice = unitPrice;
     }
 }

@@ -11,7 +11,9 @@ import com.hardwarestore.hardwarestore.repository.CartRepository;
 import com.hardwarestore.hardwarestore.repository.OrderItemRepository;
 import com.hardwarestore.hardwarestore.repository.OrderRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -33,6 +35,7 @@ public class OrderService {
         this.orderItemRepository = orderItemRepository;
     }
 
+    @Transactional
     public Order checkout(User customer) {
 
         Cart cart = cartRepository.findByCustomer(customer)
@@ -44,27 +47,60 @@ public class OrderService {
             throw new RuntimeException("Cannot checkout an empty cart");
         }
 
+        // Validate cart quantities before creating the order
+        for (CartItem cartItem : cartItems) {
+            if (cartItem.getQuantity() == null || cartItem.getQuantity() <= 0) {
+                throw new IllegalArgumentException(
+                        "Cart item quantity must be greater than zero"
+                );
+            }
+
+            if (cartItem.getUnitPrice() == null
+                    || cartItem.getUnitPrice().compareTo(BigDecimal.ZERO) < 0) {
+                throw new IllegalArgumentException(
+                        "Cart item price cannot be negative"
+                );
+            }
+        }
+
+        // Calculate the order total
+        BigDecimal totalAmount = BigDecimal.ZERO;
+
+        for (CartItem cartItem : cartItems) {
+            BigDecimal itemTotal = cartItem.getUnitPrice()
+                    .multiply(BigDecimal.valueOf(cartItem.getQuantity()));
+
+            totalAmount = totalAmount.add(itemTotal);
+        }
+
+        // Create the order
         Order order = new Order(
                 customer,
                 LocalDateTime.now(),
+                totalAmount,
                 OrderStatus.PENDING
         );
 
         order = orderRepository.save(order);
 
+        // Create order items
         for (CartItem cartItem : cartItems) {
 
             OrderItem orderItem = new OrderItem(
                     order,
                     cartItem.getProduct(),
                     cartItem.getQuantity(),
-                    cartItem.getProduct().getPrice()
+                    cartItem.getUnitPrice()
             );
 
             orderItemRepository.save(orderItem);
         }
 
+        // Clear the cart after successful order creation
         cartItemRepository.deleteAll(cartItems);
+
+        cart.setTotalAmount(BigDecimal.ZERO);
+        cartRepository.save(cart);
 
         return order;
     }
