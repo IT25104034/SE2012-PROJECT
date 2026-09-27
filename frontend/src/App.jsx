@@ -1,122 +1,92 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
-
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <div className="min-h-screen bg-slate-50">
+      <header className="border-b border-slate-200 bg-white">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
+          <div className="text-xl font-bold tracking-tight text-slate-900">
+            MUSTAFA HARDWARE{" "}
+            <span className="font-extrabold text-orange-600">
+              SHOP
+            </span>
+          </div>
+
+          <nav className="flex items-center gap-6 text-sm font-semibold">
+            <a
+              href="#products"
+              className="text-slate-600 hover:text-orange-600"
+            >
+              Products
+            </a>
+
+            <a
+              href="#management"
+              className="rounded-md bg-slate-900 px-4 py-2 text-white hover:bg-orange-600"
+            >
+              Management
+            </a>
+          </nav>
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
+      </header>
+
+      <main className="mx-auto max-w-7xl px-6 py-12">
+        <section className="rounded-xl bg-slate-900 px-8 py-14 text-white shadow-lg">
+          <p className="mb-3 text-sm font-bold uppercase tracking-widest text-orange-500">
+            Member 1 Component
           </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
+
+          <h1 className="max-w-3xl text-4xl font-extrabold tracking-tight">
+            Product and Category Management
+          </h1>
+
+          <p className="mt-4 max-w-2xl text-slate-300">
+            Manage the Mustafa Hardware product catalogue and
+            organize products using categories.
+          </p>
+        </section>
+
+        <section
+          id="management"
+          className="mt-10 grid gap-6 md:grid-cols-2"
         >
-          Count is {count}
-        </button>
-      </section>
+          <article className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-orange-100 font-extrabold text-orange-600">
+              P
+            </div>
 
-      <div className="ticks"></div>
+            <h2 className="text-xl font-bold text-slate-900">
+              Product Management
+            </h2>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+            <p className="mt-2 text-sm text-slate-500">
+              Create, view, update and delete products.
+            </p>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+            <button className="mt-6 rounded-md bg-orange-600 px-4 py-2 text-sm font-bold text-white hover:bg-orange-700">
+              Manage Products
+            </button>
+          </article>
+
+          <article className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-orange-100 font-extrabold text-orange-600">
+              C
+            </div>
+
+            <h2 className="text-xl font-bold text-slate-900">
+              Category Management
+            </h2>
+
+            <p className="mt-2 text-sm text-slate-500">
+              Create, view, update and delete categories.
+            </p>
+
+            <button className="mt-6 rounded-md bg-slate-900 px-4 py-2 text-sm font-bold text-white hover:bg-orange-600">
+              Manage Categories
+            </button>
+          </article>
+        </section>
+      </main>
+    </div>
+  );
 }
 
-export default App
+export default App;
