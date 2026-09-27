@@ -1,4 +1,5 @@
 import CategoryList from "./components/CategoryList";
+import AddCategoryForm from "./components/AddCategoryForm";
 
 
 
@@ -88,6 +89,7 @@ function App() {
             </button>
           </article>
         </section>
+         <AddCategoryForm />
         <CategoryList />
       </main>
     </div>

@@ -1,7 +1,11 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getCategories } from "../services/categoryService.js";
+import EditCategoryForm from "./EditCategoryForm.jsx";
 
 export default function CategoryList() {
+  const [editingCategory, setEditingCategory] = useState(null);
+
   const {
     data: categories = [],
     isPending,
@@ -21,6 +25,7 @@ export default function CategoryList() {
           <h2 className="text-xl font-bold text-slate-900">
             Categories
           </h2>
+
           <p className="mt-1 text-sm text-slate-500">
             Browse your product categories.
           </p>
@@ -36,6 +41,14 @@ export default function CategoryList() {
         </button>
       </div>
 
+      {editingCategory && (
+        <EditCategoryForm
+          key={editingCategory.categoryId}
+          category={editingCategory}
+          onClose={() => setEditingCategory(null)}
+        />
+      )}
+
       {isPending ? (
         <p role="status" className="p-6 text-sm text-slate-500">
           Loading categories...
@@ -45,6 +58,7 @@ export default function CategoryList() {
           <p className="font-semibold text-red-700">
             Unable to load categories
           </p>
+
           <p className="mt-1 text-sm text-red-600">
             {error.response?.data?.message || error.message}
           </p>
@@ -61,11 +75,17 @@ export default function CategoryList() {
                 <th scope="col" className="px-6 py-3 font-semibold">
                   ID
                 </th>
+
                 <th scope="col" className="px-6 py-3 font-semibold">
                   Category
                 </th>
+
                 <th scope="col" className="px-6 py-3 font-semibold">
                   Description
+                </th>
+
+                <th scope="col" className="px-6 py-3 font-semibold">
+                  Actions
                 </th>
               </tr>
             </thead>
@@ -79,11 +99,24 @@ export default function CategoryList() {
                   <td className="px-6 py-4 text-slate-500">
                     {category.categoryId}
                   </td>
+
                   <td className="px-6 py-4 font-semibold text-slate-900">
                     {category.name}
                   </td>
+
                   <td className="px-6 py-4 text-slate-600">
                     {category.description || "—"}
+                  </td>
+
+                  <td className="px-6 py-4">
+                    <button
+                      type="button"
+                      onClick={() => setEditingCategory(category)}
+                      disabled={editingCategory !== null}
+                      className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-100 disabled:opacity-50"
+                    >
+                      Edit
+                    </button>
                   </td>
                 </tr>
               ))}
