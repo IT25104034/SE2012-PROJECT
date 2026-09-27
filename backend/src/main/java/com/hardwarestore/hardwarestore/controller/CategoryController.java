@@ -2,6 +2,7 @@ package com.hardwarestore.hardwarestore.controller;
 
 import com.hardwarestore.hardwarestore.model.Category;
 import com.hardwarestore.hardwarestore.service.CategoryService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +20,7 @@ public class CategoryController {
     }
 
 
-    
+
 
     // GET all categories
     @GetMapping
@@ -36,7 +37,7 @@ public class CategoryController {
     // CREATE category
     @PostMapping
     public ResponseEntity<Category> createCategory(
-            @RequestBody Category category
+            @Valid @RequestBody Category category
     ) {
         Category createdCategory =
                 categoryService.createCategory(category);
@@ -48,7 +49,7 @@ public class CategoryController {
     @PutMapping("/{id}")
     public ResponseEntity<Category> updateCategory(
             @PathVariable Long id,
-            @RequestBody Category category
+            @Valid @RequestBody Category category
     ) {
         Category updatedCategory =
                 categoryService.updateCategory(id, category);

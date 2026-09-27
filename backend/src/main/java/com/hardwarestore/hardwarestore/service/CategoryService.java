@@ -1,5 +1,6 @@
 package com.hardwarestore.hardwarestore.service;
 
+import com.hardwarestore.hardwarestore.exception.ResourceNotFoundException;
 import com.hardwarestore.hardwarestore.model.Category;
 import com.hardwarestore.hardwarestore.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,9 @@ public class CategoryService {
     public Category getCategoryById(Long id) {
         return categoryRepository.findById(id)
                 .orElseThrow(() ->
-                        new RuntimeException("Category not found with id: " + id));
+                        new ResourceNotFoundException(
+                                "Category not found with id: " + id
+                        ));
     }
 
     // Create category
