@@ -1,5 +1,6 @@
 package com.hardwarestore.hardwarestore.service;
 
+import com.hardwarestore.hardwarestore.exception.ResourceNotFoundException;
 import com.hardwarestore.hardwarestore.model.Category;
 import com.hardwarestore.hardwarestore.model.Product;
 import com.hardwarestore.hardwarestore.repository.CategoryRepository;
@@ -31,19 +32,15 @@ public class ProductService {
     public Product getProductById(Long id) {
         return productRepository.findById(id)
                 .orElseThrow(() ->
-                        new RuntimeException("Product not found with id: " + id));
+                        new ResourceNotFoundException(
+                                "Product not found with id: " + id
+                        ));
     }
 
     // Create product
     public Product createProduct(Product product) {
 
-        Long categoryId = product.getCategory().getCategoryId();
-
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() ->
-                        new RuntimeException(
-                                "Category not found with id: " + categoryId
-                        ));
+        Category category = getProductCategory(product);
 
         product.setCategory(category);
 
@@ -60,14 +57,7 @@ public class ProductService {
         existingProduct.setPrice(updatedProduct.getPrice());
         existingProduct.setImageUrl(updatedProduct.getImageUrl());
 
-        Long categoryId =
-                updatedProduct.getCategory().getCategoryId();
-
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() ->
-                        new RuntimeException(
-                                "Category not found with id: " + categoryId
-                        ));
+        Category category = getProductCategory(updatedProduct);
 
         existingProduct.setCategory(category);
 
@@ -80,5 +70,23 @@ public class ProductService {
         Product existingProduct = getProductById(id);
 
         productRepository.delete(existingProduct);
+    }
+
+    private Category getProductCategory(Product product) {
+
+        if (product.getCategory() == null ||
+                product.getCategory().getCategoryId() == null) {
+            throw new IllegalArgumentException(
+                    "A valid category id is required for the product"
+            );
+        }
+
+        Long categoryId = product.getCategory().getCategoryId();
+
+        return categoryRepository.findById(categoryId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Category not found with id: " + categoryId
+                        ));
     }
 }

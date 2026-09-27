@@ -2,6 +2,7 @@ package com.hardwarestore.hardwarestore.controller;
 
 import com.hardwarestore.hardwarestore.model.Product;
 import com.hardwarestore.hardwarestore.service.ProductService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,7 +38,7 @@ public class ProductController {
     // CREATE product
     @PostMapping
     public ResponseEntity<Product> createProduct(
-            @RequestBody Product product
+            @Valid @RequestBody Product product
     ) {
         Product createdProduct =
                 productService.createProduct(product);
@@ -49,7 +50,7 @@ public class ProductController {
     @PutMapping("/{id}")
     public ResponseEntity<Product> updateProduct(
             @PathVariable Long id,
-            @RequestBody Product product
+            @Valid @RequestBody Product product
     ) {
         Product updatedProduct =
                 productService.updateProduct(id, product);

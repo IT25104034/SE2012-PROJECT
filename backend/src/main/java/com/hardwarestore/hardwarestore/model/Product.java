@@ -1,6 +1,10 @@
 package com.hardwarestore.hardwarestore.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 
 @Entity
@@ -12,17 +16,24 @@ public class Product {
     private Long productId;
 
     @Column(nullable = false)
+    @NotBlank(message = "Product name is required")
+    @Size(max = 150, message = "Product name must not exceed 150 characters")
     private String name;
 
+    @Size(max = 1000, message = "Product description must not exceed 1000 characters")
     private String description;
 
     @Column(nullable = false, precision = 10, scale = 2)
+    @NotNull(message = "Product price is required")
+    @Positive(message = "Product price must be greater than zero")
     private BigDecimal price;
 
+    @Size(max = 500, message = "Image URL must not exceed 500 characters")
     private String imageUrl;
 
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
+    @NotNull(message = "Product category is required")
     private Category category;
 
     public Product() {
