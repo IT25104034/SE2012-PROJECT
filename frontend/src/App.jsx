@@ -1,3 +1,7 @@
+import CategoryList from "./components/CategoryList";
+
+
+
 function App() {
   return (
     <div className="min-h-screen bg-slate-50">
@@ -84,6 +88,7 @@ function App() {
             </button>
           </article>
         </section>
+        <CategoryList />
       </main>
     </div>
   );
