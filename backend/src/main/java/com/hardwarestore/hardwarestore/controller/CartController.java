@@ -1,6 +1,8 @@
 package com.hardwarestore.hardwarestore.controller;
 
 import com.hardwarestore.hardwarestore.dto.CartItemResponse;
+import com.hardwarestore.hardwarestore.dto.CartResponse;
+import com.hardwarestore.hardwarestore.model.Cart;
 import com.hardwarestore.hardwarestore.model.CartItem;
 import com.hardwarestore.hardwarestore.model.Order;
 import com.hardwarestore.hardwarestore.model.Product;
@@ -34,16 +36,25 @@ public class CartController {
     }
 
     @GetMapping("/cart/{userId}")
-    public List<CartItemResponse> getCart(@PathVariable Long userId) {
+    public CartResponse getCart(@PathVariable Long userId) {
 
         User customer = userRepository.findById(userId)
                 .orElseThrow(() ->
                         new RuntimeException("User not found"));
 
-        return cartService.getCartItems(customer)
+        Cart cart = cartService.getOrCreateCart(customer);
+
+        List<CartItemResponse> items = cartService.getCartItems(customer)
                 .stream()
                 .map(this::toCartItemResponse)
                 .toList();
+
+        return new CartResponse(
+                cart.getCartId(),
+                customer.getId(),
+                cart.getTotalAmount(),
+                items
+        );
     }
 
     @PostMapping("/cart/{userId}/items/{productId}")
