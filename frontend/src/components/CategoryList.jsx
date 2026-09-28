@@ -20,6 +20,7 @@ export default function CategoryList() {
     onSuccess: async () => {
       setDeleteMessage("Category deleted successfully.");
       await queryClient.invalidateQueries({ queryKey: ["categories"] });
+      await queryClient.invalidateQueries({ queryKey: ["products"] });
     },
   });
 
