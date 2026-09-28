@@ -23,11 +23,15 @@ import OrderList from "./components/OrderList.jsx";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import InventoryDashboard from "./pages/InventoryDashboard.jsx";
+import UserManagement from "./pages/UserManagement.jsx";
 
 import { getCategories } from "./services/categoryService.js";
-
 import { useAuth } from "./context/AuthContext.jsx";
 
+
+/* =========================================================
+   BRAND
+========================================================= */
 
 function Brand() {
     return (
@@ -46,6 +50,10 @@ function Brand() {
 }
 
 
+/* =========================================================
+   CUSTOMER STOREFRONT
+========================================================= */
+
 function Storefront() {
     const navigate = useNavigate();
 
@@ -59,8 +67,12 @@ function Storefront() {
 
 
     async function handleLogout() {
-        await logout();
-        navigate("/");
+        try {
+            await logout();
+            navigate("/");
+        } catch (error) {
+            console.error("Logout failed:", error);
+        }
     }
 
 
@@ -69,15 +81,13 @@ function Storefront() {
 
             {/* NAVBAR */}
             <header className="sticky top-0 z-50 border-b border-white/10 bg-[#111111]/95 text-white backdrop-blur-xl">
-
                 <div className="mx-auto flex w-full max-w-[1400px] flex-wrap items-center justify-between gap-5 px-5 py-4 lg:px-8">
 
                     <Brand />
 
-
                     <nav
                         aria-label="Main navigation"
-                        className="flex flex-wrap items-center justify-end gap-x-6 gap-y-4"
+                        className="flex flex-wrap items-center justify-end gap-x-7 gap-y-4"
                     >
 
                         <NavLink
@@ -116,21 +126,22 @@ function Storefront() {
                         </NavLink>
 
 
-                        {/* AUTH AREA */}
+                        {/* SESSION CHECK */}
                         {!checkingSession && (
                             <>
-
-                                {!isAuthenticated ? (
-
-                                    /* GUEST */
-                                    <div className="flex items-center gap-3">
-
-                                        <Link
+                                {/* GUEST */}
+                                {!isAuthenticated && (
+                                    <>
+                                        <NavLink
                                             to="/login"
-                                            className="nav-link"
+                                            className={({ isActive }) =>
+                                                isActive
+                                                    ? "nav-link !text-white"
+                                                    : "nav-link"
+                                            }
                                         >
                                             Login
-                                        </Link>
+                                        </NavLink>
 
                                         <Link
                                             to="/register"
@@ -138,24 +149,21 @@ function Storefront() {
                                         >
                                             Register
                                         </Link>
+                                    </>
+                                )}
 
-                                    </div>
 
-                                ) : (
-
-                                    /* LOGGED IN USER */
-                                    <div className="flex items-center gap-3">
-
-                                        <div className="hidden border-l border-white/10 pl-5 sm:block">
-
-                                            <p className="text-xs font-black text-white">
+                                {/* LOGGED IN USER */}
+                                {isAuthenticated && (
+                                    <>
+                                        <div className="hidden border-l border-white/10 pl-6 sm:block">
+                                            <p className="text-xs font-black uppercase tracking-[0.08em] text-white">
                                                 {user?.name}
                                             </p>
 
-                                            <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.14em] text-orange-500">
+                                            <p className="mt-1 text-[9px] font-black uppercase tracking-[0.16em] text-orange-500">
                                                 {user?.role}
                                             </p>
-
                                         </div>
 
 
@@ -173,22 +181,18 @@ function Storefront() {
                                         <button
                                             type="button"
                                             onClick={handleLogout}
-                                            className="rounded-lg border border-white/15 px-4 py-3 text-xs font-black uppercase tracking-[0.1em] text-white/70 transition hover:border-orange-500 hover:text-white"
+                                            className="nav-link"
                                         >
                                             Logout
                                         </button>
-
-                                    </div>
-
+                                    </>
                                 )}
-
                             </>
                         )}
 
                     </nav>
 
                 </div>
-
             </header>
 
 
@@ -200,18 +204,15 @@ function Storefront() {
 
             {/* FOOTER */}
             <footer className="industrial-dark border-t border-white/10 px-5 py-12">
-
                 <div className="mx-auto grid w-full max-w-[1400px] gap-10 md:grid-cols-2 lg:px-3">
 
                     <div>
-
                         <Brand />
 
                         <p className="mt-5 max-w-md text-sm leading-7 text-white/55">
                             Professional tools, electronics and building supplies
                             for people who take their work seriously.
                         </p>
-
                     </div>
 
 
@@ -235,13 +236,16 @@ function Storefront() {
                     </div>
 
                 </div>
-
             </footer>
 
         </div>
     );
 }
 
+
+/* =========================================================
+   HOME PAGE
+========================================================= */
 
 function Home() {
     const categories = useQuery({
@@ -271,13 +275,11 @@ function Home() {
 
 
                         <h1 className="display-title mt-7 max-w-5xl text-6xl text-white sm:text-7xl lg:text-[110px]">
-
                             BUILT FOR
 
                             <span className="block text-orange-500">
                 REAL WORK.
               </span>
-
                         </h1>
 
 
@@ -311,7 +313,6 @@ function Home() {
                         <div className="mt-16 grid max-w-3xl grid-cols-3 gap-5 border-t border-white/10 pt-8">
 
                             <div>
-
                                 <p className="text-3xl font-black text-white">
                                     100%
                                 </p>
@@ -319,12 +320,10 @@ function Home() {
                                 <p className="mt-2 text-xs uppercase tracking-[0.16em] text-white/40">
                                     Quality Focus
                                 </p>
-
                             </div>
 
 
                             <div>
-
                                 <p className="text-3xl font-black text-white">
                                     Pro
                                 </p>
@@ -332,12 +331,10 @@ function Home() {
                                 <p className="mt-2 text-xs uppercase tracking-[0.16em] text-white/40">
                                     Grade Tools
                                 </p>
-
                             </div>
 
 
                             <div>
-
                                 <p className="text-3xl font-black text-orange-500">
                                     MH
                                 </p>
@@ -345,7 +342,6 @@ function Home() {
                                 <p className="mt-2 text-xs uppercase tracking-[0.16em] text-white/40">
                                     Trusted Hardware
                                 </p>
-
                             </div>
 
                         </div>
@@ -356,13 +352,11 @@ function Home() {
 
 
                 <div className="absolute bottom-8 right-8 hidden items-center gap-3 text-xs font-bold uppercase tracking-[0.2em] text-white/35 lg:flex">
-
                     Scroll to explore
 
                     <span className="text-orange-500">
             ↓
           </span>
-
                 </div>
 
             </section>
@@ -381,13 +375,11 @@ function Home() {
 
 
                         <h2 className="section-title mt-4 text-4xl sm:text-5xl">
-
                             Tools should work
 
                             <span className="block">
                 as hard as you do.
               </span>
-
                         </h2>
 
                     </div>
@@ -460,13 +452,11 @@ function Home() {
 
 
                             <h2 className="section-title mt-4 text-4xl sm:text-6xl">
-
                                 SHOP BY
 
                                 <span className="block text-orange-500">
                   CATEGORY.
                 </span>
-
                             </h2>
 
                         </div>
@@ -481,6 +471,7 @@ function Home() {
                     </div>
 
 
+                    {/* LOADING */}
                     {categories.isPending ? (
 
                         <div className="panel mt-12 p-10">
@@ -493,6 +484,7 @@ function Home() {
 
                     ) : categories.isError ? (
 
+                        /* ERROR */
                         <div className="mt-12 rounded-xl border border-orange-200 bg-orange-50 p-8">
 
                             <p className="font-bold text-orange-900">
@@ -504,10 +496,9 @@ function Home() {
                             </p>
 
                             <button
+                                type="button"
                                 className="btn-primary mt-5"
-                                onClick={() =>
-                                    categories.refetch()
-                                }
+                                onClick={() => categories.refetch()}
                             >
                                 Retry
                             </button>
@@ -516,6 +507,7 @@ function Home() {
 
                     ) : categories.data.length === 0 ? (
 
+                        /* EMPTY */
                         <div className="panel mt-12 p-10">
 
                             <p className="text-black/50">
@@ -526,51 +518,50 @@ function Home() {
 
                     ) : (
 
+                        /* CATEGORY CARDS */
                         <div className="mt-14 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
 
-                            {categories.data.map(
-                                (category, index) => (
+                            {categories.data.map((category, index) => (
 
-                                    <Link
-                                        key={category.categoryId}
-                                        to={`/products?categoryId=${category.categoryId}`}
-                                        className="group relative min-h-[300px] overflow-hidden rounded-xl bg-[#171717] p-7 text-white transition duration-500 hover:-translate-y-2"
-                                    >
+                                <Link
+                                    key={category.categoryId}
+                                    to={`/products?categoryId=${category.categoryId}`}
+                                    className="group relative min-h-[300px] overflow-hidden rounded-xl bg-[#171717] p-7 text-white transition duration-500 hover:-translate-y-2"
+                                >
 
-                                        <div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-orange-500/10 blur-[55px] transition duration-500 group-hover:bg-orange-500/25" />
+                                    <div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-orange-500/10 blur-[55px] transition duration-500 group-hover:bg-orange-500/25" />
 
 
-                                        <p className="text-xs font-black tracking-[0.2em] text-orange-500">
-                                            0{index + 1}
+                                    <p className="text-xs font-black tracking-[0.2em] text-orange-500">
+                                        {String(index + 1).padStart(2, "0")}
+                                    </p>
+
+
+                                    <div className="absolute bottom-7 left-7 right-7">
+
+                                        <div className="mb-6 h-px w-full bg-white/10" />
+
+
+                                        <h3 className="text-2xl font-black uppercase tracking-tight">
+                                            {category.name}
+                                        </h3>
+
+
+                                        <p className="mt-3 line-clamp-2 text-sm leading-6 text-white/45">
+                                            {category.description ||
+                                                "Explore products in this category."}
                                         </p>
 
 
-                                        <div className="absolute bottom-7 left-7 right-7">
+                                        <p className="mt-6 text-xs font-black uppercase tracking-[0.18em] text-orange-500">
+                                            Explore →
+                                        </p>
 
-                                            <div className="mb-6 h-px w-full bg-white/10" />
+                                    </div>
 
+                                </Link>
 
-                                            <h3 className="text-2xl font-black uppercase tracking-tight">
-                                                {category.name}
-                                            </h3>
-
-
-                                            <p className="mt-3 line-clamp-2 text-sm leading-6 text-white/45">
-                                                {category.description ||
-                                                    "Explore products in this category."}
-                                            </p>
-
-
-                                            <p className="mt-6 text-xs font-black uppercase tracking-[0.18em] text-orange-500">
-                                                Explore →
-                                            </p>
-
-                                        </div>
-
-                                    </Link>
-
-                                )
-                            )}
+                            ))}
 
                         </div>
 
@@ -594,13 +585,11 @@ function Home() {
 
 
                         <h2 className="display-title mt-5 max-w-4xl text-5xl text-black sm:text-7xl">
-
                             FIND THE RIGHT TOOL.
 
                             <span className="block text-white">
                 GET THE JOB DONE.
               </span>
-
                         </h2>
 
                     </div>
@@ -622,40 +611,138 @@ function Home() {
 }
 
 
+/* =========================================================
+   ADMIN MANAGEMENT LAYOUT
+========================================================= */
+
 function Management() {
+    const navigate = useNavigate();
+
+    const {
+        user,
+        isAdmin,
+        checkingSession,
+        logout,
+    } = useAuth();
+
+
+    async function handleLogout() {
+        try {
+            await logout();
+            navigate("/");
+        } catch (error) {
+            console.error("Logout failed:", error);
+        }
+    }
+
+
+    /* WAIT FOR SESSION CHECK */
+    if (checkingSession) {
+        return (
+            <div className="flex min-h-screen items-center justify-center bg-[#111111] text-white">
+                <p className="text-xs font-black uppercase tracking-[0.2em] text-white/50">
+                    Checking access...
+                </p>
+            </div>
+        );
+    }
+
+
+    /* ADMIN PROTECTION */
+    if (!isAdmin) {
+        return (
+            <div className="flex min-h-screen items-center justify-center bg-[#f3f1eb] px-6">
+
+                <div className="panel max-w-xl p-10">
+
+                    <p className="eyebrow">
+                        Restricted Area
+                    </p>
+
+                    <h1 className="mt-3 text-4xl font-black uppercase tracking-tight">
+                        Admin access required.
+                    </h1>
+
+                    <p className="mt-4 text-sm leading-7 text-neutral-600">
+                        You must sign in using an administrator account
+                        to access the management portal.
+                    </p>
+
+
+                    <div className="mt-7 flex flex-wrap gap-3">
+
+                        <Link
+                            to="/login"
+                            className="btn-primary"
+                        >
+                            Admin Login
+                        </Link>
+
+                        <Link
+                            to="/"
+                            className="btn-outline"
+                        >
+                            Customer Site
+                        </Link>
+
+                    </div>
+
+                </div>
+
+            </div>
+        );
+    }
+
+
     return (
         <div className="min-h-screen bg-slate-100 md:flex">
 
             {/* ADMIN SIDEBAR */}
-            <aside className="bg-slate-900 p-5 text-white md:w-60 md:shrink-0">
+            <aside className="bg-slate-900 p-5 text-white md:min-h-screen md:w-64 md:shrink-0">
 
                 <Brand />
 
 
-                <p className="mt-2 text-xs text-slate-400">
+                <p className="mt-3 text-xs uppercase tracking-[0.15em] text-slate-400">
                     Store Management Portal
                 </p>
 
 
+                {/* CURRENT ADMIN */}
+                <div className="mt-6 border-y border-white/10 py-4">
+
+                    <p className="text-xs font-black uppercase tracking-[0.1em] text-white">
+                        {user?.name}
+                    </p>
+
+                    <p className="mt-1 text-[9px] font-black uppercase tracking-[0.16em] text-orange-500">
+                        Administrator
+                    </p>
+
+                </div>
+
+
+                {/* ADMIN NAVIGATION */}
                 <nav
                     aria-label="Management navigation"
-                    className="mt-6 flex gap-2 md:flex-col"
+                    className="mt-6 flex gap-2 overflow-x-auto md:flex-col"
                 >
 
                     {[
                         ["/admin/products", "Products"],
                         ["/admin/categories", "Categories"],
                         ["/admin/inventory", "Inventory"],
+                        ["/admin/users", "Users"],
                     ].map(([to, label]) => (
 
                         <NavLink
                             key={to}
                             to={to}
                             className={({ isActive }) =>
-                                `rounded-md px-4 py-3 text-sm font-semibold transition ${
+                                `management-link whitespace-nowrap ${
                                     isActive
-                                        ? "bg-orange-600 text-white"
-                                        : "text-slate-300 hover:bg-slate-800"
+                                        ? "bg-orange-500 !text-black"
+                                        : ""
                                 }`
                             }
                         >
@@ -667,19 +754,35 @@ function Management() {
                 </nav>
 
 
-                <Link
-                    to="/products"
-                    className="mt-6 inline-block text-sm text-slate-300 hover:text-white"
-                >
-                    ← Customer Site
-                </Link>
+                {/* SIDEBAR BOTTOM */}
+                <div className="mt-8 border-t border-white/10 pt-6">
+
+                    <Link
+                        to="/products"
+                        className="block text-xs font-bold uppercase tracking-[0.1em] text-slate-300 transition hover:text-white"
+                    >
+                        ← Customer Site
+                    </Link>
+
+
+                    <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="mt-5 text-xs font-bold uppercase tracking-[0.1em] text-slate-400 transition hover:text-orange-500"
+                    >
+                        Logout
+                    </button>
+
+                </div>
 
             </aside>
 
 
             {/* ADMIN CONTENT */}
-            <main className="min-w-0 flex-1 p-5 md:p-10">
+            <main className="min-w-0 flex-1">
+
                 <Outlet />
+
             </main>
 
         </div>
@@ -687,15 +790,19 @@ function Management() {
 }
 
 
+/* =========================================================
+   APP ROUTES
+========================================================= */
+
 export default function App() {
     return (
         <BrowserRouter>
 
             <Routes>
 
-                {/* ===================================
-            CUSTOMER / STOREFRONT
-            =================================== */}
+                {/* =========================================
+            CUSTOMER / PUBLIC ROUTES
+        ========================================= */}
 
                 <Route element={<Storefront />}>
 
@@ -705,19 +812,6 @@ export default function App() {
                     />
 
 
-                    {/* AUTH */}
-                    <Route
-                        path="login"
-                        element={<Login />}
-                    />
-
-                    <Route
-                        path="register"
-                        element={<Register />}
-                    />
-
-
-                    {/* PRODUCTS */}
                     <Route
                         path="products"
                         element={
@@ -734,53 +828,76 @@ export default function App() {
                     />
 
 
-                    {/* CART */}
                     <Route
                         path="cart"
                         element={<Cart />}
                     />
 
 
-                    {/* ORDERS */}
                     <Route
                         path="orders"
                         element={<OrderList />}
                     />
 
 
-                    {/* NOT FOUND */}
+                    <Route
+                        path="login"
+                        element={<Login />}
+                    />
+
+
+                    <Route
+                        path="register"
+                        element={<Register />}
+                    />
+
+
+                    {/* PAGE NOT FOUND */}
                     <Route
                         path="*"
                         element={
-                            <div className="panel p-10">
+                            <section className="bg-[#f3f1eb] px-5 py-20">
 
-                                <h1 className="mb-5 text-3xl font-bold">
-                                    Page not found
-                                </h1>
+                                <div className="panel mx-auto max-w-3xl p-10">
 
-                                <Link
-                                    to="/"
-                                    className="btn-primary"
-                                >
-                                    Return Home
-                                </Link>
+                                    <p className="eyebrow">
+                                        Error 404
+                                    </p>
 
-                            </div>
+                                    <h1 className="mt-3 text-4xl font-black uppercase">
+                                        Page not found.
+                                    </h1>
+
+                                    <p className="mt-4 text-neutral-600">
+                                        The page you are looking for does not exist.
+                                    </p>
+
+                                    <Link
+                                        to="/"
+                                        className="btn-primary mt-7 inline-flex"
+                                    >
+                                        Return Home
+                                    </Link>
+
+                                </div>
+
+                            </section>
                         }
                     />
 
                 </Route>
 
 
-                {/* ===================================
-            ADMIN MANAGEMENT
-            =================================== */}
+                {/* =========================================
+            ADMIN ROUTES
+        ========================================= */}
 
                 <Route
                     path="admin"
                     element={<Management />}
                 >
 
+                    {/* DEFAULT ADMIN PAGE */}
                     <Route
                         index
                         element={
@@ -792,51 +909,64 @@ export default function App() {
                     />
 
 
-                    {/* ADMIN PRODUCTS */}
+                    {/* PRODUCT MANAGEMENT */}
                     <Route
                         path="products"
                         element={
-                            <ProductBrowser
-                                key="management"
-                                management
-                            />
+                            <div className="p-5 md:p-10">
+
+                                <ProductBrowser
+                                    key="management"
+                                    management
+                                />
+
+                            </div>
                         }
                     />
 
 
-                    {/* ADMIN CATEGORIES */}
+                    {/* CATEGORY MANAGEMENT */}
                     <Route
                         path="categories"
                         element={
-                            <>
+                            <div className="p-5 md:p-10">
 
                                 <p className="eyebrow">
-                                    Store management
+                                    Store Management
                                 </p>
 
-                                <h1 className="mt-2 text-3xl font-extrabold">
+
+                                <h1 className="mt-2 text-3xl font-extrabold uppercase">
                                     Category Management
                                 </h1>
+
 
                                 <p className="mt-2 text-slate-500">
                                     Organize your catalogue with product categories.
                                 </p>
 
+
                                 <AddCategoryForm />
+
 
                                 <CategoryList />
 
-                            </>
+                            </div>
                         }
                     />
 
 
-                    {/* ADMIN INVENTORY */}
+                    {/* INVENTORY MANAGEMENT */}
                     <Route
                         path="inventory"
-                        element={
-                            <InventoryDashboard />
-                        }
+                        element={<InventoryDashboard />}
+                    />
+
+
+                    {/* USER / ROLE MANAGEMENT */}
+                    <Route
+                        path="users"
+                        element={<UserManagement />}
                     />
 
                 </Route>
