@@ -47,9 +47,10 @@ public class OrderService {
             throw new RuntimeException("Cannot checkout an empty cart");
         }
 
-        // Validate cart quantities before creating the order
         for (CartItem cartItem : cartItems) {
-            if (cartItem.getQuantity() == null || cartItem.getQuantity() <= 0) {
+
+            if (cartItem.getQuantity() == null
+                    || cartItem.getQuantity() <= 0) {
                 throw new IllegalArgumentException(
                         "Cart item quantity must be greater than zero"
                 );
@@ -63,17 +64,16 @@ public class OrderService {
             }
         }
 
-        // Calculate the order total
         BigDecimal totalAmount = BigDecimal.ZERO;
 
         for (CartItem cartItem : cartItems) {
+
             BigDecimal itemTotal = cartItem.getUnitPrice()
                     .multiply(BigDecimal.valueOf(cartItem.getQuantity()));
 
             totalAmount = totalAmount.add(itemTotal);
         }
 
-        // Create the order
         Order order = new Order(
                 customer,
                 LocalDateTime.now(),
@@ -83,7 +83,6 @@ public class OrderService {
 
         order = orderRepository.save(order);
 
-        // Create order items
         for (CartItem cartItem : cartItems) {
 
             OrderItem orderItem = new OrderItem(
@@ -96,7 +95,6 @@ public class OrderService {
             orderItemRepository.save(orderItem);
         }
 
-        // Clear the cart after successful order creation
         cartItemRepository.deleteAll(cartItems);
 
         cart.setTotalAmount(BigDecimal.ZERO);
@@ -111,6 +109,10 @@ public class OrderService {
 
     public List<Order> getOrdersByStatus(OrderStatus status) {
         return orderRepository.findByStatus(status);
+    }
+
+    public List<OrderItem> getOrderItems(Order order) {
+        return orderItemRepository.findByOrder(order);
     }
 
     public Order updateOrderStatus(Long orderId, OrderStatus status) {

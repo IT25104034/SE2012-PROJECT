@@ -1,9 +1,11 @@
 package com.hardwarestore.hardwarestore.controller;
 
 import com.hardwarestore.hardwarestore.model.Order;
+import com.hardwarestore.hardwarestore.model.OrderItem;
 import com.hardwarestore.hardwarestore.model.OrderStatus;
 import com.hardwarestore.hardwarestore.model.User;
 import com.hardwarestore.hardwarestore.repository.UserRepository;
+import com.hardwarestore.hardwarestore.repository.OrderRepository;
 import com.hardwarestore.hardwarestore.service.OrderService;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,11 +17,14 @@ public class OrderController {
 
     private final OrderService orderService;
     private final UserRepository userRepository;
+    private final OrderRepository orderRepository;
 
     public OrderController(OrderService orderService,
-                           UserRepository userRepository) {
+                           UserRepository userRepository,
+                           OrderRepository orderRepository) {
         this.orderService = orderService;
         this.userRepository = userRepository;
+        this.orderRepository = orderRepository;
     }
 
     @GetMapping("/customer/{userId}")
@@ -35,5 +40,15 @@ public class OrderController {
     @GetMapping("/status/{status}")
     public List<Order> getOrdersByStatus(@PathVariable OrderStatus status) {
         return orderService.getOrdersByStatus(status);
+    }
+
+    @GetMapping("/{orderId}/items")
+    public List<OrderItem> getOrderItems(@PathVariable Long orderId) {
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() ->
+                        new RuntimeException("Order not found"));
+
+        return orderService.getOrderItems(order);
     }
 }
