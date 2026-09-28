@@ -4,6 +4,7 @@ import CategoryList from "./components/CategoryList.jsx";
 import AddCategoryForm from "./components/AddCategoryForm.jsx";
 import ProductBrowser from "./components/ProductBrowser.jsx";
 import ProductDetails from "./components/ProductDetails.jsx";
+import Cart from "./components/Cart.jsx";
 import { getCategories } from "./services/categoryService.js";
 
 function Brand() {
@@ -12,7 +13,7 @@ function Brand() {
 
 function Storefront() {
   return <div className="flex min-h-screen flex-col bg-slate-50">
-    <header className="border-b border-slate-200 bg-white"><div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 py-5"><Brand /><nav aria-label="Main navigation" className="flex items-center gap-5 text-sm font-semibold"><NavLink to="/products" className={({ isActive }) => isActive ? "text-orange-700" : "text-slate-600"}>Products</NavLink><Link to="/admin/products" className="btn-outline">Management</Link></nav></div></header>
+    <header className="border-b border-slate-200 bg-white"><div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 py-5"><Brand /><nav aria-label="Main navigation" className="flex items-center gap-5 text-sm font-semibold"><NavLink to="/products" className={({ isActive }) => isActive ? "text-orange-700" : "text-slate-600"}>Products</NavLink><NavLink to="/cart" className={({ isActive }) => isActive ? "text-orange-700" : "text-slate-600"}>Cart</NavLink><Link to="/admin/products" className="btn-outline">Management</Link></nav></div></header>
     <main className="mx-auto w-full max-w-7xl flex-1 px-5 py-10"><Outlet /></main>
     <footer className="mt-10 bg-slate-900 px-5 py-10 text-white"><div className="mx-auto flex max-w-7xl flex-wrap justify-between gap-5"><div><p className="font-bold">MUSTAFA HARDWARE</p><p className="mt-2 text-sm text-slate-400">Tools, electronics and supplies for your next project.</p></div><Link to="/products" className="text-sm text-slate-300 hover:text-white">Explore our catalogue →</Link></div></footer>
   </div>;
@@ -33,6 +34,7 @@ export default function App() {
       <Route index element={<Home />} />
       <Route path="products" element={<ProductBrowser key="catalogue" />} />
       <Route path="products/:productId" element={<ProductDetails />} />
+      <Route path="cart" element={<Cart />} />
       <Route path="*" element={<div className="panel p-10"><h1 className="mb-5 text-3xl font-bold">Page not found</h1><Link to="/" className="btn-primary">Return Home</Link></div>} />
     </Route>
     <Route path="admin" element={<Management />}>
