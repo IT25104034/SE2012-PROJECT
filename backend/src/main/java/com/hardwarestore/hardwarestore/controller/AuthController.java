@@ -3,17 +3,14 @@ package com.hardwarestore.hardwarestore.controller;
 import com.hardwarestore.hardwarestore.dto.LoginRequest;
 import com.hardwarestore.hardwarestore.dto.RegisterRequest;
 import com.hardwarestore.hardwarestore.dto.UserResponse;
+import com.hardwarestore.hardwarestore.model.Role;
 import com.hardwarestore.hardwarestore.model.User;
 import com.hardwarestore.hardwarestore.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -31,6 +28,8 @@ public class AuthController {
         this.userService = userService;
     }
 
+
+    // REGISTER
     @PostMapping("/register")
     public ResponseEntity<?> register(
             @Valid @RequestBody RegisterRequest request
@@ -38,18 +37,21 @@ public class AuthController {
         try {
 
             User user = new User();
+
             user.setName(request.getName());
             user.setEmail(request.getEmail());
             user.setPassword(request.getPassword());
 
-            User savedUser = userService.registerUser(user);
+            User savedUser =
+                    userService.registerUser(user);
 
-            UserResponse response = new UserResponse(
-                    savedUser.getId(),
-                    savedUser.getName(),
-                    savedUser.getEmail(),
-                    savedUser.getRole()
-            );
+            UserResponse response =
+                    new UserResponse(
+                            savedUser.getId(),
+                            savedUser.getName(),
+                            savedUser.getEmail(),
+                            savedUser.getRole()
+                    );
 
             return ResponseEntity
                     .status(HttpStatus.CREATED)
@@ -57,12 +59,19 @@ public class AuthController {
 
         } catch (IllegalArgumentException e) {
 
-            return ResponseEntity.badRequest().body(
-                    Map.of("message", e.getMessage())
-            );
+            return ResponseEntity
+                    .badRequest()
+                    .body(
+                            Map.of(
+                                    "message",
+                                    e.getMessage()
+                            )
+                    );
         }
     }
 
+
+    // LOGIN
     @PostMapping("/login")
     public ResponseEntity<?> login(
             @Valid @RequestBody LoginRequest request,
@@ -70,30 +79,123 @@ public class AuthController {
     ) {
         try {
 
-            User user = userService.loginUser(
-                    request.getEmail(),
-                    request.getPassword()
+            User user =
+                    userService.loginUser(
+                            request.getEmail(),
+                            request.getPassword()
+                    );
+
+            // Store logged-in user in session
+            session.setAttribute(
+                    "userId",
+                    user.getId()
             );
 
-            // Store logged-in user's details in the server session
-            session.setAttribute("userId", user.getId());
-            session.setAttribute("email", user.getEmail());
-            session.setAttribute("role", user.getRole());
+            session.setAttribute(
+                    "name",
+                    user.getName()
+            );
 
-            UserResponse response = new UserResponse(
-                    user.getId(),
-                    user.getName(),
-                    user.getEmail(),
+            session.setAttribute(
+                    "email",
+                    user.getEmail()
+            );
+
+            session.setAttribute(
+                    "role",
                     user.getRole()
             );
+
+
+            UserResponse response =
+                    new UserResponse(
+                            user.getId(),
+                            user.getName(),
+                            user.getEmail(),
+                            user.getRole()
+                    );
 
             return ResponseEntity.ok(response);
 
         } catch (IllegalArgumentException e) {
 
-            return ResponseEntity.badRequest().body(
-                    Map.of("message", e.getMessage())
-            );
+            return ResponseEntity
+                    .badRequest()
+                    .body(
+                            Map.of(
+                                    "message",
+                                    e.getMessage()
+                            )
+                    );
         }
+    }
+
+
+    // CURRENT LOGGED-IN USER
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser(
+            HttpSession session
+    ) {
+
+        Long userId =
+                (Long) session.getAttribute(
+                        "userId"
+                );
+
+        if (userId == null) {
+
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(
+                            Map.of(
+                                    "message",
+                                    "Not logged in"
+                            )
+                    );
+        }
+
+
+        String name =
+                (String) session.getAttribute(
+                        "name"
+                );
+
+        String email =
+                (String) session.getAttribute(
+                        "email"
+                );
+
+        Role role =
+                (Role) session.getAttribute(
+                        "role"
+                );
+
+
+        UserResponse response =
+                new UserResponse(
+                        userId,
+                        name,
+                        email,
+                        role
+                );
+
+        return ResponseEntity.ok(response);
+    }
+
+
+    // LOGOUT
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(
+            HttpSession session
+    ) {
+
+        session.invalidate();
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "message",
+                        "Logged out successfully"
+                )
+        );
     }
 }
