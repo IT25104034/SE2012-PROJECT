@@ -1,36 +1,70 @@
 import { useState } from "react";
+
 import {
   useQuery,
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
+
 import {
   getCategories,
   deleteCategory,
 } from "../services/categoryService.js";
+
 import EditCategoryForm from "./EditCategoryForm.jsx";
 
+
 export default function CategoryList() {
-  const [editingCategory, setEditingCategory] = useState(null);
+
+  const [editingCategory, setEditingCategory] =
+      useState(null);
+
+  const [deleteMessage, setDeleteMessage] =
+      useState("");
+
   const queryClient = useQueryClient();
-  const [deleteMessage, setDeleteMessage] = useState("");
+
 
   const deleteMutation = useMutation({
     mutationFn: deleteCategory,
+
     onSuccess: async () => {
-      setDeleteMessage("Category deleted successfully.");
-      await queryClient.invalidateQueries({ queryKey: ["categories"] });
-      await queryClient.invalidateQueries({ queryKey: ["products"] });
+
+      setDeleteMessage(
+          "Category deleted successfully."
+      );
+
+      await queryClient.invalidateQueries({
+        queryKey: ["categories"],
+      });
+
+      await queryClient.invalidateQueries({
+        queryKey: ["products"],
+      });
     },
   });
 
+
   function handleDelete(category) {
-    if (deleteMutation.isPending) return;
-    if (window.confirm(`Permanently delete "${category.name}"?`)) {
+
+    if (deleteMutation.isPending) {
+      return;
+    }
+
+    if (
+        window.confirm(
+            `Permanently delete "${category.name}"?`
+        )
+    ) {
+
       setDeleteMessage("");
-      deleteMutation.mutate(category.categoryId);
+
+      deleteMutation.mutate(
+          category.categoryId
+      );
     }
   }
+
 
   const {
     data: categories = [],
@@ -44,141 +78,300 @@ export default function CategoryList() {
     queryFn: getCategories,
   });
 
+
   return (
-    <section className="mt-10 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-      <div className="flex items-center justify-between gap-4 border-b border-slate-200 p-6">
-        <div>
-          <h2 className="text-xl font-bold text-slate-900">
-            Categories
-          </h2>
+      <section className="mt-10 overflow-hidden rounded-xl border border-black/10 bg-white">
 
-          <p className="mt-1 text-sm text-slate-500">
-            Browse your product categories.
-          </p>
+        {/* HEADER */}
+
+        <div className="flex flex-col justify-between gap-6 border-b border-black/10 bg-[#f8f6f1] px-6 py-6 sm:flex-row sm:items-center sm:px-8">
+
+          <div>
+
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-orange-600">
+              Catalogue Structure
+            </p>
+
+            <h2 className="mt-2 text-2xl font-black sm:text-3xl">
+              Product Categories
+            </h2>
+
+            <p className="mt-2 text-sm text-black/45">
+              Manage the categories used across the
+              Mustafa Hardware catalogue.
+            </p>
+
+          </div>
+
+
+          <button
+              type="button"
+              onClick={() => refetch()}
+              disabled={isFetching}
+              className="btn-outline self-start sm:self-auto"
+          >
+            {isFetching
+                ? "Refreshing..."
+                : "Refresh"}
+          </button>
+
         </div>
 
-        <button
-          type="button"
-          onClick={() => refetch()}
-          disabled={isFetching}
-          className="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {isFetching ? "Loading..." : "Refresh"}
-        </button>
-      </div>
 
-      {deleteMessage && (
-        <p role="status" className="m-6 rounded-md bg-green-50 p-3 text-sm text-green-700">
-          {deleteMessage}
-        </p>
-      )}
+        {/* DELETE SUCCESS */}
 
-      {deleteMutation.isError && (
-        <p role="alert" className="m-6 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-          {deleteMutation.error.response?.data?.message ||
-            "Unable to delete this category. It may be linked to products, or the server may be unavailable."}
-        </p>
-      )}
+        {deleteMessage && (
+            <div
+                role="status"
+                className="m-6 rounded-xl border border-green-200 bg-green-50 px-5 py-4 text-sm font-bold text-green-800 sm:m-8"
+            >
+              {deleteMessage}
+            </div>
+        )}
 
-      {editingCategory && (
-        <EditCategoryForm
-          key={editingCategory.categoryId}
-          category={editingCategory}
-          onClose={() => setEditingCategory(null)}
-        />
-      )}
 
-      {isPending ? (
-        <p role="status" className="p-6 text-sm text-slate-500">
-          Loading categories...
-        </p>
-      ) : isError ? (
-        <div role="alert" className="m-6 rounded-md bg-red-50 p-4">
-          <p className="font-semibold text-red-700">
-            Unable to load categories
-          </p>
+        {/* DELETE ERROR */}
 
-          <p className="mt-1 text-sm text-red-600">
-            {error.response?.data?.message || error.message}
-          </p>
-        </div>
-      ) : categories.length === 0 ? (
-        <p className="p-6 text-sm text-slate-500">
-          No categories have been added yet.
-        </p>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-slate-200 bg-slate-50 text-slate-500">
-              <tr>
-                <th scope="col" className="px-6 py-3 font-semibold">
-                  ID
-                </th>
+        {deleteMutation.isError && (
+            <div
+                role="alert"
+                className="m-6 rounded-xl border border-red-200 bg-red-50 px-5 py-4 text-sm font-semibold text-red-700 sm:m-8"
+            >
+              {deleteMutation.error.response?.data
+                      ?.message ||
+                  "Unable to delete this category. It may be linked to products."}
+            </div>
+        )}
 
-                <th scope="col" className="px-6 py-3 font-semibold">
-                  Category
-                </th>
 
-                <th scope="col" className="px-6 py-3 font-semibold">
-                  Description
-                </th>
+        {/* EDIT FORM */}
 
-                <th scope="col" className="px-6 py-3 font-semibold">
-                  Actions
-                </th>
-              </tr>
-            </thead>
+        {editingCategory && (
+            <div className="border-b border-black/10 bg-[#f3f1eb] p-6 sm:p-8">
 
-            <tbody className="divide-y divide-slate-100">
-              {categories.map((category) => (
-                <tr
-                  key={category.categoryId}
-                  className="hover:bg-slate-50"
-                >
-                  <td className="px-6 py-4 text-slate-500">
-                    {category.categoryId}
-                  </td>
+              <EditCategoryForm
+                  key={
+                    editingCategory.categoryId
+                  }
+                  category={editingCategory}
+                  onClose={() =>
+                      setEditingCategory(null)
+                  }
+              />
 
-                  <td className="px-6 py-4 font-semibold text-slate-900">
-                    {category.name}
-                  </td>
+            </div>
+        )}
 
-                  <td className="px-6 py-4 text-slate-600">
-                    {category.description || "—"}
-                  </td>
 
-                  <td className="px-6 py-4">
-                    <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        deleteMutation.reset();
-                        setDeleteMessage("");
-                        setEditingCategory(category);
-                      }}
-                      disabled={editingCategory !== null || deleteMutation.isPending}
-                      className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-100 disabled:opacity-50"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(category)}
-                      disabled={editingCategory !== null || deleteMutation.isPending}
-                      className="rounded-md bg-red-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      {deleteMutation.isPending && deleteMutation.variables === category.categoryId
-                        ? "Deleting..."
-                        : "Delete"}
-                    </button>
-                    </div>
-                  </td>
+        {/* CONTENT */}
+
+        {isPending ? (
+
+            <div className="p-8">
+
+              <p className="section-kicker">
+                Categories
+              </p>
+
+              <h3 className="mt-3 text-xl font-black">
+                Loading categories...
+              </h3>
+
+            </div>
+
+        ) : isError ? (
+
+            <div
+                role="alert"
+                className="m-6 rounded-xl border border-orange-200 bg-orange-50 p-6 sm:m-8"
+            >
+
+              <p className="section-kicker">
+                Connection Error
+              </p>
+
+              <h3 className="mt-3 text-xl font-black">
+                Unable to load categories.
+              </h3>
+
+              <p className="mt-2 text-sm text-black/50">
+                {error.response?.data?.message ||
+                    error.message}
+              </p>
+
+              <button
+                  className="btn-primary mt-5"
+                  onClick={() => refetch()}
+              >
+                Retry
+              </button>
+
+            </div>
+
+        ) : categories.length === 0 ? (
+
+            <div className="p-10 text-center">
+
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#171717] text-lg font-black text-orange-500">
+                MH
+              </div>
+
+              <h3 className="mt-5 text-2xl font-black">
+                No categories yet.
+              </h3>
+
+              <p className="mx-auto mt-2 max-w-md text-sm leading-7 text-black/45">
+                Create your first category using the
+                form above.
+              </p>
+
+            </div>
+
+        ) : (
+
+            <div className="overflow-x-auto">
+
+              <table className="w-full min-w-[800px] text-left text-sm">
+
+                <thead className="bg-[#171717] text-white">
+
+                <tr>
+
+                  {[
+                    "ID",
+                    "Category",
+                    "Description",
+                    "Actions",
+                  ].map((title) => (
+
+                      <th
+                          key={title}
+                          scope="col"
+                          className="px-6 py-4 text-xs font-black uppercase tracking-[0.12em]"
+                      >
+                        {title}
+                      </th>
+
+                  ))}
+
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </section>
+
+                </thead>
+
+
+                <tbody className="divide-y divide-black/5">
+
+                {categories.map(
+                    (category, index) => (
+
+                        <tr
+                            key={
+                              category.categoryId
+                            }
+                            className="transition hover:bg-[#faf8f4]"
+                        >
+
+                          {/* ID */}
+                          <td className="px-6 py-5">
+
+                      <span className="inline-flex h-9 min-w-9 items-center justify-center rounded-full bg-orange-100 px-3 text-xs font-black text-orange-700">
+                        {String(
+                            index + 1
+                        ).padStart(2, "0")}
+                      </span>
+
+                          </td>
+
+
+                          {/* NAME */}
+                          <td className="px-6 py-5">
+
+                            <p className="font-black text-black">
+                              {category.name}
+                            </p>
+
+                            <p className="mt-1 text-xs text-black/35">
+                              Category ID:{" "}
+                              {category.categoryId}
+                            </p>
+
+                          </td>
+
+
+                          {/* DESCRIPTION */}
+                          <td className="max-w-md px-6 py-5 text-sm leading-6 text-black/50">
+
+                            {category.description ||
+                                "No description provided."}
+
+                          </td>
+
+
+                          {/* ACTIONS */}
+                          <td className="px-6 py-5">
+
+                            <div className="flex gap-2">
+
+                              <button
+                                  type="button"
+                                  onClick={() => {
+
+                                    deleteMutation.reset();
+
+                                    setDeleteMessage("");
+
+                                    setEditingCategory(
+                                        category
+                                    );
+                                  }}
+                                  disabled={
+                                      editingCategory !==
+                                      null ||
+                                      deleteMutation.isPending
+                                  }
+                                  className="btn-outline"
+                              >
+                                Edit
+                              </button>
+
+
+                              <button
+                                  type="button"
+                                  onClick={() =>
+                                      handleDelete(
+                                          category
+                                      )
+                                  }
+                                  disabled={
+                                      editingCategory !==
+                                      null ||
+                                      deleteMutation.isPending
+                                  }
+                                  className="btn-danger"
+                              >
+                                {deleteMutation.isPending &&
+                                deleteMutation.variables ===
+                                category.categoryId
+                                    ? "Deleting..."
+                                    : "Delete"}
+                              </button>
+
+                            </div>
+
+                          </td>
+
+                        </tr>
+
+                    )
+                )}
+
+                </tbody>
+
+              </table>
+
+            </div>
+        )}
+
+      </section>
   );
 }

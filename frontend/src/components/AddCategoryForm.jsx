@@ -1,13 +1,19 @@
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
+
 import { createCategory } from "../services/categoryService.js";
 
 export default function AddCategoryForm() {
   const queryClient = useQueryClient();
 
   const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
+  const [description, setDescription] =
+      useState("");
+  const [successMessage, setSuccessMessage] =
+      useState("");
 
   const createMutation = useMutation({
     mutationFn: createCategory,
@@ -15,7 +21,9 @@ export default function AddCategoryForm() {
     onSuccess: () => {
       setName("");
       setDescription("");
-      setSuccessMessage("Category created successfully.");
+      setSuccessMessage(
+          "Category created successfully."
+      );
 
       queryClient.invalidateQueries({
         queryKey: ["categories"],
@@ -23,137 +31,195 @@ export default function AddCategoryForm() {
     },
   });
 
-  const errorData = createMutation.error?.response?.data;
+  const errorData =
+      createMutation.error?.response?.data;
 
   const fieldErrors =
-    errorData && typeof errorData === "object" && !errorData.message
-      ? errorData
-      : {};
+      errorData &&
+      typeof errorData === "object" &&
+      !errorData.message
+          ? errorData
+          : {};
 
-  const generalError = createMutation.isError
-    ? errorData?.message ||
-      (Object.keys(fieldErrors).length === 0
-        ? "Unable to save the category. Please try again."
-        : "")
-    : "";
+  const generalError =
+      createMutation.isError
+          ? errorData?.message ||
+          (Object.keys(fieldErrors).length === 0
+              ? "Unable to save the category. Please try again."
+              : "")
+          : "";
 
   function handleSubmit(event) {
     event.preventDefault();
 
-    if (createMutation.isPending) return;
+    if (createMutation.isPending) {
+      return;
+    }
 
     setSuccessMessage("");
 
     createMutation.mutate({
       name: name.trim(),
-      description: description.trim() || null,
+      description:
+          description.trim() || null,
     });
   }
 
   return (
-    <section className="mt-10 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-      <h2 className="text-xl font-bold text-slate-900">
-        Add Category
-      </h2>
+      <section className="mt-10 overflow-hidden rounded-xl border border-black/10 bg-white">
 
-      <p className="mt-1 text-sm text-slate-500">
-        Create a category to organize your products.
-      </p>
+        {/* HEADER */}
+        <div className="bg-[#171717] px-6 py-6 text-white sm:px-8">
 
-      {successMessage && (
-        <p
-          role="status"
-          className="mt-4 rounded-md border border-green-200 bg-green-50 p-3 text-sm text-green-700"
-        >
-          {successMessage}
-        </p>
-      )}
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-orange-500">
+            Create Category
+          </p>
 
-      {generalError && (
-        <p
-          role="alert"
-          className="mt-4 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700"
-        >
-          {generalError}
-        </p>
-      )}
+          <h2 className="mt-2 text-2xl font-black sm:text-3xl">
+            Add New Category
+          </h2>
 
-      <form onSubmit={handleSubmit} noValidate className="mt-6 space-y-4">
-        <div>
-          <label
-            htmlFor="category-name"
-            className="mb-1 block text-sm font-semibold text-slate-700"
-          >
-            Category name *
-          </label>
+          <p className="mt-2 max-w-xl text-sm leading-6 text-white/45">
+            Organize products into clear groups
+            so customers can browse the catalogue
+            faster.
+          </p>
 
-          <input
-            id="category-name"
-            type="text"
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            maxLength={100}
-            required
-            disabled={createMutation.isPending}
-            aria-invalid={Boolean(fieldErrors.name)}
-            aria-describedby={fieldErrors.name ? "category-name-error" : undefined}
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-50"
-            placeholder="e.g. Hand Tools"
-          />
-
-          {fieldErrors.name && (
-            <p
-              id="category-name-error"
-              role="alert"
-              className="mt-1 text-sm text-red-600"
-            >
-              {fieldErrors.name}
-            </p>
-          )}
         </div>
 
-        <div>
-          <label
-            htmlFor="category-description"
-            className="mb-1 block text-sm font-semibold text-slate-700"
-          >
-            Description
-          </label>
-
-          <textarea
-            id="category-description"
-            value={description}
-            onChange={(event) => setDescription(event.target.value)}
-            maxLength={500}
-            rows={3}
-            disabled={createMutation.isPending}
-            aria-invalid={Boolean(fieldErrors.description)}
-            aria-describedby={
-              fieldErrors.description ? "category-description-error" : undefined
-            }
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-50"
-            placeholder="Describe the products in this category"
-          />
-
-          {fieldErrors.description && (
-            <p
-              id="category-description-error"
-              role="alert"
-              className="mt-1 text-sm text-red-600"
+        {/* SUCCESS */}
+        {successMessage && (
+            <div
+                role="status"
+                className="border-b border-green-200 bg-green-50 px-6 py-4 text-sm font-bold text-green-800 sm:px-8"
             >
-              {fieldErrors.description}
-            </p>
-          )}
-        </div>
+              {successMessage}
+            </div>
+        )}
 
-        <button
-          type="submit"
-          disabled={createMutation.isPending}
-          className="rounded-md bg-orange-600 px-4 py-2 text-sm font-bold text-white hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50"
+        {/* ERROR */}
+        {generalError && (
+            <div
+                role="alert"
+                className="border-b border-red-200 bg-red-50 px-6 py-4 text-sm font-bold text-red-700 sm:px-8"
+            >
+              {generalError}
+            </div>
+        )}
+
+        <form
+            onSubmit={handleSubmit}
+            noValidate
+            className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[1fr_1fr_auto] lg:items-start"
         >
-          {createMutation.isPending ? "Saving..." : "Save Category"}
-        </button>
-      </form>
-    </section>
+
+          {/* CATEGORY NAME */}
+          <div>
+
+            <label
+                htmlFor="category-name"
+                className="mb-2 block text-xs font-black uppercase tracking-[0.12em] text-black/50"
+            >
+              Category Name *
+            </label>
+
+            <input
+                id="category-name"
+                type="text"
+                value={name}
+                onChange={(event) =>
+                    setName(event.target.value)
+                }
+                maxLength={100}
+                required
+                disabled={createMutation.isPending}
+                aria-invalid={Boolean(
+                    fieldErrors.name
+                )}
+                aria-describedby={
+                  fieldErrors.name
+                      ? "category-name-error"
+                      : undefined
+                }
+                className="w-full rounded-lg border border-black/10 bg-[#f8f6f1] px-4 py-3.5 text-sm font-medium text-black outline-none transition placeholder:text-black/25 focus:border-orange-500 focus:bg-white disabled:opacity-50"
+                placeholder="e.g. Power Tools"
+            />
+
+            {fieldErrors.name && (
+                <p
+                    id="category-name-error"
+                    role="alert"
+                    className="mt-2 text-xs font-bold text-red-600"
+                >
+                  {fieldErrors.name}
+                </p>
+            )}
+
+          </div>
+
+          {/* DESCRIPTION */}
+          <div>
+
+            <label
+                htmlFor="category-description"
+                className="mb-2 block text-xs font-black uppercase tracking-[0.12em] text-black/50"
+            >
+              Description
+            </label>
+
+            <textarea
+                id="category-description"
+                value={description}
+                onChange={(event) =>
+                    setDescription(
+                        event.target.value
+                    )
+                }
+                maxLength={500}
+                rows={3}
+                disabled={createMutation.isPending}
+                aria-invalid={Boolean(
+                    fieldErrors.description
+                )}
+                aria-describedby={
+                  fieldErrors.description
+                      ? "category-description-error"
+                      : undefined
+                }
+                className="w-full resize-none rounded-lg border border-black/10 bg-[#f8f6f1] px-4 py-3.5 text-sm font-medium leading-6 text-black outline-none transition placeholder:text-black/25 focus:border-orange-500 focus:bg-white disabled:opacity-50"
+                placeholder="Describe products in this category..."
+            />
+
+            {fieldErrors.description && (
+                <p
+                    id="category-description-error"
+                    role="alert"
+                    className="mt-2 text-xs font-bold text-red-600"
+                >
+                  {fieldErrors.description}
+                </p>
+            )}
+
+          </div>
+
+          {/* BUTTON */}
+          <div className="lg:pt-[26px]">
+
+            <button
+                type="submit"
+                disabled={
+                  createMutation.isPending
+                }
+                className="btn-primary w-full whitespace-nowrap lg:w-auto"
+            >
+              {createMutation.isPending
+                  ? "Saving..."
+                  : "+ Add Category"}
+            </button>
+
+          </div>
+
+        </form>
+      </section>
   );
 }
