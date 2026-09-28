@@ -13,6 +13,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/inventory")
+@CrossOrigin(
+        origins = "http://localhost:5173",
+        allowCredentials = "true"
+)
 public class InventoryController {
 
     private final InventoryService inventoryService;
@@ -32,19 +36,10 @@ public class InventoryController {
     public ResponseEntity<?> getProductById(
             @PathVariable Long productId
     ) {
-        try {
+        Product product =
+                inventoryService.getProductById(productId);
 
-            Product product =
-                    inventoryService.getProductById(productId);
-
-            return ResponseEntity.ok(product);
-
-        } catch (IllegalArgumentException e) {
-
-            return ResponseEntity.badRequest().body(
-                    Map.of("message", e.getMessage())
-            );
-        }
+        return ResponseEntity.ok(product);
     }
 
     @PutMapping("/{productId}/stock")
@@ -57,7 +52,7 @@ public class InventoryController {
 
             Role role = (Role) session.getAttribute("role");
 
-            // User has not logged in
+            // User is not logged in
             if (role == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                         Map.of("message", "Please login first")
