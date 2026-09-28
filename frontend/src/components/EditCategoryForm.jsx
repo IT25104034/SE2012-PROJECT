@@ -17,6 +17,7 @@ export default function EditCategoryForm({ category, onClose }) {
       await queryClient.invalidateQueries({
         queryKey: ["categories"],
       });
+      await queryClient.invalidateQueries({ queryKey: ["products"] });
 
       onClose();
     },

@@ -2,6 +2,8 @@ package com.hardwarestore.hardwarestore.model;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "cart_items")
 public class CartItem {
@@ -21,13 +23,17 @@ public class CartItem {
     @Column(nullable = false)
     private Integer quantity;
 
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal unitPrice;
+
     public CartItem() {
     }
 
-    public CartItem(Cart cart, Product product, Integer quantity) {
+    public CartItem(Cart cart, Product product, Integer quantity, BigDecimal unitPrice) {
         this.cart = cart;
         this.product = product;
         this.quantity = quantity;
+        this.unitPrice = unitPrice;
     }
 
     public Long getCartItemId() {
@@ -60,5 +66,13 @@ public class CartItem {
 
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
+    }
+
+    public BigDecimal getUnitPrice() {
+        return unitPrice;
+    }
+
+    public void setUnitPrice(BigDecimal unitPrice) {
+        this.unitPrice = unitPrice;
     }
 }

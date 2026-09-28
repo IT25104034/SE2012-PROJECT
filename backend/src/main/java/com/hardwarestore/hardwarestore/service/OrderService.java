@@ -15,6 +15,7 @@ import com.hardwarestore.hardwarestore.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -58,7 +59,7 @@ public class OrderService {
             );
         }
 
-        // Check stock before creating the order
+        // Validate stock before creating the order
         for (CartItem cartItem : cartItems) {
 
             Product product = cartItem.getProduct();
@@ -71,14 +72,52 @@ public class OrderService {
             }
         }
 
+        // Validate cart item quantity and stored unit price
+        for (CartItem cartItem : cartItems) {
+
+            if (cartItem.getQuantity() == null
+                    || cartItem.getQuantity() <= 0) {
+                throw new IllegalArgumentException(
+                        "Cart item quantity must be greater than zero"
+                );
+            }
+
+            if (cartItem.getUnitPrice() == null
+                    || cartItem.getUnitPrice()
+                    .compareTo(BigDecimal.ZERO) < 0) {
+                throw new IllegalArgumentException(
+                        "Cart item price cannot be negative"
+                );
+            }
+        }
+
+        // Calculate total order amount
+        BigDecimal totalAmount = BigDecimal.ZERO;
+
+        for (CartItem cartItem : cartItems) {
+
+            BigDecimal itemTotal =
+                    cartItem.getUnitPrice()
+                            .multiply(
+                                    BigDecimal.valueOf(
+                                            cartItem.getQuantity()
+                                    )
+                            );
+
+            totalAmount = totalAmount.add(itemTotal);
+        }
+
+        // Create order
         Order order = new Order(
                 customer,
                 LocalDateTime.now(),
+                totalAmount,
                 OrderStatus.PENDING
         );
 
         order = orderRepository.save(order);
 
+        // Create order items and reduce inventory stock
         for (CartItem cartItem : cartItems) {
 
             Product product = cartItem.getProduct();
@@ -87,12 +126,11 @@ public class OrderService {
                     order,
                     product,
                     cartItem.getQuantity(),
-                    product.getPrice()
+                    cartItem.getUnitPrice()
             );
 
             orderItemRepository.save(orderItem);
 
-            // Reduce inventory stock
             int newQuantity =
                     product.getQuantity()
                             - cartItem.getQuantity();
@@ -105,6 +143,9 @@ public class OrderService {
         // Clear cart after successful checkout
         cartItemRepository.deleteAll(cartItems);
 
+        cart.setTotalAmount(BigDecimal.ZERO);
+        cartRepository.save(cart);
+
         return order;
     }
 
@@ -114,6 +155,10 @@ public class OrderService {
 
     public List<Order> getOrdersByStatus(OrderStatus status) {
         return orderRepository.findByStatus(status);
+    }
+
+    public List<OrderItem> getOrderItems(Order order) {
+        return orderItemRepository.findByOrder(order);
     }
 
     public Order updateOrderStatus(
@@ -132,5 +177,4 @@ public class OrderService {
 
         return orderRepository.save(order);
     }
-
 }
