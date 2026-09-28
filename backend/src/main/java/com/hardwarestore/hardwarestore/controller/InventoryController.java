@@ -1,7 +1,10 @@
 package com.hardwarestore.hardwarestore.controller;
 
 import com.hardwarestore.hardwarestore.model.Product;
+import com.hardwarestore.hardwarestore.model.Role;
 import com.hardwarestore.hardwarestore.service.InventoryService;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,6 +13,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/inventory")
+@CrossOrigin(
+        origins = "http://localhost:5173",
+        allowCredentials = "true"
+)
 public class InventoryController {
 
     private final InventoryService inventoryService;
@@ -29,26 +36,36 @@ public class InventoryController {
     public ResponseEntity<?> getProductById(
             @PathVariable Long productId
     ) {
-        try {
-            Product product =
-                    inventoryService.getProductById(productId);
+        Product product =
+                inventoryService.getProductById(productId);
 
-            return ResponseEntity.ok(product);
-
-        } catch (IllegalArgumentException e) {
-
-            return ResponseEntity.badRequest().body(
-                    Map.of("message", e.getMessage())
-            );
-        }
+        return ResponseEntity.ok(product);
     }
 
     @PutMapping("/{productId}/stock")
     public ResponseEntity<?> updateStock(
             @PathVariable Long productId,
-            @RequestBody Map<String, Integer> request
+            @RequestBody Map<String, Integer> request,
+            HttpSession session
     ) {
         try {
+
+            Role role = (Role) session.getAttribute("role");
+
+            // User is not logged in
+            if (role == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                        Map.of("message", "Please login first")
+                );
+            }
+
+            // Logged-in user is not an admin
+            if (role != Role.ADMIN) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                        Map.of("message", "Admin access required")
+                );
+            }
+
             Integer quantity = request.get("quantity");
 
             if (quantity == null) {

@@ -5,11 +5,13 @@ import com.hardwarestore.hardwarestore.model.CartItem;
 import com.hardwarestore.hardwarestore.model.Order;
 import com.hardwarestore.hardwarestore.model.OrderItem;
 import com.hardwarestore.hardwarestore.model.OrderStatus;
+import com.hardwarestore.hardwarestore.model.Product;
 import com.hardwarestore.hardwarestore.model.User;
 import com.hardwarestore.hardwarestore.repository.CartItemRepository;
 import com.hardwarestore.hardwarestore.repository.CartRepository;
 import com.hardwarestore.hardwarestore.repository.OrderItemRepository;
 import com.hardwarestore.hardwarestore.repository.OrderRepository;
+import com.hardwarestore.hardwarestore.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,29 +26,53 @@ public class OrderService {
     private final CartItemRepository cartItemRepository;
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
+    private final ProductRepository productRepository;
 
-    public OrderService(CartRepository cartRepository,
-                        CartItemRepository cartItemRepository,
-                        OrderRepository orderRepository,
-                        OrderItemRepository orderItemRepository) {
+    public OrderService(
+            CartRepository cartRepository,
+            CartItemRepository cartItemRepository,
+            OrderRepository orderRepository,
+            OrderItemRepository orderItemRepository,
+            ProductRepository productRepository
+    ) {
         this.cartRepository = cartRepository;
         this.cartItemRepository = cartItemRepository;
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
+        this.productRepository = productRepository;
     }
 
     @Transactional
     public Order checkout(User customer) {
 
         Cart cart = cartRepository.findByCustomer(customer)
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Cart not found")
+                );
 
-        List<CartItem> cartItems = cartItemRepository.findByCart(cart);
+        List<CartItem> cartItems =
+                cartItemRepository.findByCart(cart);
 
         if (cartItems.isEmpty()) {
-            throw new RuntimeException("Cannot checkout an empty cart");
+            throw new IllegalArgumentException(
+                    "Cannot checkout an empty cart"
+            );
         }
 
+        // Validate stock before creating the order
+        for (CartItem cartItem : cartItems) {
+
+            Product product = cartItem.getProduct();
+
+            if (product.getQuantity() < cartItem.getQuantity()) {
+                throw new IllegalArgumentException(
+                        "Not enough stock for product: "
+                                + product.getName()
+                );
+            }
+        }
+
+        // Validate cart item quantity and stored unit price
         for (CartItem cartItem : cartItems) {
 
             if (cartItem.getQuantity() == null
@@ -57,23 +83,31 @@ public class OrderService {
             }
 
             if (cartItem.getUnitPrice() == null
-                    || cartItem.getUnitPrice().compareTo(BigDecimal.ZERO) < 0) {
+                    || cartItem.getUnitPrice()
+                    .compareTo(BigDecimal.ZERO) < 0) {
                 throw new IllegalArgumentException(
                         "Cart item price cannot be negative"
                 );
             }
         }
 
+        // Calculate total order amount
         BigDecimal totalAmount = BigDecimal.ZERO;
 
         for (CartItem cartItem : cartItems) {
 
-            BigDecimal itemTotal = cartItem.getUnitPrice()
-                    .multiply(BigDecimal.valueOf(cartItem.getQuantity()));
+            BigDecimal itemTotal =
+                    cartItem.getUnitPrice()
+                            .multiply(
+                                    BigDecimal.valueOf(
+                                            cartItem.getQuantity()
+                                    )
+                            );
 
             totalAmount = totalAmount.add(itemTotal);
         }
 
+        // Create order
         Order order = new Order(
                 customer,
                 LocalDateTime.now(),
@@ -83,18 +117,30 @@ public class OrderService {
 
         order = orderRepository.save(order);
 
+        // Create order items and reduce inventory stock
         for (CartItem cartItem : cartItems) {
+
+            Product product = cartItem.getProduct();
 
             OrderItem orderItem = new OrderItem(
                     order,
-                    cartItem.getProduct(),
+                    product,
                     cartItem.getQuantity(),
                     cartItem.getUnitPrice()
             );
 
             orderItemRepository.save(orderItem);
+
+            int newQuantity =
+                    product.getQuantity()
+                            - cartItem.getQuantity();
+
+            product.setQuantity(newQuantity);
+
+            productRepository.save(product);
         }
 
+        // Clear cart after successful checkout
         cartItemRepository.deleteAll(cartItems);
 
         cart.setTotalAmount(BigDecimal.ZERO);
@@ -115,10 +161,17 @@ public class OrderService {
         return orderItemRepository.findByOrder(order);
     }
 
-    public Order updateOrderStatus(Long orderId, OrderStatus status) {
+    public Order updateOrderStatus(
+            Long orderId,
+            OrderStatus status
+    ) {
 
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "Order not found"
+                        )
+                );
 
         order.setStatus(status);
 

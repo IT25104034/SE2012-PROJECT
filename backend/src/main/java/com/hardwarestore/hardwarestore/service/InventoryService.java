@@ -1,5 +1,6 @@
 package com.hardwarestore.hardwarestore.service;
 
+import com.hardwarestore.hardwarestore.exception.ResourceNotFoundException;
 import com.hardwarestore.hardwarestore.model.Product;
 import com.hardwarestore.hardwarestore.repository.ProductRepository;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,9 @@ public class InventoryService {
     public Product getProductById(Long productId) {
         return productRepository.findById(productId)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Product not found")
+                        new ResourceNotFoundException(
+                                "Product not found with id: " + productId
+                        )
                 );
     }
 
