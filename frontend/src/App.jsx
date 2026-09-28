@@ -11,8 +11,6 @@ import {
 
 import { useQuery } from "@tanstack/react-query";
 
-import { useAuth } from "./context/AuthContext.jsx";
-
 import mustafaLogo from "./assets/mustafa-hardware-logo.png";
 
 import CategoryList from "./components/CategoryList.jsx";
@@ -22,10 +20,13 @@ import ProductDetails from "./components/ProductDetails.jsx";
 import Cart from "./components/Cart.jsx";
 import OrderList from "./components/OrderList.jsx";
 
-import { getCategories } from "./services/categoryService.js";
-
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
+import InventoryDashboard from "./pages/InventoryDashboard.jsx";
+
+import { getCategories } from "./services/categoryService.js";
+
+import { useAuth } from "./context/AuthContext.jsx";
 
 
 function Brand() {
@@ -46,7 +47,6 @@ function Brand() {
 
 
 function Storefront() {
-
     const navigate = useNavigate();
 
     const {
@@ -119,6 +119,7 @@ function Storefront() {
                         {/* AUTH AREA */}
                         {!checkingSession && (
                             <>
+
                                 {!isAuthenticated ? (
 
                                     /* GUEST */
@@ -142,7 +143,7 @@ function Storefront() {
 
                                 ) : (
 
-                                    /* LOGGED IN */
+                                    /* LOGGED IN USER */
                                     <div className="flex items-center gap-3">
 
                                         <div className="hidden border-l border-white/10 pl-5 sm:block">
@@ -180,6 +181,7 @@ function Storefront() {
                                     </div>
 
                                 )}
+
                             </>
                         )}
 
@@ -239,8 +241,9 @@ function Storefront() {
         </div>
     );
 }
-function Home() {
 
+
+function Home() {
     const categories = useQuery({
         queryKey: ["categories"],
         queryFn: getCategories,
@@ -268,6 +271,7 @@ function Home() {
 
 
                         <h1 className="display-title mt-7 max-w-5xl text-6xl text-white sm:text-7xl lg:text-[110px]">
+
                             BUILT FOR
 
                             <span className="block text-orange-500">
@@ -375,6 +379,7 @@ function Home() {
                             Mustafa Hardware
                         </p>
 
+
                         <h2 className="section-title mt-4 text-4xl sm:text-5xl">
 
                             Tools should work
@@ -404,7 +409,7 @@ function Home() {
             </section>
 
 
-            {/* DARK FEATURE STRIP */}
+            {/* FEATURE STRIP */}
             <section className="bg-[#151515] px-5 py-6 text-white lg:px-8">
 
                 <div className="mx-auto grid max-w-[1400px] gap-6 sm:grid-cols-3">
@@ -618,10 +623,10 @@ function Home() {
 
 
 function Management() {
-
     return (
         <div className="min-h-screen bg-slate-100 md:flex">
 
+            {/* ADMIN SIDEBAR */}
             <aside className="bg-slate-900 p-5 text-white md:w-60 md:shrink-0">
 
                 <Brand />
@@ -640,13 +645,14 @@ function Management() {
                     {[
                         ["/admin/products", "Products"],
                         ["/admin/categories", "Categories"],
+                        ["/admin/inventory", "Inventory"],
                     ].map(([to, label]) => (
 
                         <NavLink
                             key={to}
                             to={to}
                             className={({ isActive }) =>
-                                `rounded-md px-4 py-3 text-sm font-semibold ${
+                                `rounded-md px-4 py-3 text-sm font-semibold transition ${
                                     isActive
                                         ? "bg-orange-600 text-white"
                                         : "text-slate-300 hover:bg-slate-800"
@@ -671,6 +677,7 @@ function Management() {
             </aside>
 
 
+            {/* ADMIN CONTENT */}
             <main className="min-w-0 flex-1 p-5 md:p-10">
                 <Outlet />
             </main>
@@ -681,13 +688,15 @@ function Management() {
 
 
 export default function App() {
-
     return (
         <BrowserRouter>
 
             <Routes>
 
-                {/* CUSTOMER / STOREFRONT */}
+                {/* ===================================
+            CUSTOMER / STOREFRONT
+            =================================== */}
+
                 <Route element={<Storefront />}>
 
                     <Route
@@ -763,7 +772,10 @@ export default function App() {
                 </Route>
 
 
-                {/* ADMIN */}
+                {/* ===================================
+            ADMIN MANAGEMENT
+            =================================== */}
+
                 <Route
                     path="admin"
                     element={<Management />}
@@ -780,6 +792,7 @@ export default function App() {
                     />
 
 
+                    {/* ADMIN PRODUCTS */}
                     <Route
                         path="products"
                         element={
@@ -791,6 +804,7 @@ export default function App() {
                     />
 
 
+                    {/* ADMIN CATEGORIES */}
                     <Route
                         path="categories"
                         element={
@@ -813,6 +827,15 @@ export default function App() {
                                 <CategoryList />
 
                             </>
+                        }
+                    />
+
+
+                    {/* ADMIN INVENTORY */}
+                    <Route
+                        path="inventory"
+                        element={
+                            <InventoryDashboard />
                         }
                     />
 
