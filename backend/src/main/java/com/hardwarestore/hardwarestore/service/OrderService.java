@@ -11,7 +11,9 @@ import com.hardwarestore.hardwarestore.repository.CartRepository;
 import com.hardwarestore.hardwarestore.repository.OrderItemRepository;
 import com.hardwarestore.hardwarestore.repository.OrderRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -33,6 +35,7 @@ public class OrderService {
         this.orderItemRepository = orderItemRepository;
     }
 
+    @Transactional
     public Order checkout(User customer) {
 
         Cart cart = cartRepository.findByCustomer(customer)
@@ -44,9 +47,37 @@ public class OrderService {
             throw new RuntimeException("Cannot checkout an empty cart");
         }
 
+        for (CartItem cartItem : cartItems) {
+
+            if (cartItem.getQuantity() == null
+                    || cartItem.getQuantity() <= 0) {
+                throw new IllegalArgumentException(
+                        "Cart item quantity must be greater than zero"
+                );
+            }
+
+            if (cartItem.getUnitPrice() == null
+                    || cartItem.getUnitPrice().compareTo(BigDecimal.ZERO) < 0) {
+                throw new IllegalArgumentException(
+                        "Cart item price cannot be negative"
+                );
+            }
+        }
+
+        BigDecimal totalAmount = BigDecimal.ZERO;
+
+        for (CartItem cartItem : cartItems) {
+
+            BigDecimal itemTotal = cartItem.getUnitPrice()
+                    .multiply(BigDecimal.valueOf(cartItem.getQuantity()));
+
+            totalAmount = totalAmount.add(itemTotal);
+        }
+
         Order order = new Order(
                 customer,
                 LocalDateTime.now(),
+                totalAmount,
                 OrderStatus.PENDING
         );
 
@@ -58,13 +89,16 @@ public class OrderService {
                     order,
                     cartItem.getProduct(),
                     cartItem.getQuantity(),
-                    cartItem.getProduct().getPrice()
+                    cartItem.getUnitPrice()
             );
 
             orderItemRepository.save(orderItem);
         }
 
         cartItemRepository.deleteAll(cartItems);
+
+        cart.setTotalAmount(BigDecimal.ZERO);
+        cartRepository.save(cart);
 
         return order;
     }
@@ -75,6 +109,10 @@ public class OrderService {
 
     public List<Order> getOrdersByStatus(OrderStatus status) {
         return orderRepository.findByStatus(status);
+    }
+
+    public List<OrderItem> getOrderItems(Order order) {
+        return orderItemRepository.findByOrder(order);
     }
 
     public Order updateOrderStatus(Long orderId, OrderStatus status) {

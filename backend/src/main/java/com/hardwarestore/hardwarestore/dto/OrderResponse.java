@@ -1,40 +1,28 @@
-package com.hardwarestore.hardwarestore.model;
+package com.hardwarestore.hardwarestore.dto;
 
-import jakarta.persistence.*;
+import com.hardwarestore.hardwarestore.model.OrderStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "orders")
-public class Order {
+public class OrderResponse {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderId;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User customer;
-
-    @Column(nullable = false)
+    private Long customerId;
     private LocalDateTime orderDate;
-
-    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal totalAmount;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private OrderStatus status;
 
-    public Order() {
+    public OrderResponse() {
     }
 
-    public Order(User customer,
-                 LocalDateTime orderDate,
-                 BigDecimal totalAmount,
-                 OrderStatus status) {
-        this.customer = customer;
+    public OrderResponse(Long orderId,
+                         Long customerId,
+                         LocalDateTime orderDate,
+                         BigDecimal totalAmount,
+                         OrderStatus status) {
+        this.orderId = orderId;
+        this.customerId = customerId;
         this.orderDate = orderDate;
         this.totalAmount = totalAmount;
         this.status = status;
@@ -48,12 +36,12 @@ public class Order {
         this.orderId = orderId;
     }
 
-    public User getCustomer() {
-        return customer;
+    public Long getCustomerId() {
+        return customerId;
     }
 
-    public void setCustomer(User customer) {
-        this.customer = customer;
+    public void setCustomerId(Long customerId) {
+        this.customerId = customerId;
     }
 
     public LocalDateTime getOrderDate() {
