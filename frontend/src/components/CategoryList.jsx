@@ -1,10 +1,35 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { getCategories } from "../services/categoryService.js";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
+import {
+  getCategories,
+  deleteCategory,
+} from "../services/categoryService.js";
 import EditCategoryForm from "./EditCategoryForm.jsx";
 
 export default function CategoryList() {
   const [editingCategory, setEditingCategory] = useState(null);
+  const queryClient = useQueryClient();
+  const [deleteMessage, setDeleteMessage] = useState("");
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteCategory,
+    onSuccess: async () => {
+      setDeleteMessage("Category deleted successfully.");
+      await queryClient.invalidateQueries({ queryKey: ["categories"] });
+    },
+  });
+
+  function handleDelete(category) {
+    if (deleteMutation.isPending) return;
+    if (window.confirm(`Permanently delete "${category.name}"?`)) {
+      setDeleteMessage("");
+      deleteMutation.mutate(category.categoryId);
+    }
+  }
 
   const {
     data: categories = [],
@@ -40,6 +65,19 @@ export default function CategoryList() {
           {isFetching ? "Loading..." : "Refresh"}
         </button>
       </div>
+
+      {deleteMessage && (
+        <p role="status" className="m-6 rounded-md bg-green-50 p-3 text-sm text-green-700">
+          {deleteMessage}
+        </p>
+      )}
+
+      {deleteMutation.isError && (
+        <p role="alert" className="m-6 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          {deleteMutation.error.response?.data?.message ||
+            "Unable to delete this category. It may be linked to products, or the server may be unavailable."}
+        </p>
+      )}
 
       {editingCategory && (
         <EditCategoryForm
@@ -109,14 +147,30 @@ export default function CategoryList() {
                   </td>
 
                   <td className="px-6 py-4">
+                    <div className="flex gap-2">
                     <button
                       type="button"
-                      onClick={() => setEditingCategory(category)}
-                      disabled={editingCategory !== null}
+                      onClick={() => {
+                        deleteMutation.reset();
+                        setDeleteMessage("");
+                        setEditingCategory(category);
+                      }}
+                      disabled={editingCategory !== null || deleteMutation.isPending}
                       className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-100 disabled:opacity-50"
                     >
                       Edit
                     </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(category)}
+                      disabled={editingCategory !== null || deleteMutation.isPending}
+                      className="rounded-md bg-red-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {deleteMutation.isPending && deleteMutation.variables === category.categoryId
+                        ? "Deleting..."
+                        : "Delete"}
+                    </button>
+                    </div>
                   </td>
                 </tr>
               ))}

@@ -18,3 +18,7 @@ export async function updateCategory({ categoryId, category }) {
 
   return response.data;
 }
+
+export async function deleteCategory(categoryId) {
+  await apiClient.delete(`/api/categories/${categoryId}`);
+}
