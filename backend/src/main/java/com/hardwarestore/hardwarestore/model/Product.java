@@ -21,6 +21,9 @@ public class Product {
 
     private String imageUrl;
 
+    @Column(nullable = false)
+    private Integer quantity = 0;
+
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
@@ -33,12 +36,14 @@ public class Product {
             String description,
             BigDecimal price,
             String imageUrl,
+            Integer quantity,
             Category category
     ) {
         this.name = name;
         this.description = description;
         this.price = price;
         this.imageUrl = imageUrl;
+        this.quantity = quantity;
         this.category = category;
     }
 
@@ -80,6 +85,14 @@ public class Product {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
 
     public Category getCategory() {
