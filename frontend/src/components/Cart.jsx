@@ -94,7 +94,12 @@ function Cart() {
             })
             .catch((error) => {
                 console.error('Checkout failed:', error)
-                setError(error.response?.data?.message || 'Unable to complete checkout.')
+                const responseMessage = error.response?.data?.message
+                setError(
+                    error.response?.status < 500 && responseMessage
+                        ? responseMessage
+                        : 'Unable to complete checkout. Please try again.'
+                )
             })
     }
 

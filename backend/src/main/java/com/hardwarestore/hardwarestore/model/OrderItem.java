@@ -26,6 +26,11 @@ public class OrderItem {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal unitPrice;
 
+    // Compatibility with the original database schema. Older installations
+    // require a non-null `price` column while current code uses `unit_price`.
+    @Column(name = "price", nullable = false, precision = 10, scale = 2)
+    private BigDecimal legacyPrice;
+
     public OrderItem() {
     }
 
@@ -37,6 +42,7 @@ public class OrderItem {
         this.product = product;
         this.quantity = quantity;
         this.unitPrice = unitPrice;
+        this.legacyPrice = unitPrice;
     }
 
     public Long getOrderItemId() {
@@ -77,5 +83,20 @@ public class OrderItem {
 
     public void setUnitPrice(BigDecimal unitPrice) {
         this.unitPrice = unitPrice;
+        this.legacyPrice = unitPrice;
+    }
+
+    @PrePersist
+    @PreUpdate
+    private void synchronizePriceColumns() {
+        legacyPrice = unitPrice;
+    }
+
+    @PostLoad
+    private void restoreLegacyPrice() {
+        if ((unitPrice == null || BigDecimal.ZERO.compareTo(unitPrice) == 0)
+                && legacyPrice != null) {
+            unitPrice = legacyPrice;
+        }
     }
 }
