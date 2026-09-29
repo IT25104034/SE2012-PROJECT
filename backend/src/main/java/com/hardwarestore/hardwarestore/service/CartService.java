@@ -4,6 +4,7 @@ import com.hardwarestore.hardwarestore.model.Cart;
 import com.hardwarestore.hardwarestore.model.CartItem;
 import com.hardwarestore.hardwarestore.model.Product;
 import com.hardwarestore.hardwarestore.model.User;
+import com.hardwarestore.hardwarestore.exception.ResourceNotFoundException;
 import com.hardwarestore.hardwarestore.repository.CartItemRepository;
 import com.hardwarestore.hardwarestore.repository.CartRepository;
 import org.springframework.stereotype.Service;
@@ -48,6 +49,7 @@ public class CartService {
         if (existingItem != null) {
             int newQuantity = existingItem.getQuantity() + quantity;
             validateQuantity(newQuantity);
+            validateStock(product, newQuantity);
 
             existingItem.setQuantity(newQuantity);
 
@@ -56,6 +58,8 @@ public class CartService {
 
             return savedItem;
         }
+
+        validateStock(product, quantity);
 
         CartItem newItem = new CartItem(
                 cart,
@@ -75,13 +79,14 @@ public class CartService {
                                    Integer quantity) {
 
         validateQuantity(quantity);
+        validateStock(product, quantity);
 
         Cart cart = getOrCreateCart(customer);
 
         CartItem item = cartItemRepository
                 .findByCartAndProduct(cart, product)
                 .orElseThrow(() ->
-                        new RuntimeException("Product not found in cart"));
+                        new ResourceNotFoundException("Product not found in cart"));
 
         item.setQuantity(quantity);
 
@@ -98,7 +103,7 @@ public class CartService {
         CartItem item = cartItemRepository
                 .findByCartAndProduct(cart, product)
                 .orElseThrow(() ->
-                        new RuntimeException("Product not found in cart"));
+                        new ResourceNotFoundException("Product not found in cart"));
 
         cartItemRepository.delete(item);
 
@@ -109,6 +114,15 @@ public class CartService {
         if (quantity == null || quantity <= 0) {
             throw new IllegalArgumentException(
                     "Quantity must be greater than zero"
+            );
+        }
+    }
+
+    private void validateStock(Product product, Integer requestedQuantity) {
+        if (product.getQuantity() == null || product.getQuantity() < requestedQuantity) {
+            throw new IllegalArgumentException(
+                    "Only " + (product.getQuantity() == null ? 0 : product.getQuantity())
+                            + " units available for " + product.getName()
             );
         }
     }

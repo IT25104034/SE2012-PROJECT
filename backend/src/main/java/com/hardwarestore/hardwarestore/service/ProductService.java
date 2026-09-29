@@ -56,6 +56,7 @@ public class ProductService {
         existingProduct.setDescription(updatedProduct.getDescription());
         existingProduct.setPrice(updatedProduct.getPrice());
         existingProduct.setImageUrl(updatedProduct.getImageUrl());
+        existingProduct.setQuantity(updatedProduct.getQuantity());
 
         Category category = getProductCategory(updatedProduct);
 

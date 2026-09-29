@@ -2,13 +2,18 @@ package com.hardwarestore.hardwarestore.controller;
 
 import com.hardwarestore.hardwarestore.dto.OrderItemResponse;
 import com.hardwarestore.hardwarestore.dto.OrderResponse;
+import com.hardwarestore.hardwarestore.exception.ResourceNotFoundException;
 import com.hardwarestore.hardwarestore.model.Order;
 import com.hardwarestore.hardwarestore.model.OrderItem;
 import com.hardwarestore.hardwarestore.model.OrderStatus;
+import com.hardwarestore.hardwarestore.model.Role;
 import com.hardwarestore.hardwarestore.model.User;
 import com.hardwarestore.hardwarestore.repository.OrderRepository;
 import com.hardwarestore.hardwarestore.repository.UserRepository;
 import com.hardwarestore.hardwarestore.service.OrderService;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,11 +35,16 @@ public class OrderController {
     }
 
     @GetMapping("/customer/{userId}")
-    public List<OrderResponse> getCustomerOrders(@PathVariable Long userId) {
+    public List<OrderResponse> getCustomerOrders(
+            @PathVariable Long userId,
+            HttpSession session
+    ) {
+
+        requireSameUserOrAdmin(userId, session);
 
         User customer = userRepository.findById(userId)
                 .orElseThrow(() ->
-                        new RuntimeException("User not found"));
+                        new ResourceNotFoundException("User not found with id: " + userId));
 
         return orderService.getCustomerOrders(customer)
                 .stream()
@@ -43,7 +53,12 @@ public class OrderController {
     }
 
     @GetMapping("/status/{status}")
-    public List<OrderResponse> getOrdersByStatus(@PathVariable OrderStatus status) {
+    public List<OrderResponse> getOrdersByStatus(
+            @PathVariable OrderStatus status,
+            HttpSession session
+    ) {
+
+        requireAdmin(session);
 
         return orderService.getOrdersByStatus(status)
                 .stream()
@@ -52,16 +67,34 @@ public class OrderController {
     }
 
     @GetMapping("/{orderId}/items")
-    public List<OrderItemResponse> getOrderItems(@PathVariable Long orderId) {
+    public List<OrderItemResponse> getOrderItems(
+            @PathVariable Long orderId,
+            HttpSession session
+    ) {
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() ->
-                        new RuntimeException("Order not found"));
+                        new ResourceNotFoundException("Order not found with id: " + orderId));
+
+        requireSameUserOrAdmin(order.getCustomer().getId(), session);
 
         return orderService.getOrderItems(order)
                 .stream()
                 .map(this::toOrderItemResponse)
                 .toList();
+    }
+
+    @PutMapping("/{orderId}/status")
+    public OrderResponse updateOrderStatus(
+            @PathVariable Long orderId,
+            @RequestParam OrderStatus status,
+            HttpSession session
+    ) {
+        requireAdmin(session);
+
+        return toOrderResponse(
+                orderService.updateOrderStatus(orderId, status)
+        );
     }
 
     private OrderResponse toOrderResponse(Order order) {
@@ -84,5 +117,27 @@ public class OrderController {
                 orderItem.getQuantity(),
                 orderItem.getUnitPrice()
         );
+    }
+
+    private void requireSameUserOrAdmin(Long requestedUserId, HttpSession session) {
+        Long authenticatedUserId = (Long) session.getAttribute("userId");
+        Role role = (Role) session.getAttribute("role");
+
+        if (authenticatedUserId == null
+                || (!authenticatedUserId.equals(requestedUserId) && role != Role.ADMIN)) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "You cannot access another customer's orders"
+            );
+        }
+    }
+
+    private void requireAdmin(HttpSession session) {
+        if (session.getAttribute("role") != Role.ADMIN) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Admin access required"
+            );
+        }
     }
 }

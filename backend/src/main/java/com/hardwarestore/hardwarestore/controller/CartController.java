@@ -2,6 +2,8 @@ package com.hardwarestore.hardwarestore.controller;
 
 import com.hardwarestore.hardwarestore.dto.CartItemResponse;
 import com.hardwarestore.hardwarestore.dto.CartResponse;
+import com.hardwarestore.hardwarestore.dto.OrderResponse;
+import com.hardwarestore.hardwarestore.exception.ResourceNotFoundException;
 import com.hardwarestore.hardwarestore.model.Cart;
 import com.hardwarestore.hardwarestore.model.CartItem;
 import com.hardwarestore.hardwarestore.model.Order;
@@ -11,7 +13,10 @@ import com.hardwarestore.hardwarestore.repository.ProductRepository;
 import com.hardwarestore.hardwarestore.repository.UserRepository;
 import com.hardwarestore.hardwarestore.service.CartService;
 import com.hardwarestore.hardwarestore.service.OrderService;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,11 +41,9 @@ public class CartController {
     }
 
     @GetMapping("/cart/{userId}")
-    public CartResponse getCart(@PathVariable Long userId) {
+    public CartResponse getCart(@PathVariable Long userId, HttpSession session) {
 
-        User customer = userRepository.findById(userId)
-                .orElseThrow(() ->
-                        new RuntimeException("User not found"));
+        User customer = getAuthenticatedCustomer(userId, session);
 
         Cart cart = cartService.getOrCreateCart(customer);
 
@@ -60,15 +63,14 @@ public class CartController {
     @PostMapping("/cart/{userId}/items/{productId}")
     public CartItemResponse addItem(@PathVariable Long userId,
                                     @PathVariable Long productId,
-                                    @RequestParam Integer quantity) {
+                                    @RequestParam Integer quantity,
+                                    HttpSession session) {
 
-        User customer = userRepository.findById(userId)
-                .orElseThrow(() ->
-                        new RuntimeException("User not found"));
+        User customer = getAuthenticatedCustomer(userId, session);
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(() ->
-                        new RuntimeException("Product not found"));
+                        new ResourceNotFoundException("Product not found with id: " + productId));
 
         CartItem cartItem = cartService.addItem(
                 customer,
@@ -82,15 +84,14 @@ public class CartController {
     @PutMapping("/cart/{userId}/items/{productId}")
     public CartItemResponse updateQuantity(@PathVariable Long userId,
                                            @PathVariable Long productId,
-                                           @RequestParam Integer quantity) {
+                                           @RequestParam Integer quantity,
+                                           HttpSession session) {
 
-        User customer = userRepository.findById(userId)
-                .orElseThrow(() ->
-                        new RuntimeException("User not found"));
+        User customer = getAuthenticatedCustomer(userId, session);
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(() ->
-                        new RuntimeException("Product not found"));
+                        new ResourceNotFoundException("Product not found with id: " + productId));
 
         CartItem cartItem = cartService.updateQuantity(
                 customer,
@@ -103,15 +104,14 @@ public class CartController {
 
     @DeleteMapping("/cart/{userId}/items/{productId}")
     public ResponseEntity<Void> removeItem(@PathVariable Long userId,
-                                           @PathVariable Long productId) {
+                                           @PathVariable Long productId,
+                                           HttpSession session) {
 
-        User customer = userRepository.findById(userId)
-                .orElseThrow(() ->
-                        new RuntimeException("User not found"));
+        User customer = getAuthenticatedCustomer(userId, session);
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(() ->
-                        new RuntimeException("Product not found"));
+                        new ResourceNotFoundException("Product not found with id: " + productId));
 
         cartService.removeItem(customer, product);
 
@@ -119,13 +119,19 @@ public class CartController {
     }
 
     @PostMapping("/cart/{userId}/checkout")
-    public Order checkout(@PathVariable Long userId) {
+    public OrderResponse checkout(@PathVariable Long userId, HttpSession session) {
 
-        User customer = userRepository.findById(userId)
-                .orElseThrow(() ->
-                        new RuntimeException("User not found"));
+        User customer = getAuthenticatedCustomer(userId, session);
 
-        return orderService.checkout(customer);
+        Order order = orderService.checkout(customer);
+
+        return new OrderResponse(
+                order.getOrderId(),
+                order.getCustomer().getId(),
+                order.getOrderDate(),
+                order.getTotalAmount(),
+                order.getStatus()
+        );
     }
 
     private CartItemResponse toCartItemResponse(CartItem cartItem) {
@@ -137,5 +143,23 @@ public class CartController {
                 cartItem.getQuantity(),
                 cartItem.getUnitPrice()
         );
+    }
+
+    private User getAuthenticatedCustomer(Long requestedUserId, HttpSession session) {
+        Long authenticatedUserId = (Long) session.getAttribute("userId");
+
+        if (authenticatedUserId == null || !authenticatedUserId.equals(requestedUserId)) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Please login to access this cart"
+            );
+        }
+
+        return userRepository.findById(authenticatedUserId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "User not found with id: " + authenticatedUserId
+                        )
+                );
     }
 }

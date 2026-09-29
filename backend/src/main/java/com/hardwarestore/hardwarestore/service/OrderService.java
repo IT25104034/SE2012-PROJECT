@@ -7,6 +7,7 @@ import com.hardwarestore.hardwarestore.model.OrderItem;
 import com.hardwarestore.hardwarestore.model.OrderStatus;
 import com.hardwarestore.hardwarestore.model.Product;
 import com.hardwarestore.hardwarestore.model.User;
+import com.hardwarestore.hardwarestore.exception.ResourceNotFoundException;
 import com.hardwarestore.hardwarestore.repository.CartItemRepository;
 import com.hardwarestore.hardwarestore.repository.CartRepository;
 import com.hardwarestore.hardwarestore.repository.OrderItemRepository;
@@ -168,8 +169,8 @@ public class OrderService {
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() ->
-                        new IllegalArgumentException(
-                                "Order not found"
+                        new ResourceNotFoundException(
+                                "Order not found with id: " + orderId
                         )
                 );
 

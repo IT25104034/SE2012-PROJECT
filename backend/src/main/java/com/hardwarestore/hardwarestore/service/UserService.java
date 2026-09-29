@@ -2,6 +2,7 @@ package com.hardwarestore.hardwarestore.service;
 
 import com.hardwarestore.hardwarestore.model.Role;
 import com.hardwarestore.hardwarestore.model.User;
+import com.hardwarestore.hardwarestore.exception.ResourceNotFoundException;
 import com.hardwarestore.hardwarestore.repository.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -48,5 +49,14 @@ public class UserService {
         }
 
         return user;
+    }
+
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "User not found with id: " + userId
+                        )
+                );
     }
 }

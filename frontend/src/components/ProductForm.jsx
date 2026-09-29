@@ -8,7 +8,7 @@ export default function ProductForm({ product, onClose, onSaved }) {
   const client = useQueryClient();
   const [form, setForm] = useState({
     name: product?.name ?? "", description: product?.description ?? "",
-    price: product?.price ?? "", imageUrl: product?.imageUrl ?? "",
+    price: product?.price ?? "", quantity: product?.quantity ?? 0, imageUrl: product?.imageUrl ?? "",
     categoryId: product?.category?.categoryId ?? "",
   });
   const categories = useQuery({ queryKey: ["categories"], queryFn: getCategories });
@@ -29,6 +29,7 @@ export default function ProductForm({ product, onClose, onSaved }) {
     mutation.mutate({ productId: product?.productId, product: {
       name: form.name.trim(), description: form.description.trim() || null,
       price: form.price === "" ? null : Number(form.price),
+      quantity: form.quantity === "" ? null : Number(form.quantity),
       imageUrl: form.imageUrl.trim() || null,
       category: form.categoryId === "" ? null : { categoryId: Number(form.categoryId) },
     }});
@@ -51,8 +52,9 @@ export default function ProductForm({ product, onClose, onSaved }) {
       </p>}
       <form noValidate onSubmit={submit} className="mt-5 space-y-4">
         {field("name", "Product name *", { required: true, maxLength: 150, autoFocus: true })}
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-3">
           {field("price", "Price (Rs.) *", { type: "number", step: "0.01", min: "0.01", required: true })}
+          {field("quantity", "Stock quantity *", { type: "number", step: "1", min: "0", required: true })}
           <div>
             <label className="field-label" htmlFor="product-category">Category *</label>
             <select id="product-category" name="categoryId" value={form.categoryId} onChange={change}

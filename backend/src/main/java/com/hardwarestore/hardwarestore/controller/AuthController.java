@@ -9,18 +9,14 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(
-        origins = "http://localhost:5173",
+        origins = {"http://localhost:5173", "http://localhost:5175"},
         allowCredentials = "true"
 )
 public class AuthController {
@@ -33,32 +29,24 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(
-            @Valid @RequestBody RegisterRequest request
+            @Valid @RequestBody RegisterRequest request,
+            HttpSession session
     ) {
         try {
-
             User user = new User();
             user.setName(request.getName());
             user.setEmail(request.getEmail());
             user.setPassword(request.getPassword());
 
             User savedUser = userService.registerUser(user);
-
-            UserResponse response = new UserResponse(
-                    savedUser.getId(),
-                    savedUser.getName(),
-                    savedUser.getEmail(),
-                    savedUser.getRole()
-            );
+            storeUserSession(session, savedUser);
 
             return ResponseEntity
                     .status(HttpStatus.CREATED)
-                    .body(response);
-
-        } catch (IllegalArgumentException e) {
-
+                    .body(toUserResponse(savedUser));
+        } catch (IllegalArgumentException exception) {
             return ResponseEntity.badRequest().body(
-                    Map.of("message", e.getMessage())
+                    Map.of("message", exception.getMessage())
             );
         }
     }
@@ -69,31 +57,53 @@ public class AuthController {
             HttpSession session
     ) {
         try {
-
             User user = userService.loginUser(
                     request.getEmail(),
                     request.getPassword()
             );
 
-            // Store logged-in user's details in the server session
-            session.setAttribute("userId", user.getId());
-            session.setAttribute("email", user.getEmail());
-            session.setAttribute("role", user.getRole());
-
-            UserResponse response = new UserResponse(
-                    user.getId(),
-                    user.getName(),
-                    user.getEmail(),
-                    user.getRole()
-            );
-
-            return ResponseEntity.ok(response);
-
-        } catch (IllegalArgumentException e) {
-
+            storeUserSession(session, user);
+            return ResponseEntity.ok(toUserResponse(user));
+        } catch (IllegalArgumentException exception) {
             return ResponseEntity.badRequest().body(
-                    Map.of("message", e.getMessage())
+                    Map.of("message", exception.getMessage())
             );
         }
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> currentUser(HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
+
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    Map.of("message", "Please login first")
+            );
+        }
+
+        return ResponseEntity.ok(
+                toUserResponse(userService.getUserById(userId))
+        );
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpSession session) {
+        session.invalidate();
+        return ResponseEntity.noContent().build();
+    }
+
+    private void storeUserSession(HttpSession session, User user) {
+        session.setAttribute("userId", user.getId());
+        session.setAttribute("email", user.getEmail());
+        session.setAttribute("role", user.getRole());
+    }
+
+    private UserResponse toUserResponse(User user) {
+        return new UserResponse(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getRole()
+        );
     }
 }
