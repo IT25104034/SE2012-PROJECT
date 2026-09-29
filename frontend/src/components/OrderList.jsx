@@ -1,24 +1,22 @@
 import { useEffect, useState } from "react";
+import { getCustomerOrders, getOrderItems } from "../services/orderService.js";
+import { useAuth } from "../auth/authContext.js";
 
 function OrderList() {
+    const { user } = useAuth();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [expandedOrderId, setExpandedOrderId] = useState(null);
+    const [itemsByOrder, setItemsByOrder] = useState({});
+    const [itemsError, setItemsError] = useState("");
 
     const fetchOrders = async () => {
         try {
             setLoading(true);
             setError("");
 
-            const response = await fetch(
-                "http://localhost:8081/api/orders/customer/1"
-            );
-
-            if (!response.ok) {
-                throw new Error("Failed to load orders");
-            }
-
-            const data = await response.json();
+            const data = await getCustomerOrders(user.id);
             setOrders(data);
         } catch (err) {
             setError(err.message || "Unable to load orders");
@@ -27,9 +25,50 @@ function OrderList() {
         }
     };
 
+    const toggleOrderItems = async (orderId) => {
+        if (expandedOrderId === orderId) {
+            setExpandedOrderId(null);
+            return;
+        }
+
+        setExpandedOrderId(orderId);
+        setItemsError("");
+
+        if (!itemsByOrder[orderId]) {
+            try {
+                const items = await getOrderItems(orderId);
+                setItemsByOrder((current) => ({ ...current, [orderId]: items }));
+            } catch (err) {
+                setItemsError(
+                    err.response?.data?.message || "Unable to load order items"
+                );
+            }
+        }
+    };
+
     useEffect(() => {
-        fetchOrders();
-    }, []);
+        let active = true;
+
+        getCustomerOrders(user.id)
+            .then((data) => {
+                if (active) {
+                    setOrders(data);
+                    setLoading(false);
+                }
+            })
+            .catch((err) => {
+                if (active) {
+                    setError(
+                        err.response?.data?.message || "Unable to load orders"
+                    );
+                    setLoading(false);
+                }
+            });
+
+        return () => {
+            active = false;
+        };
+    }, [user.id]);
 
     const formatDate = (dateValue) => {
         if (!dateValue) {
@@ -147,6 +186,37 @@ function OrderList() {
                   Rs. {Number(order.totalAmount || 0).toFixed(2)}
                 </span>
                             </div>
+
+                            <button
+                                type="button"
+                                className="mt-4 text-sm font-bold text-orange-700 hover:underline"
+                                onClick={() => toggleOrderItems(order.orderId)}
+                            >
+                                {expandedOrderId === order.orderId
+                                    ? "Hide order items"
+                                    : "View order items"}
+                            </button>
+
+                            {expandedOrderId === order.orderId && (
+                                <div className="mt-4 rounded-md bg-white p-4">
+                                    {itemsError ? (
+                                        <p role="alert" className="text-sm text-red-700">{itemsError}</p>
+                                    ) : !itemsByOrder[order.orderId] ? (
+                                        <p role="status" className="text-sm text-slate-500">Loading order items…</p>
+                                    ) : (
+                                        <ul className="divide-y divide-slate-100">
+                                            {itemsByOrder[order.orderId].map((item) => (
+                                                <li key={item.orderItemId} className="flex justify-between gap-4 py-3 text-sm">
+                                                    <span>{item.productName} × {item.quantity}</span>
+                                                    <span className="font-semibold">
+                                                        Rs. {(Number(item.unitPrice) * item.quantity).toFixed(2)}
+                                                    </span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </div>
+                            )}
                         </article>
                     ))}
                 </div>

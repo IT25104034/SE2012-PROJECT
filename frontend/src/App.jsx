@@ -15,6 +15,10 @@ import ProductBrowser from "./components/ProductBrowser.jsx";
 import ProductDetails from "./components/ProductDetails.jsx";
 import Cart from "./components/Cart.jsx";
 import OrderList from "./components/OrderList.jsx";
+import LoginPage from "./components/LoginPage.jsx";
+import RegisterPage from "./components/RegisterPage.jsx";
+import ProtectedRoute from "./auth/ProtectedRoute.jsx";
+import { useAuth } from "./auth/authContext.js";
 
 import { getCategories } from "./services/categoryService.js";
 
@@ -31,6 +35,8 @@ function Brand() {
 }
 
 function Storefront() {
+  const { user, logout } = useAuth();
+
   return (
       <div className="flex min-h-screen flex-col bg-slate-50">
         <header className="border-b border-slate-200 bg-white">
@@ -74,12 +80,27 @@ function Storefront() {
                 Orders
               </NavLink>
 
-              <Link
-                  to="/admin/products"
-                  className="btn-outline"
-              >
-                Management
-              </Link>
+              {user?.role === "ADMIN" && (
+                <Link to="/admin/products" className="btn-outline">
+                  Management
+                </Link>
+              )}
+
+              {user ? (
+                <div className="flex items-center gap-3 border-l border-slate-200 pl-4">
+                  <span className="hidden text-slate-500 sm:inline">
+                    Hi, {user.name}
+                  </span>
+                  <button type="button" className="text-slate-600 hover:text-orange-700" onClick={logout}>
+                    Sign Out
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Link to="/login" className="text-slate-600 hover:text-orange-700">Sign In</Link>
+                  <Link to="/register" className="btn-primary">Register</Link>
+                </div>
+              )}
             </nav>
           </div>
         </header>
@@ -272,13 +293,16 @@ export default function App() {
 
             <Route
                 path="cart"
-                element={<Cart />}
+                element={<ProtectedRoute><Cart /></ProtectedRoute>}
             />
 
             <Route
                 path="orders"
-                element={<OrderList />}
+                element={<ProtectedRoute><OrderList /></ProtectedRoute>}
             />
+
+            <Route path="login" element={<LoginPage />} />
+            <Route path="register" element={<RegisterPage />} />
 
             <Route
                 path="*"
@@ -301,7 +325,7 @@ export default function App() {
 
           <Route
               path="admin"
-              element={<Management />}
+              element={<ProtectedRoute role="ADMIN"><Management /></ProtectedRoute>}
           >
             <Route
                 index

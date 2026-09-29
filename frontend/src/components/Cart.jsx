@@ -1,25 +1,26 @@
 import { useEffect, useState } from 'react'
+import {
+    checkoutCart,
+    getCart,
+    removeCartItem,
+    updateCartQuantity,
+} from '../services/cartService.js'
+import { useAuth } from '../auth/authContext.js'
 
 function Cart() {
+    const { user } = useAuth()
     const [cart, setCart] = useState(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
     const [checkoutMessage, setCheckoutMessage] = useState('')
 
-    const userId = 1
+    const userId = user.id
 
     const loadCart = () => {
         setLoading(true)
         setError('')
 
-        fetch(`http://localhost:8081/api/cart/${userId}`)
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error('Failed to load cart')
-                }
-
-                return response.json()
-            })
+        getCart(userId)
             .then((data) => {
                 setCart(data)
                 setLoading(false)
@@ -32,48 +33,46 @@ function Cart() {
     }
 
     useEffect(() => {
-        loadCart()
-    }, [])
+        let active = true
+
+        getCart(userId)
+            .then((data) => {
+                if (active) {
+                    setCart(data)
+                    setLoading(false)
+                }
+            })
+            .catch((error) => {
+                console.error('Failed to load cart:', error)
+                if (active) {
+                    setError(error.response?.data?.message || 'Unable to load your cart.')
+                    setLoading(false)
+                }
+            })
+
+        return () => {
+            active = false
+        }
+    }, [userId])
 
     const updateQuantity = (productId, quantity) => {
         if (quantity < 1) {
             return
         }
 
-        fetch(
-            `http://localhost:8081/api/cart/${userId}/items/${productId}?quantity=${quantity}`,
-            {
-                method: 'PUT',
-            }
-        )
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error('Failed to update quantity')
-                }
-
-                return response.json()
-            })
+        updateCartQuantity({ userId, productId, quantity })
             .then(() => {
                 loadCart()
             })
             .catch((error) => {
                 console.error('Failed to update quantity:', error)
-                setError('Unable to update item quantity.')
+                setError(error.response?.data?.message || 'Unable to update item quantity.')
             })
     }
 
     const removeItem = (productId) => {
-        fetch(
-            `http://localhost:8081/api/cart/${userId}/items/${productId}`,
-            {
-                method: 'DELETE',
-            }
-        )
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error('Failed to remove item')
-                }
-
+        removeCartItem({ userId, productId })
+            .then(() => {
                 loadCart()
             })
             .catch((error) => {
@@ -86,16 +85,7 @@ function Cart() {
         setCheckoutMessage('')
         setError('')
 
-        fetch(`http://localhost:8081/api/cart/${userId}/checkout`, {
-            method: 'POST',
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error('Checkout failed')
-                }
-
-                return response.json()
-            })
+        checkoutCart(userId)
             .then((order) => {
                 setCheckoutMessage(
                     `Order #${order.orderId} created successfully.`
@@ -104,7 +94,7 @@ function Cart() {
             })
             .catch((error) => {
                 console.error('Checkout failed:', error)
-                setError('Unable to complete checkout.')
+                setError(error.response?.data?.message || 'Unable to complete checkout.')
             })
     }
 

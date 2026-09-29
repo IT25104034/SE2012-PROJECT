@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 
@@ -32,6 +33,8 @@ public class Product {
     private String imageUrl;
 
     @Column(nullable = false)
+    @NotNull(message = "Product stock quantity is required")
+    @PositiveOrZero(message = "Product stock quantity cannot be negative")
     private Integer quantity = 0;
 
     @ManyToOne
