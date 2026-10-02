@@ -84,8 +84,8 @@ function Storefront() {
                 Orders
               </NavLink>
 
-              {user?.role === "ADMIN" && (
-                <Link to="/admin/products" className="btn-outline">
+              {["ADMIN", "STAFF"].includes(user?.role) && (
+                <Link to={user.role === "ADMIN" ? "/admin/products" : "/staff/orders"} className="btn-outline">
                   Management
                 </Link>
               )}
@@ -230,6 +230,8 @@ function Home() {
 }
 
 function Management() {
+  const { user } = useAuth();
+  const staff = user?.role === "STAFF";
   return (
       <div className="min-h-screen bg-slate-100 md:flex">
         <aside className="bg-slate-900 p-5 text-white md:w-60 md:shrink-0">
@@ -243,13 +245,13 @@ function Management() {
               aria-label="Management navigation"
               className="mt-6 flex flex-wrap gap-2 md:flex-col"
           >
-            {[
+            {(staff ? [["/staff/orders", "Orders"], ["/staff/inventory", "Inventory"]] : [
               ["/admin/products", "Products"],
               ["/admin/categories", "Categories"],
               ["/admin/inventory", "Inventory"],
               ["/admin/orders", "Orders"],
               ["/admin/users", "Users"],
-            ].map(([to, label]) => (
+            ]).map(([to, label]) => (
                 <NavLink
                     key={to}
                     to={to}
@@ -328,6 +330,12 @@ export default function App() {
                   </div>
                 }
             />
+          </Route>
+
+          <Route path="staff" element={<ProtectedRoute role={["STAFF", "ADMIN"]}><Management /></ProtectedRoute>}>
+            <Route index element={<Navigate to="orders" replace />} />
+            <Route path="orders" element={<AdminOrders />} />
+            <Route path="inventory" element={<Inventory />} />
           </Route>
 
           <Route

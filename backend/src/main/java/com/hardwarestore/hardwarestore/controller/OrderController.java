@@ -124,7 +124,7 @@ public class OrderController {
         Role role = (Role) session.getAttribute("role");
 
         if (authenticatedUserId == null
-                || (!authenticatedUserId.equals(requestedUserId) && role != Role.ADMIN)) {
+                || (!authenticatedUserId.equals(requestedUserId) && role != Role.ADMIN && role != Role.STAFF)) {
             throw new ResponseStatusException(
                     HttpStatus.UNAUTHORIZED,
                     "You cannot access another customer's orders"
@@ -133,10 +133,10 @@ public class OrderController {
     }
 
     private void requireAdmin(HttpSession session) {
-        if (session.getAttribute("role") != Role.ADMIN) {
+        if (session.getAttribute("role") != Role.ADMIN && session.getAttribute("role") != Role.STAFF) {
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN,
-                    "Admin access required"
+                    "Staff or admin access required"
             );
         }
     }

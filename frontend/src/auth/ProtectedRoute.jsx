@@ -13,7 +13,7 @@ export default function ProtectedRoute({ children, role }) {
     return <Navigate to="/login" replace state={{ from: location.pathname }} />;
   }
 
-  if (role && user.role !== role) {
+  if (role && !(Array.isArray(role) ? role : [role]).includes(user.role)) {
     return <Navigate to="/" replace />;
   }
 

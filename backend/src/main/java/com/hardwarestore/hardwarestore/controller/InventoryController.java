@@ -60,9 +60,9 @@ public class InventoryController {
             }
 
             // Logged-in user is not an admin
-            if (role != Role.ADMIN) {
+            if (role != Role.ADMIN && role != Role.STAFF) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
-                        Map.of("message", "Admin access required")
+                        Map.of("message", "Staff or admin access required")
                 );
             }
 
