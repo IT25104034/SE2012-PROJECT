@@ -109,7 +109,7 @@ function OrderList() {
                         Your purchases
                     </p>
 
-                    <h1 className="mt-2 text-3xl font-extrabold text-slate-900">
+                    <h1 className="mt-2 text-3xl font-bold text-slate-900">
                         My Orders
                     </h1>
 
@@ -171,7 +171,7 @@ function OrderList() {
                                 </div>
 
                                 <span
-                                    className={`w-fit rounded-full px-3 py-1 text-xs font-extrabold ${getStatusClasses(
+                                    className={`w-fit rounded-full px-3 py-1 text-xs font-bold ${getStatusClasses(
                                         order.status
                                     )}`}
                                 >
@@ -184,7 +184,7 @@ function OrderList() {
                   Total
                 </span>
 
-                                <span className="text-lg font-extrabold text-slate-900">
+                                <span className="text-lg font-bold text-slate-900">
                   Rs. {Number(order.totalAmount || 0).toFixed(2)}
                 </span>
                             </div>

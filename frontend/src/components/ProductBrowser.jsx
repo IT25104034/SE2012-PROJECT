@@ -59,7 +59,7 @@ export default function ProductBrowser({ management = false }) {
   return <div className="space-y-6">
     <div className="catalogue-heading flex flex-wrap items-center justify-between gap-4">
       <div><p className="eyebrow">{management ? "Store management" : "Explore the catalogue"}</p>
-        <h1 className="mt-2 text-3xl font-extrabold">{management ? "Product Management" : "Our Products"}</h1>
+        <h1 className="mt-2 text-3xl font-bold">{management ? "Product Management" : "Our Products"}</h1>
         <p className="mt-2 text-slate-500">{management ? "Create and maintain your product catalogue." : "Find tools, electronics and supplies for your next project."}</p></div>
       <div className="flex gap-2"><button className="btn-outline" disabled={products.isFetching} onClick={() => products.refetch()}>{products.isFetching ? "Loading…" : "Refresh"}</button>
         {management && <button className="btn-primary" disabled={editor !== null || remove.isPending} onClick={() => { setMessage(""); remove.reset(); setEditor({}); }}>+ Add Product</button>}</div>

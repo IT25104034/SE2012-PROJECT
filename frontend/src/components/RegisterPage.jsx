@@ -35,7 +35,7 @@ export default function RegisterPage() {
       <div className="auth-panel panel overflow-hidden">
         <div className="auth-heading text-white">
           <p className="eyebrow text-orange-400">Customer account</p>
-          <h1 className="mt-2 text-3xl font-extrabold">Create your account</h1>
+          <h1 className="mt-2 text-3xl font-bold">Create your account</h1>
           <p className="mt-2 text-sm text-slate-300">Register to start shopping and track your orders.</p>
         </div>
         <form className="space-y-5 p-8" onSubmit={submit}>

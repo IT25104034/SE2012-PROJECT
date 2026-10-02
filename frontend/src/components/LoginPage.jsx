@@ -37,7 +37,7 @@ export default function LoginPage() {
       <div className="auth-panel panel overflow-hidden">
         <div className="auth-heading text-white">
           <p className="eyebrow text-orange-400">Store account</p>
-          <h1 className="mt-2 text-3xl font-extrabold">Welcome back</h1>
+          <h1 className="mt-2 text-3xl font-bold">Welcome back</h1>
           <p className="mt-2 text-sm text-slate-300">Sign in to shop or access your store workspace.</p>
         </div>
         <form className="space-y-5 p-8" onSubmit={submit}>

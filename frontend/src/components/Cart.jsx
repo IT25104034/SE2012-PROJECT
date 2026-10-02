@@ -154,7 +154,7 @@ function Cart() {
                     Your project essentials
                 </p>
 
-                <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-slate-900">
+                <h1 className="mt-2 text-3xl font-bold text-slate-900">
                     Shopping Cart
                 </h1>
 
@@ -177,7 +177,7 @@ function Cart() {
 
             {items.length === 0 ? (
                 <article className="panel empty-state p-10 text-center">
-                    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-orange-100 font-extrabold text-orange-600">
+                    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-orange-100 font-bold text-orange-600">
                         <Icon name="cart" />
                     </div>
 
@@ -307,7 +307,7 @@ function Cart() {
                                 Total
                             </span>
 
-                            <span className="text-xl font-extrabold text-orange-600">
+                            <span className="text-xl font-bold text-orange-600">
                                 Rs.{' '}
                                 {Number(cart?.totalAmount ?? 0).toFixed(2)}
                             </span>

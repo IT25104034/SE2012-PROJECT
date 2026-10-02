@@ -42,3 +42,10 @@ Refreshed the storefront header/footer, homepage/category cards, catalogue/produ
 Frontend build and lint pass. Browser checks verified nine product cards with loaded images, Next pagination, category filtering, ascending price sorting, out-of-stock filtering and reset behavior. Product details, existing admin login/management navigation, cart/orders, logout and the enabled Google button were checked without placing orders or changing inventory. Mobile layouts were rendered in temporary same-origin preview frames at 390px and 320px; home/catalogue/login had no horizontal overflow. The mobile disclosure opened and search returned the two drill products, resetting the page parameter. The temporary preview file was removed and the browser viewport restored.
 
 The existing store data and backend authentication rules were not changed. This is local visual/interaction verification, not a full browser/device matrix or a real Google account sign-in test.
+
+### Typography revision — 2026-10-03
+
+- Replaced the application font stack with self-hosted Source Sans 3, including its SIL OFL license and source record.
+- Removed widely spaced uppercase labels and tight heading tracking; reduced heavy heading weights across storefront and management pages.
+- Verified the font loads, catalogue still shows nine products, and desktop catalogue plus 390px home/catalogue/login have no horizontal overflow.
+- Frontend production build and lint passed.

@@ -59,7 +59,7 @@ function Storefront() {
     <footer className="store-footer">
       <div className="site-width footer-top"><div><Brand /><p className="mt-5 max-w-sm text-sm leading-relaxed text-slate-400">From everyday repairs to your next big idea. Find the tools, components and supplies to make it happen.</p></div>
         <div><p className="eyebrow text-orange-400">Explore the store</p><div className="mt-4 flex flex-col gap-3 text-sm text-slate-300"><Link to="/products">All products</Link><Link to="/cart">Your cart</Link><Link to="/orders">Your orders</Link></div></div>
-        <div className="footer-cta"><p className="text-2xl font-bold tracking-tight">Let's build something.</p><Link to="/products" className="btn-primary mt-5">Explore the catalogue <Icon name="arrow" /></Link></div>
+        <div className="footer-cta"><p className="text-2xl font-bold">Let's build something.</p><Link to="/products" className="btn-primary mt-5">Explore the catalogue <Icon name="arrow" /></Link></div>
       </div>
       <div className="site-width footer-bottom"><span>Mustafa Hardware</span><span>Tools for the work. Supplies for the idea.</span></div>
     </footer>
@@ -77,8 +77,8 @@ function Home() {
         <div className="hero-actions"><Link to="/products" className="btn-primary">Explore products <Icon name="arrow" /></Link><a href="#shop-categories" className="hero-secondary">Shop by category</a></div>
         <div className="hero-facts"><span><strong>{products.isSuccess ? products.data.length : "—"}</strong> products to explore</span><span><strong>{categories.isSuccess ? categories.data.length : "—"}</strong> useful categories</span></div>
       </div>
-      <div className="hero-display"><div className="display-topline"><span>THE PROJECT ESSENTIALS</span><Icon name="tools" /></div>
-        <div className="hero-tool-photo"><img src="/images/products/cordless-drill-18v.jpg" alt="Cordless drill from the sample catalogue" /><span className="tool-note">POWER YOUR NEXT IDEA</span></div>
+      <div className="hero-display"><div className="display-topline"><span>Project essentials</span><Icon name="tools" /></div>
+        <div className="hero-tool-photo"><img src="/images/products/cordless-drill-18v.jpg" alt="Cordless drill from the sample catalogue" /><span className="tool-note">Power your next idea</span></div>
         <div className="hero-display-bottom"><div><span className="eyebrow text-orange-300">Ready, set, create.</span><p>Small fixes.<br />Big possibilities.</p></div><Link to="/products" aria-label="Browse project essentials" className="hero-round-link"><Icon name="arrow" /></Link></div>
       </div>
     </section>
@@ -239,7 +239,7 @@ export default function App() {
                       Store management
                     </p>
 
-                    <h1 className="mt-2 text-3xl font-extrabold">
+                    <h1 className="mt-2 text-3xl font-bold">
                       Category Management
                     </h1>
 

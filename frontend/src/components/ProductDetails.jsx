@@ -56,7 +56,7 @@ export default function ProductDetails() {
           <Link to={`/products?categoryId=${product.category?.categoryId}`} className="eyebrow">
             {product.category?.name}
           </Link>
-          <h1 className="mt-3 text-3xl font-extrabold">{product.name}</h1>
+          <h1 className="mt-3 text-3xl font-bold">{product.name}</h1>
           <p className="mt-5 text-2xl font-bold">
             Rs. {Number(product.price).toLocaleString("en-LK", { minimumFractionDigits: 2 })}
           </p>
