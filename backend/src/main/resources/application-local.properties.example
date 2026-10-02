@@ -1,0 +1,4 @@
+# Copy to application-local.properties for local development.
+# The real local file is ignored by Git.
+spring.datasource.username=root
+spring.datasource.password=YOUR_MYSQL_PASSWORD
