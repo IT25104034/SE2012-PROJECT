@@ -105,7 +105,7 @@ function OrderList() {
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <p className="text-sm font-bold uppercase tracking-widest text-orange-600">
-                        Member 2
+                        Your purchases
                     </p>
 
                     <h2 className="mt-1 text-2xl font-extrabold text-slate-900">

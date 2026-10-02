@@ -10,7 +10,8 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  if (user) return <Navigate to="/products" replace />;
+  const destination = (account) => account.role === "ADMIN" ? "/admin/products" : account.role === "STAFF" ? "/staff/orders" : "/products";
+  if (user) return <Navigate to={destination(user)} replace />;
 
   async function submit(event) {
     event.preventDefault();
@@ -18,8 +19,8 @@ export default function LoginPage() {
     setError("");
 
     try {
-      await login(form);
-      navigate(location.state?.from || "/products", { replace: true });
+      const account = await login(form);
+      navigate(location.state?.from || destination(account), { replace: true });
     } catch (requestError) {
       setError(requestError.response?.data?.message || "Unable to sign in.");
     } finally {
@@ -31,9 +32,9 @@ export default function LoginPage() {
     <section className="mx-auto max-w-md">
       <div className="panel overflow-hidden">
         <div className="bg-slate-900 px-8 py-8 text-white">
-          <p className="eyebrow text-orange-400">Customer account</p>
+          <p className="eyebrow text-orange-400">Store account</p>
           <h1 className="mt-2 text-3xl font-extrabold">Welcome back</h1>
-          <p className="mt-2 text-sm text-slate-300">Sign in to manage your cart and orders.</p>
+          <p className="mt-2 text-sm text-slate-300">Sign in to shop or access your store workspace.</p>
         </div>
         <form className="space-y-5 p-8" onSubmit={submit}>
           {error && <p role="alert" className="rounded-md bg-red-50 p-3 text-sm font-semibold text-red-700">{error}</p>}

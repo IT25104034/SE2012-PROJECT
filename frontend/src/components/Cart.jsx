@@ -230,6 +230,7 @@ function Cart() {
                                                                 item.quantity - 1
                                                             )
                                                         }
+                                                        aria-label={`Decrease quantity of ${item.productName}`}
                                                         disabled={
                                                             busy || item.quantity <= 1
                                                         }
@@ -250,6 +251,7 @@ function Cart() {
                                                                 item.quantity + 1
                                                             )
                                                         }
+                                                        aria-label={`Increase quantity of ${item.productName}`}
                                                         disabled={busy}
                                                         className="px-3 py-2 font-bold text-slate-700 hover:bg-slate-100"
                                                     >

@@ -25,6 +25,20 @@ public class SessionRefreshInterceptor implements HandlerInterceptor {
             session.setAttribute("role", user.getRole());
             session.setAttribute("email", user.getEmail());
         }
+        String path = request.getRequestURI();
+        boolean accountManagement = path.startsWith("/api/admin/users");
+        boolean operations = path.startsWith("/api/inventory") || path.startsWith("/api/orders/status/")
+                || (path.startsWith("/api/orders/") && path.endsWith("/status"));
+        if (accountManagement || operations) {
+            if (session == null || session.getAttribute("userId") == null) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Please login first");
+            }
+            Object role = session.getAttribute("role");
+            if (accountManagement ? role != com.hardwarestore.hardwarestore.model.Role.ADMIN
+                    : role != com.hardwarestore.hardwarestore.model.Role.ADMIN && role != com.hardwarestore.hardwarestore.model.Role.STAFF) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission for this operation.");
+            }
+        }
         return true;
     }
 }

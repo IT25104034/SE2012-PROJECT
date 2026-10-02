@@ -49,7 +49,7 @@ function Storefront() {
 
             <nav
                 aria-label="Main navigation"
-                className="flex items-center gap-5 text-sm font-semibold"
+                className="flex flex-wrap items-center gap-3 text-sm font-semibold"
             >
               <NavLink
                   to="/products"

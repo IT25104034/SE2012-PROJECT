@@ -6,6 +6,7 @@ import com.hardwarestore.hardwarestore.dto.UserResponse;
 import com.hardwarestore.hardwarestore.model.User;
 import com.hardwarestore.hardwarestore.service.UserService;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +31,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(
             @Valid @RequestBody RegisterRequest request,
-            HttpSession session
+            HttpSession session, HttpServletRequest httpRequest
     ) {
         try {
             User user = new User();
@@ -39,6 +40,7 @@ public class AuthController {
             user.setPassword(request.getPassword());
 
             User savedUser = userService.registerUser(user);
+            httpRequest.changeSessionId();
             storeUserSession(session, savedUser);
 
             return ResponseEntity
@@ -54,7 +56,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(
             @Valid @RequestBody LoginRequest request,
-            HttpSession session
+            HttpSession session, HttpServletRequest httpRequest
     ) {
         try {
             User user = userService.loginUser(
@@ -62,6 +64,7 @@ public class AuthController {
                     request.getPassword()
             );
 
+            httpRequest.changeSessionId();
             storeUserSession(session, user);
             return ResponseEntity.ok(toUserResponse(user));
         } catch (IllegalArgumentException exception) {
