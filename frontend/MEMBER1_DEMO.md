@@ -14,7 +14,7 @@ Run Spring Boot in IntelliJ on port 8081. Run `npm run dev -- --port 5173 --stri
 
 `productService.js` calls the existing ProductController. GET returns an array; search, filtering and sorting run in React. This is not backend search or pagination. ProductForm sends `category: { categoryId }`, matching the JPA relationship. React Query tracks pending/errors and refreshes queries after mutations. Category renames also invalidate product data so category names stay current.
 
-Product fields: name, description, price, imageUrl, quantity and category. Authentication, cart and checkout are integrated. Management routes require an ADMIN account in the frontend; backend product/category writes still need role enforcement. SKU, brand and active status are not implemented.
+Product fields: name, description, price, imageUrl, quantity and category. Authentication, cart and checkout are integrated. Management routes and backend product/category writes require an authenticated ADMIN account. Catalogue reads remain public. SKU, brand and active status are not implemented.
 
 ## Demo checklist
 

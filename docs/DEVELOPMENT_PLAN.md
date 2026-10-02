@@ -16,7 +16,7 @@ Keep the current layered design: React -> Axios -> Spring MVC controllers -> ser
 - Staff (pending): incoming orders, processing/status updates and stock operations.
 - Admin: catalogue, inventory, orders and account/role administration.
 
-Registration currently creates CUSTOMER only. ADMIN exists, including a local demo initializer. STAFF is not implemented. Admin catalogue routes have frontend guards, but product/category write APIs still lack server authorization.
+Registration currently creates CUSTOMER only. ADMIN exists, including a local demo initializer. STAFF is not implemented. Admin catalogue routes have frontend guards. Product/category POST, PUT and DELETE now also require an authenticated ADMIN session at the backend; GET remains public.
 
 ## Current implementation and evidence
 
@@ -26,16 +26,16 @@ Registration currently creates CUSTOMER only. ADMIN exists, including a local de
 | FR03–07 catalogue | CRUD, details, browser search/category/price/sort and stock details; URL-backed availability filtering and catalogue stock indicators added in the first increment |
 | FR08–11 cart/order journey | Cart operations, stock checks, transactional checkout, order history/items |
 | FR12–16 Staff operations | Admin can inspect/process orders and update stock; Staff role/access pending |
-| FR17–18 catalogue management | Admin UI present; server write permissions pending |
+| FR17–18 catalogue management | Admin UI and server write permissions present |
 | FR19 inventory management | Dedicated admin stock dashboard and editor now present |
 | FR20–22 account/staff/roles | Management APIs and UI pending |
 
-Verified in this session: frontend build/lint; backend compilation; Spring Boot startup connected to ECOM; all seven tables created; admin login and catalogue/inventory API reads succeeded. Those checks do not establish a complete cart/checkout acceptance test or browser QA. No deployment has been verified.
+Verified in this session: frontend build/lint; backend compilation; Spring Boot startup connected to ECOM; all seven tables created; admin login and catalogue/inventory API reads succeeded. Those checks do not establish a complete cart/checkout acceptance test or browser QA. Catalogue authorization: 28 focused tests cover guest/customer/admin writes, public reads, malformed guest requests and preflight bypass. Live API checks confirmed all six guest write routes return 401, public reads and CORS preflight return 200, and admin writes reach the service using nonexistent IDs. No deployment has been verified.
 
 ## Small implementation increments
 
 1. Catalogue availability: URL-backed All/In stock/Out of stock filter, combined with current filters, and visible stock indicators (FR05/FR07).
-2. Catalogue API permissions: public reads; authenticated ADMIN writes; tests for guest/customer/admin POST, PUT and DELETE (FR17/FR18/NFR03).
+2. Catalogue API permissions (completed): public reads; authenticated ADMIN writes; guest gets 401, customer gets 403. Authorization runs before body validation (FR17/FR18/NFR03).
 3. Referenced deletion errors: friendly conflict responses for products/categories still in use (NFR04/NFR09).
 4. Staff access: STAFF enum, shared server permission checks and operational routes; keep catalogue/account management restricted to ADMIN (FR12–16).
 5. Account management: safe user DTOs, admin staff creation and role management, validation and protections against removing the last admin (FR20–22).
