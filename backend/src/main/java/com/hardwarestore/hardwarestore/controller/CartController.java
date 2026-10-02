@@ -119,11 +119,12 @@ public class CartController {
     }
 
     @PostMapping("/cart/{userId}/checkout")
-    public OrderResponse checkout(@PathVariable Long userId, HttpSession session) {
+    public OrderResponse checkout(@PathVariable Long userId, HttpSession session,
+                                  @RequestHeader(value = "X-Checkout-Key", required = false) String checkoutKey) {
 
         User customer = getAuthenticatedCustomer(userId, session);
 
-        Order order = orderService.checkout(customer);
+        Order order = checkoutKey == null ? orderService.checkout(customer) : orderService.checkout(customer, checkoutKey);
 
         return new OrderResponse(
                 order.getOrderId(),

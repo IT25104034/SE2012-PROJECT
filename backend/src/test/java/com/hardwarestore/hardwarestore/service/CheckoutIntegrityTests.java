@@ -3,7 +3,7 @@ package com.hardwarestore.hardwarestore.service;
 import com.hardwarestore.hardwarestore.model.*;
 import com.hardwarestore.hardwarestore.repository.*;
 import com.hardwarestore.hardwarestore.exception.ResourceConflictException;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -57,6 +57,42 @@ class CheckoutIntegrityTests {
             assertNotEquals(one.get(10,TimeUnit.SECONDS),two.get(10,TimeUnit.SECONDS));
             assertEquals(0,products.findById(product.getProductId()).orElseThrow().getQuantity());
             assertEquals(1,orderRepository.findByCustomer(first).size()+orderRepository.findByCustomer(second).size());
+        } finally {executor.shutdownNow();}
+    }
+    @Test void emptyCartAndInvalidQuantitiesAreRejected() {
+        var user=customer();var product=product(3);carts.getOrCreateCart(user);
+        assertThrows(IllegalArgumentException.class,()->orders.checkout(user));
+        assertThrows(IllegalArgumentException.class,()->carts.addItem(user,product,0));
+        assertThrows(IllegalArgumentException.class,()->carts.addItem(user,product,4));
+        assertTrue(carts.getCartItems(user).isEmpty());
+    }
+    @Test void concurrentAddsMergeIntoOneLineWithCorrectTotal() throws Exception {
+        var user=customer();var product=product(5);var start=new CountDownLatch(1);var executor=Executors.newFixedThreadPool(2);
+        try {
+            Callable<Void> action=()->{start.await();carts.addItem(user,products.findById(product.getProductId()).orElseThrow(),1);return null;};
+            var first=executor.submit(action);var second=executor.submit(action);start.countDown();
+            first.get(10,TimeUnit.SECONDS);second.get(10,TimeUnit.SECONDS);
+            var items=carts.getCartItems(user);assertEquals(1,items.size());assertEquals(2,items.get(0).getQuantity());
+            assertEquals(new BigDecimal("25.00"),cartRepository.findByCustomer(user).orElseThrow().getTotalAmount());
+        } finally {executor.shutdownNow();}
+    }
+    @Test void repeatedCheckoutKeyReturnsSameOrder() {
+        var user=customer();var product=product(4);carts.addItem(user,product,2);
+        String key=UUID.randomUUID().toString();
+        var first=orders.checkout(user,key);var retry=orders.checkout(user,key);
+        assertEquals(first.getOrderId(),retry.getOrderId());
+        assertEquals(1,orderRepository.findByCustomer(user).size());
+        assertEquals(2,products.findById(product.getProductId()).orElseThrow().getQuantity());
+    }
+    @Test void concurrentDuplicateCheckoutReturnsOneOrder() throws Exception {
+        var user=customer();var product=product(4);carts.addItem(user,product,2);
+        String key=UUID.randomUUID().toString();var start=new CountDownLatch(1);var executor=Executors.newFixedThreadPool(2);
+        try {
+            Callable<Order> action=()->{start.await();return orders.checkout(user,key);};
+            var first=executor.submit(action);var second=executor.submit(action);start.countDown();
+            assertEquals(first.get(10,TimeUnit.SECONDS).getOrderId(),second.get(10,TimeUnit.SECONDS).getOrderId());
+            assertEquals(1,orderRepository.findByCustomer(user).size());
+            assertEquals(2,products.findById(product.getProductId()).orElseThrow().getQuantity());
         } finally {executor.shutdownNow();}
     }
     @Test void cancellationRestoresStockWithoutDoubleRestocking() {

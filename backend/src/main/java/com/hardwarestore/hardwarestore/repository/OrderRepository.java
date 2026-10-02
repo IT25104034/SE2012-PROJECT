@@ -18,6 +18,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     Optional<Order> findByIdForUpdate(@Param("id") Long id);
 
 
+    Optional<Order> findByCustomerAndCheckoutKey(User customer, String checkoutKey);
+
     List<Order> findByCustomer(User customer);
 
     List<Order> findByStatus(OrderStatus status);

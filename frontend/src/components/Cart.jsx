@@ -1,14 +1,19 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
     checkoutCart,
     getCart,
     removeCartItem,
     updateCartQuantity,
 } from '../services/cartService.js'
+import { useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '../auth/authContext.js'
 
 function Cart() {
     const { user } = useAuth()
+    const client = useQueryClient()
+    const checkoutKey = useRef(null)
+    const operationPending = useRef(false)
+    const [busy, setBusy] = useState(false)
     const [cart, setCart] = useState(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
@@ -60,6 +65,10 @@ function Cart() {
             return
         }
 
+        if (operationPending.current) return
+        operationPending.current = true
+        setBusy(true)
+        checkoutKey.current = null
         updateCartQuantity({ userId, productId, quantity })
             .then(() => {
                 loadCart()
@@ -67,26 +76,37 @@ function Cart() {
             .catch((error) => {
                 console.error('Failed to update quantity:', error)
                 setError(error.response?.data?.message || 'Unable to update item quantity.')
-            })
+            }).finally(() => { operationPending.current = false; setBusy(false) })
     }
 
     const removeItem = (productId) => {
+        if (operationPending.current) return
+        operationPending.current = true
+        setBusy(true)
+        checkoutKey.current = null
         removeCartItem({ userId, productId })
             .then(() => {
                 loadCart()
             })
             .catch((error) => {
                 console.error('Failed to remove item:', error)
-                setError('Unable to remove item from cart.')
-            })
+                setError(error.response?.data?.message || 'Unable to remove item from cart.')
+            }).finally(() => { operationPending.current = false; setBusy(false) })
     }
 
     const checkout = () => {
+        if (operationPending.current) return
+        operationPending.current = true
+        setBusy(true)
+        checkoutKey.current ??= crypto.randomUUID()
         setCheckoutMessage('')
         setError('')
 
-        checkoutCart(userId)
+        checkoutCart(userId, checkoutKey.current)
             .then((order) => {
+                checkoutKey.current = null
+                client.invalidateQueries({ queryKey: ["products"] })
+                client.invalidateQueries({ queryKey: ["inventory"] })
                 setCheckoutMessage(
                     `Order #${order.orderId} created successfully.`
                 )
@@ -100,7 +120,8 @@ function Cart() {
                         ? responseMessage
                         : 'Unable to complete checkout. Please try again.'
                 )
-            })
+                if (error.response?.status < 500) checkoutKey.current = null
+            }).finally(() => { operationPending.current = false; setBusy(false) })
     }
 
     if (loading) {
@@ -210,7 +231,7 @@ function Cart() {
                                                             )
                                                         }
                                                         disabled={
-                                                            item.quantity <= 1
+                                                            busy || item.quantity <= 1
                                                         }
                                                         className="px-3 py-2 font-bold text-slate-700 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
                                                     >
@@ -229,6 +250,7 @@ function Cart() {
                                                                 item.quantity + 1
                                                             )
                                                         }
+                                                        disabled={busy}
                                                         className="px-3 py-2 font-bold text-slate-700 hover:bg-slate-100"
                                                     >
                                                         +
@@ -247,6 +269,7 @@ function Cart() {
                                                             item.productId
                                                         )
                                                     }
+                                                    disabled={busy}
                                                     className="text-sm font-semibold text-red-600 hover:text-red-700"
                                                 >
                                                     Remove
@@ -287,10 +310,11 @@ function Cart() {
 
                         <button
                             type="button"
+                            disabled={busy}
                             onClick={checkout}
                             className="mt-6 w-full rounded-md bg-orange-600 px-4 py-3 text-sm font-bold text-white hover:bg-orange-700"
                         >
-                            Proceed to Checkout
+                            {busy ? "Please wait…" : "Proceed to Checkout"}
                         </button>
                     </aside>
                 </div>

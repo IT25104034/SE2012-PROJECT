@@ -50,7 +50,17 @@ public class OrderService {
 
     @Transactional
     public Order checkout(User customer) {
+        return checkout(customer, java.util.UUID.randomUUID().toString());
+    }
+
+    @Transactional
+    public Order checkout(User customer, String checkoutKey) {
+        try { java.util.UUID.fromString(checkoutKey); }
+        catch (IllegalArgumentException exception) { throw new IllegalArgumentException("Checkout key must be a UUID"); }
         userRepository.findByIdForUpdate(customer.getId()).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        var previous = orderRepository.findByCustomerAndCheckoutKey(customer, checkoutKey);
+        if (previous.isPresent()) return previous.get();
 
         Cart cart = cartRepository.findByCustomer(customer)
                 .orElseThrow(() ->
@@ -118,6 +128,7 @@ public class OrderService {
                 OrderStatus.PENDING
         );
 
+        order.setCheckoutKey(checkoutKey);
         order = orderRepository.save(order);
 
         // Create order items and reduce inventory stock

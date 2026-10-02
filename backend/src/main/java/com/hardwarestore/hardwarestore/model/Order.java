@@ -13,6 +13,11 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderId;
 
+    @Column(unique = true, length = 36)
+    private String checkoutKey;
+
+    public void setCheckoutKey(String checkoutKey) { this.checkoutKey = checkoutKey; }
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User customer;
