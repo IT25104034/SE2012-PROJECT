@@ -24,6 +24,13 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    @Column(unique = true)
+    private String googleSubject;
+
+    public String getGoogleSubject() { return googleSubject; }
+    public void setGoogleSubject(String googleSubject) { this.googleSubject = googleSubject; }
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;

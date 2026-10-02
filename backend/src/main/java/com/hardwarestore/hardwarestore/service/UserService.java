@@ -76,7 +76,7 @@ public class UserService {
                         new IllegalArgumentException("Invalid email or password")
                 );
 
-        if (!passwordEncoder.matches(password, user.getPassword())) {
+        if (user.getGoogleSubject() != null || !passwordEncoder.matches(password, user.getPassword())) {
             throw new IllegalArgumentException("Invalid email or password");
         }
 

@@ -2,3 +2,10 @@
 # The real local file is ignored by Git.
 spring.datasource.username=root
 spring.datasource.password=YOUR_MYSQL_PASSWORD
+
+# Enable after creating a Web application OAuth client in Google Auth Platform.
+# store.google.enabled=true
+# store.google.client-id=your-client-id.apps.googleusercontent.com
+# store.google.client-secret=your-client-secret
+# store.google.redirect-uri=http://localhost:8081/login/oauth2/code/google
+# store.google.frontend-url=http://localhost:5173

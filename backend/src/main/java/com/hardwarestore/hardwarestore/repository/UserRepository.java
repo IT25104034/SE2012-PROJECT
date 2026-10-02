@@ -19,5 +19,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("select u from User u order by u.id")
     List<User> findAllForRoleUpdate();
 
+    Optional<User> findByGoogleSubject(String googleSubject);
+
     Optional<User> findByEmail(String email);
 }

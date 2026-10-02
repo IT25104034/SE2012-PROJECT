@@ -6,9 +6,11 @@ CREATE TABLE `user` (
   `email` varchar(255) NOT NULL,
   `name` varchar(255) DEFAULT NULL,
   `password` varchar(255) NOT NULL,
+  `google_subject` varchar(255) DEFAULT NULL,
   `role` enum('CUSTOMER','STAFF','ADMIN') NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `UKob8kqyqqgmefl0aco34akdtpe` (`email`)
+  UNIQUE KEY `UKob8kqyqqgmefl0aco34akdtpe` (`email`),
+  UNIQUE KEY `google_subject_unique` (`google_subject`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `categories` (
