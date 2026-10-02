@@ -23,7 +23,7 @@ Registration currently creates CUSTOMER only. ADMIN exists, including a local de
 | Requirement | Current fork |
 | --- | --- |
 | FR01–02 registration/login | Customer/Admin API and UI; BCrypt and sessions; Staff pending |
-| FR03–07 catalogue | CRUD, details, browser search/category/price/sort and stock details; availability filtering is the first increment |
+| FR03–07 catalogue | CRUD, details, browser search/category/price/sort and stock details; URL-backed availability filtering and catalogue stock indicators added in the first increment |
 | FR08–11 cart/order journey | Cart operations, stock checks, transactional checkout, order history/items |
 | FR12–16 Staff operations | Admin can inspect/process orders and update stock; Staff role/access pending |
 | FR17–18 catalogue management | Admin UI present; server write permissions pending |

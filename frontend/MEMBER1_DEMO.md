@@ -5,7 +5,7 @@ Run Spring Boot in IntelliJ on port 8081. Run `npm run dev -- --port 5173 --stri
 ## Screens
 
 - `/`: storefront with real categories.
-- `/products`: catalogue, search, category/price filters and sorting.
+- `/products`: catalogue, search, category/price/availability filters and sorting.
 - `/products/:productId`: product details fetched by ID.
 - `/admin/products`: list, create, edit and delete products.
 - `/admin/categories`: existing category CRUD.
@@ -22,7 +22,7 @@ Product fields: name, description, price, imageUrl, quantity and category. Authe
 2. Create a product in that category, first with an empty name/price to show field errors.
 3. Verify the nested category in the browser Network request and response.
 4. Edit the product price and description. Confirm the ID stays the same.
-5. Browse the catalogue, search by name, filter by category and price, sort prices.
+5. Browse the catalogue, search by name, filter by category, price and availability, sort prices. Verify zero-stock products appear under Out of stock and positive-stock products under In stock; reload the URL to preserve filters, then Clear filters to reset.
 6. Open product details, including a direct URL refresh. Check a nonexistent product ID shows an error.
 7. Rename the category and revisit the catalogue to verify the refreshed name.
 8. Test Delete → Cancel, then delete the temporary product and its temporary category.
