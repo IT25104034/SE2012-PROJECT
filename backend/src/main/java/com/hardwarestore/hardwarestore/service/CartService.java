@@ -8,23 +8,29 @@ import com.hardwarestore.hardwarestore.exception.ResourceNotFoundException;
 import com.hardwarestore.hardwarestore.repository.CartItemRepository;
 import com.hardwarestore.hardwarestore.repository.CartRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import com.hardwarestore.hardwarestore.repository.UserRepository;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 @Service
+@Transactional
 public class CartService {
 
+    private final UserRepository userRepository;
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
 
     public CartService(CartRepository cartRepository,
-                       CartItemRepository cartItemRepository) {
+                       CartItemRepository cartItemRepository, UserRepository userRepository) {
+        this.userRepository = userRepository;
         this.cartRepository = cartRepository;
         this.cartItemRepository = cartItemRepository;
     }
 
     public Cart getOrCreateCart(User customer) {
+        userRepository.findByIdForUpdate(customer.getId()).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         return cartRepository.findByCustomer(customer)
                 .orElseGet(() -> cartRepository.save(new Cart(customer)));
     }
@@ -47,7 +53,9 @@ public class CartService {
                 .orElse(null);
 
         if (existingItem != null) {
-            int newQuantity = existingItem.getQuantity() + quantity;
+            int newQuantity;
+            try { newQuantity = Math.addExact(existingItem.getQuantity(), quantity); }
+            catch (ArithmeticException exception) { throw new IllegalArgumentException("Quantity is too large"); }
             validateQuantity(newQuantity);
             validateStock(product, newQuantity);
 

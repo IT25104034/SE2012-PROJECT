@@ -14,6 +14,7 @@ import com.hardwarestore.hardwarestore.repository.CartRepository;
 import com.hardwarestore.hardwarestore.repository.OrderItemRepository;
 import com.hardwarestore.hardwarestore.repository.OrderRepository;
 import com.hardwarestore.hardwarestore.repository.ProductRepository;
+import com.hardwarestore.hardwarestore.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,7 @@ import java.util.List;
 @Service
 public class OrderService {
 
+    private final UserRepository userRepository;
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
     private final OrderRepository orderRepository;
@@ -35,8 +37,10 @@ public class OrderService {
             CartItemRepository cartItemRepository,
             OrderRepository orderRepository,
             OrderItemRepository orderItemRepository,
-            ProductRepository productRepository
+            ProductRepository productRepository,
+            UserRepository userRepository
     ) {
+        this.userRepository = userRepository;
         this.cartRepository = cartRepository;
         this.cartItemRepository = cartItemRepository;
         this.orderRepository = orderRepository;
@@ -46,6 +50,7 @@ public class OrderService {
 
     @Transactional
     public Order checkout(User customer) {
+        userRepository.findByIdForUpdate(customer.getId()).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         Cart cart = cartRepository.findByCustomer(customer)
                 .orElseThrow(() ->
@@ -59,19 +64,6 @@ public class OrderService {
             throw new IllegalArgumentException(
                     "Cannot checkout an empty cart"
             );
-        }
-
-        // Validate stock before creating the order
-        for (CartItem cartItem : cartItems) {
-
-            Product product = cartItem.getProduct();
-
-            if (product.getQuantity() < cartItem.getQuantity()) {
-                throw new IllegalArgumentException(
-                        "Not enough stock for product: "
-                                + product.getName()
-                );
-            }
         }
 
         // Validate cart item quantity and stored unit price
@@ -90,6 +82,15 @@ public class OrderService {
                 throw new IllegalArgumentException(
                         "Cart item price cannot be negative"
                 );
+            }
+        }
+
+        // Conditional updates are evaluated by the database, preventing overselling.
+        // Stable product order reduces deadlocks for overlapping multi-product carts.
+        cartItems = cartItems.stream().sorted(java.util.Comparator.comparing(item -> item.getProduct().getProductId())).toList();
+        for (CartItem item : cartItems) {
+            if (productRepository.deductStock(item.getProduct().getProductId(), item.getQuantity()) != 1) {
+                throw new ResourceConflictException("Not enough stock for product: " + item.getProduct().getName() + ". Refresh your cart.", null);
             }
         }
 
@@ -133,13 +134,6 @@ public class OrderService {
 
             orderItemRepository.save(orderItem);
 
-            int newQuantity =
-                    product.getQuantity()
-                            - cartItem.getQuantity();
-
-            product.setQuantity(newQuantity);
-
-            productRepository.save(product);
         }
 
         // Clear cart after successful checkout
