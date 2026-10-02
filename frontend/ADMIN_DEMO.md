@@ -1,6 +1,6 @@
 # Admin orders and inventory
 
-Run the backend on port 8081 with MySQL and DB_PASSWORD configured. Run the frontend on port 5173 (npm ci, then npm run dev -- --port 5173 --strictPort). Sign in with an existing ADMIN account; registration creates CUSTOMER accounts.
+Run the backend on port 8081 with MySQL ECOM and the ignored application-local.properties configured. Run the frontend on port 5173 (npm ci, then npm run dev -- --port 5173 --strictPort). The backend initializes admin@mustafa.com with password admin if that email does not exist. Existing accounts/passwords are preserved. Registration creates CUSTOMER accounts.
 
 ## Orders: /admin/orders
 
