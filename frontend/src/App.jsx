@@ -9,6 +9,9 @@ import {
 } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
+import AdminOrders from "./components/AdminOrders.jsx";
+import Inventory from "./components/Inventory.jsx";
+
 import CategoryList from "./components/CategoryList.jsx";
 import AddCategoryForm from "./components/AddCategoryForm.jsx";
 import ProductBrowser from "./components/ProductBrowser.jsx";
@@ -237,11 +240,13 @@ function Management() {
 
           <nav
               aria-label="Management navigation"
-              className="mt-6 flex gap-2 md:flex-col"
+              className="mt-6 flex flex-wrap gap-2 md:flex-col"
           >
             {[
               ["/admin/products", "Products"],
               ["/admin/categories", "Categories"],
+              ["/admin/inventory", "Inventory"],
+              ["/admin/orders", "Orders"],
             ].map(([to, label]) => (
                 <NavLink
                     key={to}
@@ -346,6 +351,9 @@ export default function App() {
                   />
                 }
             />
+
+            <Route path="inventory" element={<Inventory />} />
+            <Route path="orders" element={<AdminOrders />} />
 
             <Route
                 path="categories"

@@ -15,7 +15,7 @@ export default function ProductForm({ product, onClose, onSaved }) {
   const mutation = useMutation({
     mutationFn: saveProduct,
     onSuccess: async () => {
-      await client.invalidateQueries({ queryKey: ["products"] });
+      await Promise.all([client.invalidateQueries({ queryKey: ["products"] }), client.invalidateQueries({ queryKey: ["inventory"] })]);
       onSaved(product ? "Product updated successfully." : "Product created successfully.");
       onClose();
     },

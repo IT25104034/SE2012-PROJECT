@@ -15,3 +15,7 @@ export async function updateOrderStatus({ orderId, status }) {
     })
   ).data;
 }
+
+export async function getOrdersByStatus(status) {
+  return (await apiClient.get(`/api/orders/status/${status}`)).data;
+}

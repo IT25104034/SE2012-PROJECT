@@ -15,7 +15,7 @@ export default function ProductBrowser({ management = false }) {
   const categories = useQuery({ queryKey: ["categories"], queryFn: getCategories });
   const remove = useMutation({ mutationFn: deleteProduct, onSuccess: async () => {
     setMessage("Product deleted successfully.");
-    await client.invalidateQueries({ queryKey: ["products"] });
+    await Promise.all([client.invalidateQueries({ queryKey: ["products"] }), client.invalidateQueries({ queryKey: ["inventory"] })]);
   }});
   const search = params.get("search") ?? "";
   const category = params.get("categoryId") ?? "";
