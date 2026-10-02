@@ -1,0 +1,23 @@
+@startuml
+start
+:Operator selects order and next status;
+if (Staff or Admin?) then (yes)
+  :Begin transaction; lock order;
+  if (Status already matches?) then (yes)
+    :Return existing order without stock changes;
+  else (no)
+    if (Allowed transition?) then (yes)
+      if (Pre-shipping cancellation?) then (yes)
+        :Restore stock in product-ID order;
+      endif
+      :Save status; commit transaction;
+      :Refresh operator/customer views;
+    else (no)
+      :Return 409; leave order unchanged;
+    endif
+  endif
+else (no)
+  :Return 401/403;
+endif
+stop
+@enduml

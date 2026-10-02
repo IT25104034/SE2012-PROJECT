@@ -1,0 +1,21 @@
+@startuml
+start
+:Operator searches inventory;
+if (Staff or Admin?) then (yes)
+  :Select product; fetch current record;
+  :Enter total available stock;
+  if (Non-negative integer?) then (yes)
+    :Save versioned update;
+    if (Concurrent write?) then (yes)
+      :Return 409; refresh and retry;
+    else (no)
+      :Refresh inventory and catalogue;
+    endif
+  else (no)
+    :Show validation error;
+  endif
+else (no)
+  :Return 401/403;
+endif
+stop
+@enduml

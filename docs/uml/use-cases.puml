@@ -1,0 +1,30 @@
+@startuml
+left to right direction
+actor Customer
+actor Staff
+actor Admin
+rectangle "Mustafa Hardware Online Store" {
+  usecase "Register / Sign in" as Auth
+  usecase "Browse / Filter / View Products" as Browse
+  usecase "Manage Cart" as Cart
+  usecase "Place Order" as Checkout
+  usecase "View Own Orders" as History
+  usecase "Manage Catalogue" as Catalogue
+  usecase "Manage Inventory" as Inventory
+  usecase "Process Orders" as Process
+  usecase "Manage Accounts / Roles" as Accounts
+}
+Customer --> Auth
+Customer --> Browse
+Customer --> Cart
+Customer --> Checkout
+Customer --> History
+Staff --> Auth
+Staff --> Inventory
+Staff --> Process
+Admin --> Auth
+Admin --> Catalogue
+Admin --> Inventory
+Admin --> Process
+Admin --> Accounts
+@enduml

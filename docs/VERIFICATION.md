@@ -1,0 +1,36 @@
+# Verification evidence — 2 October 2026
+
+## Automated
+
+- Backend full suite: 73 tests passing in the final clean verification, including context startup, server permissions, Staff access, account creation/role rules, negative validation, deletion conflicts, checkout rollback/concurrency and retry identity.
+- Tests use H2 in MySQL mode with separate in-memory data. This does not replace MySQL verification.
+- Frontend production build and Oxlint pass. Compose YAML parses; container runtime is unverified.
+- Git diff whitespace check passes.
+
+Run backend `bash mvnw clean verify`, and frontend `npm run build` / `npm run lint`.
+
+## Actual ECOM / MySQL
+
+Verified through the running backend:
+
+- Database connection, public catalogue reads, admin login, seven tables and admin bootstrap.
+- Guest catalogue writes denied; Admin writes reach services; CORS preflight succeeds.
+- Referenced category and cart product deletion return 409; records remain; deleting after removing references works.
+- Staff creation/login/order access; Staff denied catalogue/accounts; demotion revokes an existing session; last-admin demotion rejected.
+- Checkout returns an order, clears cart and deducts stock; retry key returns the same order.
+- Invalid status jump rejected. Cancellation restores stock; repeating it does not restore twice.
+- Simultaneous two-customer checkout of the last unit yields one 200 and one 409, with stock zero.
+
+The final workflow smoke run made 29 requests: median 7.5 ms, maximum 71.7 ms locally. This is not a performance/load benchmark or an agreed service target. Temporary records were cleaned up using only IDs created by that run.
+
+The MySQL role enum initially rejected STAFF although the isolated tests passed. Migration 001 corrected ECOM; the live workflow suite then passed. This is why migrations and MySQL checks accompany the portable tests.
+
+## Browser
+
+Local in-app-browser smoke checks: homepage, login, catalogue/availability controls, admin navigation, Users form/table, Orders empty state and Inventory empty state. Admin login succeeds and account data loads. Navigation wraps; controls have labels and status/error feedback.
+
+This is not a completed cross-browser/device matrix or representative user study. Populated-table and Staff workflow behavior is supported by API/integration tests; full visual acceptance remains a follow-up.
+
+## Release limits
+
+Clean backend verify/package succeeded. Local credential files are absent from the packaged JAR. The packaged production profile started outside the checkout on port 8082, validated ECOM and returned health UP; that validation server was stopped. Docker is not installed on the current host, so container runtime testing and an actual hosted deployment are unverified. Client approvals, course submission, uptime, recovery targets and backup restore exercises were not verified.

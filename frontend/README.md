@@ -1,16 +1,9 @@
-# React + Vite
+# Mustafa Hardware frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Run npm ci, then npm run dev -- --port 5173 --strictPort. Backend runs on 8081. Copy .env.example to .env if an API override is needed. Axios sends session cookies.
 
-Currently, two official plugins are available:
+Verify with npm run build and npm run lint.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Customer catalogue/cart/order routes share the storefront. Admin routes manage catalogue, orders, inventory and accounts. Staff routes manage orders and inventory. Server checks enforce permissions regardless of route guards.
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+See the repository README and docs/ for requirements, test evidence, UML and deployment. The Docker build uses the same-origin /api proxy; an empty VITE_API_BASE_URL intentionally enables that behavior.

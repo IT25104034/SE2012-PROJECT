@@ -1,0 +1,51 @@
+@startuml
+class User { -id: Long
+-name: String
+-email: String
+-password: String
+-role: Role }
+enum Role { CUSTOMER
+STAFF
+ADMIN }
+class Category { -categoryId: Long
+-name: String
+-description: String }
+class Product { -productId: Long
+-name: String
+-price: BigDecimal
+-quantity: Integer
+-version: Long }
+class Cart { -cartId: Long
+-totalAmount: BigDecimal }
+class CartItem { -cartItemId: Long
+-quantity: Integer
+-unitPrice: BigDecimal }
+class Order { -orderId: Long
+-orderDate: LocalDateTime
+-totalAmount: BigDecimal
+-status: OrderStatus
+-checkoutKey: String }
+class OrderItem { -orderItemId: Long
+-quantity: Integer
+-unitPrice: BigDecimal
+-legacyPrice: BigDecimal }
+enum OrderStatus { PENDING
+CONFIRMED
+PROCESSING
+SHIPPED
+DELIVERED
+CANCELLED }
+User --> Role
+Category "1" <-- "0..*" Product
+User "1" <-- "0..1" Cart
+Cart "1" <-- "0..*" CartItem
+Product "1" <-- "0..*" CartItem
+User "1" <-- "0..*" Order
+Order "1" <-- "1..*" OrderItem
+Product "1" <-- "0..*" OrderItem
+Order --> OrderStatus
+note bottom
+Domain diagram. Relationships do not claim JPA cascade deletion.
+Controllers/services contain login, checkout and stock operations.
+end note
+@enduml

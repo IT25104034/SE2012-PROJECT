@@ -1,0 +1,20 @@
+@startuml
+start
+:Admin selects catalogue action;
+if (Authorized Admin?) then (yes)
+  :Enter/select product or category;
+  if (Valid fields and references?) then (yes)
+    :Save or delete through service;
+    if (Database reference conflict?) then (yes)
+      :Return 409; preserve record;
+    else (no)
+      :Return success; refresh UI;
+    endif
+  else (no)
+    :Show validation or missing-record error;
+  endif
+else (no)
+  :Return 401/403;
+endif
+stop
+@enduml

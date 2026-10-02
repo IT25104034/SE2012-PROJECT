@@ -20,4 +20,4 @@ Run the backend on port 8081 with MySQL ECOM and the ignored application-local.p
 
 ## Verification checklist
 
-Use temporary test records. Verify all six status filters, a customer with orders, an empty customer result, expanded items, status updates, stock set to zero and then restored, search/filter empty states, backend outage/retry, and customer denial of both admin routes. Cancelling an order only changes its status: the existing backend does not restore inventory.
+Use temporary test records. Verify all six status filters, a customer with orders, an empty customer result, expanded items, status updates, stock set to zero and then restored, search/filter empty states, backend outage/retry, and customer denial of both admin routes. Pre-shipping cancellation restores stock once. Only the allowed next statuses are offered; delivered/cancelled orders are final. Staff uses /staff/orders and /staff/inventory. Admin manages accounts and roles at /admin/users; public registration creates CUSTOMER only.

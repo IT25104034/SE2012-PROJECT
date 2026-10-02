@@ -1,0 +1,26 @@
+@startuml
+start
+:Customer submits cart with checkout UUID;
+if (Authenticated owner?) then (yes)
+  :Begin transaction; lock customer;
+  if (Order already exists for key?) then (yes)
+    :Return original order;
+  else (no)
+    if (Nonempty cart and valid quantities/prices?) then (yes)
+      :Conditionally deduct stock in product-ID order;
+      if (All deductions succeed?) then (yes)
+        :Create PENDING order and items;
+        :Clear cart; reset total;
+        :Commit transaction; return order;
+      else (no)
+        :Rollback all changes; return 409;
+      endif
+    else (no)
+      :Rollback; return validation error;
+    endif
+  endif
+else (no)
+  :Return unauthorized;
+endif
+stop
+@enduml
