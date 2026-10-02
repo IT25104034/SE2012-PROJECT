@@ -34,3 +34,11 @@ This is not a completed cross-browser/device matrix or representative user study
 ## Release limits
 
 Clean backend verify/package succeeded. Local credential files are absent from the packaged JAR. The packaged production profile started outside the checkout on port 8082, validated ECOM and returned health UP; that validation server was stopped. Docker is not installed on the current host, so container runtime testing and an actual hosted deployment are unverified. Client approvals, course submission, uptime, recovery targets and backup restore exercises were not verified.
+
+## UI polish — 3 October 2026 (`new-ui`)
+
+Refreshed the storefront header/footer, homepage/category cards, catalogue/product details, login/register and cart/order panels. Added shared SVG icons, clearer stock badges and prices, mobile filter disclosure, a skip-to-content link and reduced-motion styling. The management workspace shares the new colors, controls and panels. Homepage totals/category counts come from the catalogue rather than fixed marketing numbers.
+
+Frontend build and lint pass. Browser checks verified nine product cards with loaded images, Next pagination, category filtering, ascending price sorting, out-of-stock filtering and reset behavior. Product details, existing admin login/management navigation, cart/orders, logout and the enabled Google button were checked without placing orders or changing inventory. Mobile layouts were rendered in temporary same-origin preview frames at 390px and 320px; home/catalogue/login had no horizontal overflow. The mobile disclosure opened and search returned the two drill products, resetting the page parameter. The temporary preview file was removed and the browser viewport restored.
+
+The existing store data and backend authentication rules were not changed. This is local visual/interaction verification, not a full browser/device matrix or a real Google account sign-in test.

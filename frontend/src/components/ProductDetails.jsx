@@ -50,9 +50,9 @@ export default function ProductDetails() {
   return (
     <div>
       <Link className="text-sm font-semibold text-orange-700" to="/products">← Back to Products</Link>
-      <article className="panel mt-6 grid overflow-hidden md:grid-cols-2">
-        <ProductImage product={product} className="h-72 w-full p-8 md:h-96" />
-        <div className="p-8">
+      <article className="detail-panel panel mt-6 grid overflow-hidden md:grid-cols-2">
+        <div className="detail-photo"><ProductImage product={product} className="h-72 w-full p-8 md:h-96" /></div>
+        <div className="detail-content">
           <Link to={`/products?categoryId=${product.category?.categoryId}`} className="eyebrow">
             {product.category?.name}
           </Link>
