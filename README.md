@@ -8,12 +8,14 @@ Requirements: Java 17+, Node compatible with Vite 8 (Node 22.12+ or 24), MySQL a
 
 1. Create ECOM in your local MySQL server.
 2. Copy `backend/src/main/resources/application-local.properties.example` to `application-local.properties` in the same folder, and fill in your local credentials. That file is ignored by Git and excluded from packaged artifacts.
-3. For an existing installation, back up the fork database and run `backend/db/migrations/001-enable-staff.sql` and `002-checkout-integrity.sql` against ECOM. For a fresh development database, Hibernate creates tables. Never run these scripts against the college database.
+3. For an existing installation, back up the fork database and run `backend/db/migrations/001-enable-staff.sql` and `002-checkout-integrity.sql` and `003-google-login.sql` against ECOM. For a fresh development database, Hibernate creates tables. Never run these scripts against the college database.
 4. From `backend`, run `bash mvnw spring-boot:run`.
 5. From `frontend`, run `npm ci`, then `npm run dev -- --port 5173 --strictPort`.
 6. Open http://localhost:5173. Backend runs on 8081.
 
 Local demo startup creates `admin@mustafa.com` / `admin` only if that email is absent. Existing accounts/passwords are preserved. Production disables this default initializer; see deployment instructions.
+
+Google sign-in is optional and disabled until configured. See [Google login setup](docs/GOOGLE_SIGN_IN.md).
 
 ## Workspaces
 
