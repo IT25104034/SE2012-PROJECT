@@ -1,3 +1,4 @@
+import GoogleSignIn from "./GoogleSignIn.jsx";
 import { useState } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/authContext.js";
@@ -7,7 +8,10 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const [form, setForm] = useState({ email: "", password: "" });
-  const [error, setError] = useState("");
+  const googleError = new URLSearchParams(location.search).get("google");
+  const [error, setError] = useState(googleError === "existing-account"
+    ? "This email already has a store account. Sign in with your existing email and password."
+    : googleError === "failed" ? "Google sign-in could not be completed. Please try again." : "");
   const [submitting, setSubmitting] = useState(false);
 
   const destination = (account) => account.role === "ADMIN" ? "/admin/products" : account.role === "STAFF" ? "/staff/orders" : "/products";
@@ -51,6 +55,7 @@ export default function LoginPage() {
           <button className="btn-primary w-full py-3" disabled={submitting}>
             {submitting ? "Signing in…" : "Sign In"}
           </button>
+          <GoogleSignIn />
           <p className="text-center text-sm text-slate-500">
             New to Mustafa Hardware? <Link className="font-bold text-orange-700 hover:underline" to="/register">Create an account</Link>
           </p>

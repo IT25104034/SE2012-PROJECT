@@ -1,3 +1,4 @@
+import GoogleSignIn from "./GoogleSignIn.jsx";
 import { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/authContext.js";
@@ -55,6 +56,7 @@ export default function RegisterPage() {
           <button className="btn-primary w-full py-3" disabled={submitting}>
             {submitting ? "Creating account…" : "Create Account"}
           </button>
+          <GoogleSignIn />
           <p className="text-center text-sm text-slate-500">
             Already have an account? <Link className="font-bold text-orange-700 hover:underline" to="/login">Sign in</Link>
           </p>
