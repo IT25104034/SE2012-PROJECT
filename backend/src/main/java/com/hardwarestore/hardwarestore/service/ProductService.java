@@ -1,6 +1,9 @@
 package com.hardwarestore.hardwarestore.service;
 
 import com.hardwarestore.hardwarestore.exception.ResourceNotFoundException;
+import com.hardwarestore.hardwarestore.exception.ResourceConflictException;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.transaction.annotation.Transactional;
 import com.hardwarestore.hardwarestore.model.Category;
 import com.hardwarestore.hardwarestore.model.Product;
 import com.hardwarestore.hardwarestore.repository.CategoryRepository;
@@ -66,11 +69,19 @@ public class ProductService {
     }
 
     // Delete product
+    @Transactional
     public void deleteProduct(Long id) {
 
         Product existingProduct = getProductById(id);
 
-        productRepository.delete(existingProduct);
+        try {
+            productRepository.delete(existingProduct);
+            // Force database constraints to be checked before leaving this method.
+            productRepository.flush();
+        } catch (DataIntegrityViolationException exception) {
+            throw new ResourceConflictException(
+                    "Cannot delete this product because it is used in a cart or order. Remove it from carts first; products in order history must be kept.", exception);
+        }
     }
 
     private Category getProductCategory(Product product) {

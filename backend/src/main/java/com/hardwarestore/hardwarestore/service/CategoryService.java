@@ -1,6 +1,9 @@
 package com.hardwarestore.hardwarestore.service;
 
 import com.hardwarestore.hardwarestore.exception.ResourceNotFoundException;
+import com.hardwarestore.hardwarestore.exception.ResourceConflictException;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.transaction.annotation.Transactional;
 import com.hardwarestore.hardwarestore.model.Category;
 import com.hardwarestore.hardwarestore.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
@@ -47,10 +50,18 @@ public class CategoryService {
     }
 
     // Delete category
+    @Transactional
     public void deleteCategory(Long id) {
 
         Category existingCategory = getCategoryById(id);
 
-        categoryRepository.delete(existingCategory);
+        try {
+            categoryRepository.delete(existingCategory);
+            // Force database constraints to be checked before leaving this method.
+            categoryRepository.flush();
+        } catch (DataIntegrityViolationException exception) {
+            throw new ResourceConflictException(
+                    "Cannot delete this category because it contains products. Move or delete those products first.", exception);
+        }
     }
 }

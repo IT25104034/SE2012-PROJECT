@@ -30,13 +30,13 @@ Registration currently creates CUSTOMER only. ADMIN exists, including a local de
 | FR19 inventory management | Dedicated admin stock dashboard and editor now present |
 | FR20–22 account/staff/roles | Management APIs and UI pending |
 
-Verified in this session: frontend build/lint; backend compilation; Spring Boot startup connected to ECOM; all seven tables created; admin login and catalogue/inventory API reads succeeded. Those checks do not establish a complete cart/checkout acceptance test or browser QA. Catalogue authorization: 28 focused tests cover guest/customer/admin writes, public reads, malformed guest requests and preflight bypass. Live API checks confirmed all six guest write routes return 401, public reads and CORS preflight return 200, and admin writes reach the service using nonexistent IDs. No deployment has been verified.
+Verified in this session: frontend build/lint; backend compilation; Spring Boot startup connected to ECOM; all seven tables created; admin login and catalogue/inventory API reads succeeded. Those checks do not establish a complete cart/checkout acceptance test or browser QA. Catalogue authorization: 28 focused tests cover guest/customer/admin writes, public reads, malformed guest requests and preflight bypass. Live API checks confirmed all six guest write routes return 401, public reads and CORS preflight return 200, and admin writes reach the service using nonexistent IDs. Deletion verification: 8 additional tests cover immediate/deferred constraints, successful deletion and missing records (36 tests total with authorization). Live ECOM checks confirmed referenced category/product deletes return 409 and preserve records, while deletes after removing references return 204. Temporary category/product/cart items were removed afterward. Order-reference conflicts were covered by constraint-response tests, not a new live order. No deployment has been verified.
 
 ## Small implementation increments
 
 1. Catalogue availability: URL-backed All/In stock/Out of stock filter, combined with current filters, and visible stock indicators (FR05/FR07).
 2. Catalogue API permissions (completed): public reads; authenticated ADMIN writes; guest gets 401, customer gets 403. Authorization runs before body validation (FR17/FR18/NFR03).
-3. Referenced deletion errors: friendly conflict responses for products/categories still in use (NFR04/NFR09).
+3. Referenced deletion errors (completed): product/category deletes flush within a transaction; database reference failures return HTTP 409 with an actionable message. Existing carts and order history are preserved (NFR04/NFR09).
 4. Staff access: STAFF enum, shared server permission checks and operational routes; keep catalogue/account management restricted to ADMIN (FR12–16).
 5. Account management: safe user DTOs, admin staff creation and role management, validation and protections against removing the last admin (FR20–22).
 6. Order processing rules: document permitted transitions and cancellation policy, implement and test together (FR13/FR14/NFR09).
