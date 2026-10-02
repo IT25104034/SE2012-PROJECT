@@ -6,6 +6,9 @@ import com.hardwarestore.hardwarestore.exception.ResourceNotFoundException;
 import com.hardwarestore.hardwarestore.repository.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.hardwarestore.hardwarestore.dto.CreateUserRequest;
+import java.util.List;
+import java.util.Locale;
 
 @Service
 public class UserService {
@@ -19,12 +22,26 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    public List<User> getAllUsers() { return userRepository.findAll(); }
+
+    public User createManagedUser(CreateUserRequest request) {
+        String email = request.getEmail().trim().toLowerCase(Locale.ROOT);
+        if (emailExists(email)) throw new IllegalArgumentException("Email already registered");
+        User user = new User();
+        user.setName(request.getName().trim());
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRole(request.getRole());
+        return userRepository.save(user);
+    }
+
     public boolean emailExists(String email) {
         return userRepository.findByEmail(email).isPresent();
     }
 
     public User registerUser(User user) {
 
+        user.setEmail(user.getEmail().trim().toLowerCase(Locale.ROOT));
         if (emailExists(user.getEmail())) {
             throw new IllegalArgumentException("Email already registered");
         }
@@ -39,7 +56,7 @@ public class UserService {
 
     public User loginUser(String email, String password) {
 
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmail(email.trim().toLowerCase(Locale.ROOT))
                 .orElseThrow(() ->
                         new IllegalArgumentException("Invalid email or password")
                 );

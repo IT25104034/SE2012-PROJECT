@@ -9,6 +9,7 @@ import {
 } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
+import UserManagement from "./components/UserManagement.jsx";
 import AdminOrders from "./components/AdminOrders.jsx";
 import Inventory from "./components/Inventory.jsx";
 
@@ -247,6 +248,7 @@ function Management() {
               ["/admin/categories", "Categories"],
               ["/admin/inventory", "Inventory"],
               ["/admin/orders", "Orders"],
+              ["/admin/users", "Users"],
             ].map(([to, label]) => (
                 <NavLink
                     key={to}
@@ -352,6 +354,7 @@ export default function App() {
                 }
             />
 
+            <Route path="users" element={<UserManagement />} />
             <Route path="inventory" element={<Inventory />} />
             <Route path="orders" element={<AdminOrders />} />
 
