@@ -6,6 +6,8 @@ import { getCategories } from "../services/categoryService.js";
 import ProductImage from "./ProductImage.jsx";
 import ProductForm from "./ProductForm.jsx";
 
+const PAGE_SIZE = 9;
+
 export default function ProductBrowser({ management = false }) {
   const client = useQueryClient();
   const [params, setParams] = useSearchParams();
@@ -29,6 +31,7 @@ export default function ProductBrowser({ management = false }) {
     setParams((previous) => {
       const next = new URLSearchParams(previous);
       if (value) next.set(name, value); else next.delete(name);
+      next.delete("page");
       return next;
     }, { replace: true });
   }
@@ -38,6 +41,18 @@ export default function ProductBrowser({ management = false }) {
     (!availability || (availability === "in" ? Number(product.quantity ?? 0) > 0 : Number(product.quantity ?? 0) === 0)) &&
     (min === "" || product.price >= Number(min)) && (max === "" || product.price <= Number(max))
   ).sort((a, b) => sort === "price-low" ? a.price - b.price : sort === "price-high" ? b.price - a.price : a.name.localeCompare(b.name));
+  const pageCount = Math.max(1, Math.ceil(visible.length / PAGE_SIZE));
+  const requestedPage = Number(params.get("page") ?? 1);
+  const page = Number.isSafeInteger(requestedPage) && requestedPage > 0 ? Math.min(requestedPage, pageCount) : 1;
+  const start = (page - 1) * PAGE_SIZE;
+  const pageProducts = visible.slice(start, start + PAGE_SIZE);
+  function changePage(nextPage) {
+    setParams((previous) => {
+      const next = new URLSearchParams(previous);
+      if (nextPage === 1) next.delete("page"); else next.set("page", String(nextPage));
+      return next;
+    });
+  }
 
   return <div className="space-y-6">
     <div className="flex flex-wrap items-center justify-between gap-4">
@@ -76,14 +91,19 @@ export default function ProductBrowser({ management = false }) {
       </aside>
       <div className="min-w-0">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3 text-sm text-slate-500">
-          <span>{products.isSuccess ? `${visible.length} products` : "Catalogue"}</span>
+          <span role="status">{products.isSuccess ? visible.length ? `Showing ${start + 1}–${start + pageProducts.length} of ${visible.length} products` : "0 products" : "Catalogue"}</span>
           <label className="flex items-center gap-2">Sort by<select className="rounded border border-slate-200 bg-white p-2" value={sort} onChange={(e) => filter("sort", e.target.value)}><option value="name">Name</option><option value="price-low">Price: low to high</option><option value="price-high">Price: high to low</option></select></label>
         </div>
         {products.isPending ? <p role="status" className="panel p-8">Loading products…</p> : products.isError ? <div role="alert" className="panel p-8 text-red-700">Unable to load products. Check that Spring Boot is running, then use Refresh.</div> : visible.length === 0 ? <div className="panel p-12 text-center"><h2 className="font-bold">No products found</h2><p className="mt-2 text-sm text-slate-500">{products.data.length ? "Try changing your filters." : "Products will appear here after they are added."}</p></div> : management ? (
           <div className="panel overflow-x-auto"><table className="w-full text-left text-sm"><thead className="border-b bg-slate-50 text-slate-500"><tr>{["Product", "Category", "Price", "Stock", "Actions"].map((title) => <th key={title} scope="col" className="p-4">{title}</th>)}</tr></thead><tbody className="divide-y divide-slate-100">
-            {visible.map((product) => <tr key={product.productId} className="hover:bg-slate-50"><td className="p-4"><Link className="font-bold hover:text-orange-700" to={`/products/${product.productId}`}>{product.name}</Link><p className="mt-1 max-w-xs truncate text-slate-500">{product.description || "—"}</p></td><td className="p-4">{product.category?.name}</td><td className="whitespace-nowrap p-4">Rs. {Number(product.price).toLocaleString("en-LK", { minimumFractionDigits: 2 })}</td><td className={`whitespace-nowrap p-4 font-semibold ${Number(product.quantity ?? 0) > 0 ? "text-green-700" : "text-red-700"}`}>{Number(product.quantity ?? 0) > 0 ? `${product.quantity} in stock` : "Out of stock"}</td><td className="p-4"><div className="flex gap-2"><button className="btn-outline" disabled={editor !== null || remove.isPending} onClick={() => { setMessage(""); remove.reset(); setEditor(product); }}>Edit</button><button className="btn-danger" disabled={editor !== null || remove.isPending} onClick={() => { if (window.confirm(`Permanently delete "${product.name}"?`)) { setMessage(""); remove.mutate(product.productId); } }}>{remove.isPending && remove.variables === product.productId ? "Deleting…" : "Delete"}</button></div></td></tr>)}
+            {pageProducts.map((product) => <tr key={product.productId} className="hover:bg-slate-50"><td className="p-4"><Link className="font-bold hover:text-orange-700" to={`/products/${product.productId}`}>{product.name}</Link><p className="mt-1 max-w-xs truncate text-slate-500">{product.description || "—"}</p></td><td className="p-4">{product.category?.name}</td><td className="whitespace-nowrap p-4">Rs. {Number(product.price).toLocaleString("en-LK", { minimumFractionDigits: 2 })}</td><td className={`whitespace-nowrap p-4 font-semibold ${Number(product.quantity ?? 0) > 0 ? "text-green-700" : "text-red-700"}`}>{Number(product.quantity ?? 0) > 0 ? `${product.quantity} in stock` : "Out of stock"}</td><td className="p-4"><div className="flex gap-2"><button className="btn-outline" disabled={editor !== null || remove.isPending} onClick={() => { setMessage(""); remove.reset(); setEditor(product); }}>Edit</button><button className="btn-danger" disabled={editor !== null || remove.isPending} onClick={() => { if (window.confirm(`Permanently delete "${product.name}"?`)) { setMessage(""); remove.mutate(product.productId); } }}>{remove.isPending && remove.variables === product.productId ? "Deleting…" : "Delete"}</button></div></td></tr>)}
           </tbody></table></div>
-        ) : <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">{visible.map((product) => <article key={product.productId} className="panel overflow-hidden transition-shadow hover:shadow-md"><Link to={`/products/${product.productId}`}><ProductImage product={product} className="h-48 w-full p-5" /></Link><div className="p-5"><p className="text-xs font-bold uppercase tracking-wide text-orange-700">{product.category?.name}</p><h2 className="mt-2 text-lg font-bold"><Link to={`/products/${product.productId}`}>{product.name}</Link></h2><p className="mt-2 line-clamp-2 text-sm text-slate-500">{product.description || "View product details."}</p><p className="mt-4 text-lg font-extrabold">Rs. {Number(product.price).toLocaleString("en-LK", { minimumFractionDigits: 2 })}</p><p className={`mt-2 text-sm font-semibold ${Number(product.quantity ?? 0) > 0 ? "text-green-700" : "text-red-700"}`}>{Number(product.quantity ?? 0) > 0 ? `${product.quantity} in stock` : "Out of stock"}</p><Link className="btn-primary mt-4 block text-center" to={`/products/${product.productId}`}>View Details</Link></div></article>)}</div>}
+        ) : <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">{pageProducts.map((product) => <article key={product.productId} className="panel overflow-hidden transition-shadow hover:shadow-md"><Link to={`/products/${product.productId}`}><ProductImage product={product} className="h-48 w-full p-5" /></Link><div className="p-5"><p className="text-xs font-bold uppercase tracking-wide text-orange-700">{product.category?.name}</p><h2 className="mt-2 text-lg font-bold"><Link to={`/products/${product.productId}`}>{product.name}</Link></h2><p className="mt-2 line-clamp-2 text-sm text-slate-500">{product.description || "View product details."}</p><p className="mt-4 text-lg font-extrabold">Rs. {Number(product.price).toLocaleString("en-LK", { minimumFractionDigits: 2 })}</p><p className={`mt-2 text-sm font-semibold ${Number(product.quantity ?? 0) > 0 ? "text-green-700" : "text-red-700"}`}>{Number(product.quantity ?? 0) > 0 ? `${product.quantity} in stock` : "Out of stock"}</p><Link className="btn-primary mt-4 block text-center" to={`/products/${product.productId}`}>View Details</Link></div></article>)}</div>}
+        {products.isSuccess && visible.length > 0 && <nav aria-label="Product pages" className="mt-6 flex flex-wrap items-center justify-between gap-3">
+          <button className="btn-outline" disabled={page === 1} onClick={() => changePage(page - 1)}>Previous</button>
+          <span className="text-sm text-slate-500">Page {page} of {pageCount}</span>
+          <button className="btn-outline" disabled={page === pageCount} onClick={() => changePage(page + 1)}>Next</button>
+        </nav>}
       </div>
     </div>
   </div>;
