@@ -30,6 +30,11 @@ export function AuthProvider({ children }) {
     () => ({
       user,
       loading,
+      async refresh() {
+        const currentUser = await authService.getCurrentUser();
+        setUser(currentUser);
+        return currentUser;
+      },
       async login(credentials) {
         const authenticatedUser = await authService.login(credentials);
         setUser(authenticatedUser);

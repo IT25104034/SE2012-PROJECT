@@ -1,6 +1,22 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getUsers, createUser } from "../services/userService.js";
+import { useAuth } from "../auth/authContext.js";
+import { getUsers, createUser, updateUserRole } from "../services/userService.js";
+
+function RoleEditor({ user }) {
+  const client = useQueryClient();
+  const { refresh } = useAuth();
+  const [role, setRole] = useState(user.role);
+  const mutation = useMutation({ mutationFn: updateUserRole, onSuccess: async () => {
+    await client.invalidateQueries({ queryKey: ["users"] });
+    await refresh();
+  }});
+  return <form className="space-y-2" onSubmit={(event) => { event.preventDefault(); mutation.mutate({ userId: user.id, role }); }}>
+    <select aria-label={`Role for ${user.email}`} className="field-input" value={role} onChange={(event) => { setRole(event.target.value); mutation.reset(); }} disabled={mutation.isPending}>{["CUSTOMER", "STAFF", "ADMIN"].map((value) => <option key={value}>{value}</option>)}</select>
+    <button className="btn-outline" disabled={mutation.isPending || role === user.role}>{mutation.isPending ? "Saving…" : "Save role"}</button>
+    {mutation.isError && <p role="alert" className="field-error">{mutation.error.response?.data?.message || "Unable to update role."}</p>}
+  </form>;
+}
 
 export default function UserManagement() {
   const client = useQueryClient();
@@ -27,6 +43,6 @@ export default function UserManagement() {
       <button className="btn-primary" disabled={create.isPending}>{create.isPending ? "Creating…" : "Create account"}</button>
     </form>
     <div className="panel p-5"><label className="field-label" htmlFor="user-search">Search users</label><input id="user-search" className="field-input" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Name, email or role" /><button className="btn-outline mt-3" disabled={users.isFetching} onClick={() => users.refetch()}>Refresh</button></div>
-    {users.isPending ? <p role="status">Loading users…</p> : users.isError ? <p role="alert" className="text-red-700">Unable to load users. <button className="underline" onClick={() => users.refetch()}>Retry</button></p> : <div className="panel overflow-x-auto"><table className="w-full text-left text-sm"><thead><tr>{["ID", "Name", "Email", "Role"].map((label) => <th scope="col" className="p-4" key={label}>{label}</th>)}</tr></thead><tbody>{users.data.filter((user) => `${user.name} ${user.email} ${user.role}`.toLowerCase().includes(search.toLowerCase())).map((user) => <tr key={user.id} className="border-t border-slate-100"><td className="p-4">{user.id}</td><td className="p-4">{user.name}</td><td className="p-4">{user.email}</td><td className="p-4">{user.role}</td></tr>)}</tbody></table>{!users.data.some((user) => `${user.name} ${user.email} ${user.role}`.toLowerCase().includes(search.toLowerCase())) && <p className="p-5">No users match this search.</p>}</div>}
+    {users.isPending ? <p role="status">Loading users…</p> : users.isError ? <p role="alert" className="text-red-700">Unable to load users. <button className="underline" onClick={() => users.refetch()}>Retry</button></p> : <div className="panel overflow-x-auto"><table className="w-full text-left text-sm"><thead><tr>{["ID", "Name", "Email", "Role"].map((label) => <th scope="col" className="p-4" key={label}>{label}</th>)}</tr></thead><tbody>{users.data.filter((user) => `${user.name} ${user.email} ${user.role}`.toLowerCase().includes(search.toLowerCase())).map((user) => <tr key={user.id} className="border-t border-slate-100"><td className="p-4">{user.id}</td><td className="p-4">{user.name}</td><td className="p-4">{user.email}</td><td className="p-4"><RoleEditor key={`${user.id}-${user.role}`} user={user} /></td></tr>)}</tbody></table>{!users.data.some((user) => `${user.name} ${user.email} ${user.role}`.toLowerCase().includes(search.toLowerCase())) && <p className="p-5">No users match this search.</p>}</div>}
   </section>;
 }

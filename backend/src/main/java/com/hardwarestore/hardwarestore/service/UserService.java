@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import com.hardwarestore.hardwarestore.dto.CreateUserRequest;
 import java.util.List;
 import java.util.Locale;
+import org.springframework.transaction.annotation.Transactional;
+import com.hardwarestore.hardwarestore.exception.ResourceConflictException;
 
 @Service
 public class UserService {
@@ -20,6 +22,19 @@ public class UserService {
                        BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    @Transactional
+    public User updateRole(Long userId, Role role) {
+        List<User> users = userRepository.findAllForRoleUpdate();
+        User user = users.stream().filter(item -> item.getId().equals(userId)).findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+        if (user.getRole() == Role.ADMIN && role != Role.ADMIN
+                && users.stream().filter(item -> item.getRole() == Role.ADMIN).count() <= 1) {
+            throw new ResourceConflictException("The last administrator cannot be demoted. Create another admin first.", null);
+        }
+        user.setRole(role);
+        return userRepository.save(user);
     }
 
     public List<User> getAllUsers() { return userRepository.findAll(); }

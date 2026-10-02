@@ -2,6 +2,7 @@ package com.hardwarestore.hardwarestore.controller;
 
 import com.hardwarestore.hardwarestore.dto.CreateUserRequest;
 import com.hardwarestore.hardwarestore.dto.UserResponse;
+import com.hardwarestore.hardwarestore.dto.UpdateRoleRequest;
 import com.hardwarestore.hardwarestore.model.Role;
 import com.hardwarestore.hardwarestore.model.User;
 import com.hardwarestore.hardwarestore.service.UserService;
@@ -32,6 +33,11 @@ public class UserManagementController {
     public UserResponse create(@Valid @RequestBody CreateUserRequest request, HttpSession session) {
         requireAdmin(session);
         return response(users.createManagedUser(request));
+    }
+    @PutMapping("/{userId}/role")
+    public UserResponse updateRole(@PathVariable Long userId, @Valid @RequestBody UpdateRoleRequest request, HttpSession session) {
+        requireAdmin(session);
+        return response(users.updateRole(userId, request.role()));
     }
     private UserResponse response(User user) {
         return new UserResponse(user.getId(), user.getName(), user.getEmail(), user.getRole());
