@@ -8,6 +8,7 @@ import com.hardwarestore.hardwarestore.model.OrderStatus;
 import com.hardwarestore.hardwarestore.model.Product;
 import com.hardwarestore.hardwarestore.model.User;
 import com.hardwarestore.hardwarestore.exception.ResourceNotFoundException;
+import com.hardwarestore.hardwarestore.exception.ResourceConflictException;
 import com.hardwarestore.hardwarestore.repository.CartItemRepository;
 import com.hardwarestore.hardwarestore.repository.CartRepository;
 import com.hardwarestore.hardwarestore.repository.OrderItemRepository;
@@ -162,18 +163,33 @@ public class OrderService {
         return orderItemRepository.findByOrder(order);
     }
 
+    @Transactional
     public Order updateOrderStatus(
             Long orderId,
             OrderStatus status
     ) {
 
-        Order order = orderRepository.findById(orderId)
+        Order order = orderRepository.findByIdForUpdate(orderId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
                                 "Order not found with id: " + orderId
                         )
                 );
 
+        if (order.getStatus() == status) return order;
+        if (!order.getStatus().nextStatuses().contains(status)) {
+            throw new ResourceConflictException("Cannot change an order from " + order.getStatus() + " to " + status + ".", null);
+        }
+        if (status == OrderStatus.CANCELLED) {
+            // Keep consistent product lock order when cancelling multi-product orders.
+            var items = orderItemRepository.findByOrder(order).stream()
+                    .sorted(java.util.Comparator.comparing(item -> item.getProduct().getProductId())).toList();
+            for (OrderItem item : items) {
+                if (productRepository.restoreStock(item.getProduct().getProductId(), item.getQuantity()) != 1) {
+                    throw new ResourceConflictException("Unable to restore product stock. Order was not cancelled.", null);
+                }
+            }
+        }
         order.setStatus(status);
 
         return orderRepository.save(order);

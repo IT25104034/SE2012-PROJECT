@@ -3,7 +3,14 @@ package com.hardwarestore.hardwarestore.repository;
 import com.hardwarestore.hardwarestore.model.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
+    @Modifying
+    @Query("update Product p set p.quantity = p.quantity + :quantity, p.version = p.version + 1 where p.productId = :id")
+    int restoreStock(@Param("id") Long id, @Param("quantity") int quantity);
+
 }
