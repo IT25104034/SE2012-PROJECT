@@ -27,6 +27,12 @@ class WorkflowAcceptanceTests {
         var user=new User();user.setName("Test user");user.setEmail(UUID.randomUUID()+"@example.com");user.setPassword("test hash");user.setRole(role);user=users.save(user);
         var session=new MockHttpSession();session.setAttribute("userId",user.getId());session.setAttribute("role",role);return session;
     }
+    @Test void healthAndCorsAreAvailable() throws Exception {
+        mvc.perform(get("/api/health")).andExpect(status().isOk()).andExpect(jsonPath("$.status").value("UP"));
+        mvc.perform(options("/api/products").header("Origin","http://localhost:5173").header("Access-Control-Request-Method","PUT"))
+                .andExpect(status().isOk()).andExpect(header().string("Access-Control-Allow-Origin","http://localhost:5173"))
+                .andExpect(header().string("Access-Control-Allow-Credentials","true"));
+    }
     @Test void staffOperatesOrdersButCannotManageAccountsOrCatalogue() throws Exception {
         var session=session(Role.STAFF);
         mvc.perform(get("/api/orders/status/PENDING").session(session)).andExpect(status().isOk());

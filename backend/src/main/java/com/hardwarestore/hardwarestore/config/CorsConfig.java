@@ -1,19 +1,19 @@
 package com.hardwarestore.hardwarestore.config;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class CorsConfig implements WebMvcConfigurer {
+    @Value("${store.cors.origins:http://localhost:5173,http://localhost:5175}")
+    private String[] origins;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
-                .allowedOrigins(
-                        "http://localhost:5173",
-                        "http://localhost:5175"
-                )
+                .allowedOrigins(origins)
                 .allowedMethods(
                         "GET",
                         "POST",

@@ -8,3 +8,7 @@ frontend/dist/
 frontend/.env
 frontend/.env.local
 backend/src/main/resources/application-local.properties
+
+.env
+.env.*
+!.env.example
