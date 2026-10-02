@@ -1,7 +1,7 @@
 {
   "researchedOn": "2026-10-02",
   "currency": "LKR",
-  "notes": "Reference prices from accessible retailer pages, including displayed discounts. Cached listings may lag retailer changes. Descriptions are concise paraphrases. Quantities are fictional development stock, not retailer availability. Images use the existing app fallback. Category listing source URLs identify the product and listed price. No automatic startup seeding.",
+  "notes": "Reference prices from accessible retailer pages, including displayed discounts. Cached listings may lag retailer changes. Descriptions are concise paraphrases. Quantities are fictional development stock, not retailer availability. Images are downloaded local photographs; attribution and variant/representative notes are in product-image-sources.json. Category listing source URLs identify the product and listed price. No automatic startup seeding.",
   "categories": [
     {
       "name": "Plumbing Supplies",
@@ -12,7 +12,7 @@
           "description": "UPVC handle; rated 150 PSI. Reference listing: HardwareMart; price in LKR. Sample inventory quantity.",
           "price": 404,
           "quantity": 10,
-          "imageUrl": null,
+          "imageUrl": "/images/products/hasky-pvc-socketed-ball-valve-3-4-inch.jpg",
           "sourceUrl": "https://hardwaremart.lk/",
           "retailer": "HardwareMart"
         },
@@ -21,7 +21,7 @@
           "description": "UPVC handle; rated 150 PSI. Reference listing: HardwareMart; price in LKR. Sample inventory quantity.",
           "price": 553,
           "quantity": 12,
-          "imageUrl": null,
+          "imageUrl": "/images/products/hasky-pvc-socketed-ball-valve-1-inch.jpg",
           "sourceUrl": "https://hardwaremart.lk/",
           "retailer": "HardwareMart"
         },
@@ -30,7 +30,7 @@
           "description": "UPVC handle; rated 150 PSI. Reference listing: HardwareMart; price in LKR. Sample inventory quantity.",
           "price": 243,
           "quantity": 14,
-          "imageUrl": null,
+          "imageUrl": "/images/products/hasky-pvc-socketed-ball-valve-1-2-inch.jpg",
           "sourceUrl": "https://hardwaremart.lk/",
           "retailer": "HardwareMart"
         },
@@ -39,7 +39,7 @@
           "description": "UPVC handle; rated 150 PSI. Reference listing: HardwareMart; price in LKR. Sample inventory quantity.",
           "price": 1093,
           "quantity": 16,
-          "imageUrl": null,
+          "imageUrl": "/images/products/hasky-pvc-socketed-ball-valve-1-1-2-inch.jpg",
           "sourceUrl": "https://hardwaremart.lk/",
           "retailer": "HardwareMart"
         },
@@ -48,7 +48,7 @@
           "description": "Threaded valve; UPVC handle, 150 PSI. Reference listing: HardwareMart; price in LKR. Sample inventory quantity.",
           "price": 1399,
           "quantity": 18,
-          "imageUrl": null,
+          "imageUrl": "/images/products/hasky-pvc-threaded-ball-valve-1-1-2-inch.jpg",
           "sourceUrl": "https://hardwaremart.lk/",
           "retailer": "HardwareMart"
         },
@@ -57,7 +57,7 @@
           "description": "Threaded valve; UPVC handle, 150 PSI. Reference listing: HardwareMart; price in LKR. Sample inventory quantity.",
           "price": 693,
           "quantity": 20,
-          "imageUrl": null,
+          "imageUrl": "/images/products/hasky-pvc-threaded-ball-valve-1-inch.jpg",
           "sourceUrl": "https://hardwaremart.lk/",
           "retailer": "HardwareMart"
         },
@@ -66,7 +66,7 @@
           "description": "Threaded valve; UPVC handle, 150 PSI. Reference listing: HardwareMart; price in LKR. Sample inventory quantity.",
           "price": 561,
           "quantity": 22,
-          "imageUrl": null,
+          "imageUrl": "/images/products/hasky-pvc-threaded-ball-valve-3-4-inch.jpg",
           "sourceUrl": "https://hardwaremart.lk/",
           "retailer": "HardwareMart"
         },
@@ -75,7 +75,7 @@
           "description": "Threaded valve; UPVC handle, 150 PSI. Reference listing: HardwareMart; price in LKR. Sample inventory quantity.",
           "price": 352,
           "quantity": 24,
-          "imageUrl": null,
+          "imageUrl": "/images/products/hasky-pvc-threaded-ball-valve-1-2-inch.jpg",
           "sourceUrl": "https://hardwaremart.lk/",
           "retailer": "HardwareMart"
         },
@@ -84,7 +84,7 @@
           "description": "For plumbing and irrigation applications. Reference listing: HardwareMart; price in LKR. Sample inventory quantity.",
           "price": 672,
           "quantity": 26,
-          "imageUrl": null,
+          "imageUrl": "/images/products/hasky-pvc-foot-valve-1-inch.jpg",
           "sourceUrl": "https://hardwaremart.lk/",
           "retailer": "HardwareMart"
         },
@@ -93,7 +93,7 @@
           "description": "For plumbing and irrigation applications. Reference listing: HardwareMart; price in LKR. Sample inventory quantity.",
           "price": 1458,
           "quantity": 28,
-          "imageUrl": null,
+          "imageUrl": "/images/products/hasky-pvc-foot-valve-1-1-2-inch.jpg",
           "sourceUrl": "https://hardwaremart.lk/",
           "retailer": "HardwareMart"
         }
@@ -108,7 +108,7 @@
           "description": "For oil-based paint and varnish. Reference listing: HardwareMart; price in LKR. Sample inventory quantity.",
           "price": 353,
           "quantity": 10,
-          "imageUrl": null,
+          "imageUrl": "/images/products/hasky-paint-brush-1-inch.jpg",
           "sourceUrl": "https://hardwaremart.lk/product-category/paint-sealant-adhesives/paint-accessories/",
           "retailer": "HardwareMart"
         },
@@ -117,7 +117,7 @@
           "description": "For oil-based paint and varnish. Reference listing: HardwareMart; price in LKR. Sample inventory quantity.",
           "price": 595,
           "quantity": 12,
-          "imageUrl": null,
+          "imageUrl": "/images/products/hasky-paint-brush-2-inch.jpg",
           "sourceUrl": "https://hardwaremart.lk/product-category/paint-sealant-adhesives/paint-accessories/",
           "retailer": "HardwareMart"
         },
@@ -126,7 +126,7 @@
           "description": "For oil-based paint and varnish. Reference listing: HardwareMart; price in LKR. Sample inventory quantity.",
           "price": 884,
           "quantity": 14,
-          "imageUrl": null,
+          "imageUrl": "/images/products/hasky-paint-brush-3-inch.jpg",
           "sourceUrl": "https://hardwaremart.lk/product-category/paint-sealant-adhesives/paint-accessories/",
           "retailer": "HardwareMart"
         },
@@ -135,7 +135,7 @@
           "description": "Polyester roller for smooth interior surfaces. Reference listing: HardwareMart; price in LKR. Sample inventory quantity.",
           "price": 1160,
           "quantity": 16,
-          "imageUrl": null,
+          "imageUrl": "/images/products/hasky-interior-roller-brush-9-inch-white.jpg",
           "sourceUrl": "https://hardwaremart.lk/product-category/paint-sealant-adhesives/paint-accessories/",
           "retailer": "HardwareMart"
         },
@@ -144,7 +144,7 @@
           "description": "Acrylic roller for rough exterior surfaces. Reference listing: HardwareMart; price in LKR. Sample inventory quantity.",
           "price": 1203,
           "quantity": 18,
-          "imageUrl": null,
+          "imageUrl": "/images/products/hasky-exterior-roller-brush-9-inch-green.jpg",
           "sourceUrl": "https://hardwaremart.lk/product-category/paint-sealant-adhesives/paint-accessories/",
           "retailer": "HardwareMart"
         },
@@ -153,7 +153,7 @@
           "description": "Handle for a four-inch baby roller. Reference listing: HardwareMart; price in LKR. Sample inventory quantity.",
           "price": 144,
           "quantity": 20,
-          "imageUrl": null,
+          "imageUrl": "/images/products/baby-roller-handle-4-inch.jpg",
           "sourceUrl": "https://hardwaremart.lk/product-category/paint-sealant-adhesives/paint-accessories/",
           "retailer": "HardwareMart"
         },
@@ -162,7 +162,7 @@
           "description": "Acrylic roller for emulsion and masonry paint. Reference listing: HardwareMart; price in LKR. Sample inventory quantity.",
           "price": 302,
           "quantity": 22,
-          "imageUrl": null,
+          "imageUrl": "/images/products/exterior-baby-roller-brush-4-inch-yellow.jpg",
           "sourceUrl": "https://hardwaremart.lk/product-category/paint-sealant-adhesives/paint-accessories/",
           "retailer": "HardwareMart"
         },
@@ -171,7 +171,7 @@
           "description": "Four-inch exterior roller sponge. Reference listing: HardwareMart; price in LKR. Sample inventory quantity.",
           "price": 158,
           "quantity": 24,
-          "imageUrl": null,
+          "imageUrl": "/images/products/exterior-baby-roller-sponge-4-inch.jpg",
           "sourceUrl": "https://hardwaremart.lk/product-category/paint-sealant-adhesives/paint-accessories/",
           "retailer": "HardwareMart"
         },
@@ -180,7 +180,7 @@
           "description": "Polyester roller for smooth interior surfaces. Reference listing: HardwareMart; price in LKR. Sample inventory quantity.",
           "price": 293,
           "quantity": 26,
-          "imageUrl": null,
+          "imageUrl": "/images/products/interior-baby-roller-brush-4-inch-white.jpg",
           "sourceUrl": "https://hardwaremart.lk/product-category/paint-sealant-adhesives/paint-accessories/",
           "retailer": "HardwareMart"
         },
@@ -189,7 +189,7 @@
           "description": "Four-inch interior roller sponge. Reference listing: HardwareMart; price in LKR. Sample inventory quantity.",
           "price": 135,
           "quantity": 28,
-          "imageUrl": null,
+          "imageUrl": "/images/products/interior-baby-roller-sponge-4-inch.jpg",
           "sourceUrl": "https://hardwaremart.lk/product-category/paint-sealant-adhesives/paint-accessories/",
           "retailer": "HardwareMart"
         }
@@ -204,7 +204,7 @@
           "description": "Gap-filling adhesive for wood and panels. Reference listing: HardwareMart; price in LKR. Sample inventory quantity.",
           "price": 1492,
           "quantity": 10,
-          "imageUrl": null,
+          "imageUrl": "/images/products/fevicol-1k-pur-polyurethane-adhesive-150ml.jpg",
           "sourceUrl": "https://hardwaremart.lk/product-category/paint-sealant-adhesives/sealant-adhesives/",
           "retailer": "HardwareMart"
         },
@@ -213,7 +213,7 @@
           "description": "Gap-filling adhesive for wood and panels. Reference listing: HardwareMart; price in LKR. Sample inventory quantity.",
           "price": 3902,
           "quantity": 12,
-          "imageUrl": null,
+          "imageUrl": "/images/products/fevicol-1k-pur-polyurethane-adhesive-500g.jpg",
           "sourceUrl": "https://hardwaremart.lk/product-category/paint-sealant-adhesives/sealant-adhesives/",
           "retailer": "HardwareMart"
         },
@@ -222,7 +222,7 @@
           "description": "Gap-filling adhesive for wood and panels. Reference listing: HardwareMart; price in LKR. Sample inventory quantity.",
           "price": 6498,
           "quantity": 14,
-          "imageUrl": null,
+          "imageUrl": "/images/products/fevicol-1k-pur-polyurethane-adhesive-1kg.jpg",
           "sourceUrl": "https://hardwaremart.lk/product-category/paint-sealant-adhesives/sealant-adhesives/",
           "retailer": "HardwareMart"
         },
@@ -231,7 +231,7 @@
           "description": "Adhesive for porous materials. Reference listing: HardwareMart; price in LKR. Sample inventory quantity.",
           "price": 6494,
           "quantity": 16,
-          "imageUrl": null,
+          "imageUrl": "/images/products/fevicol-chemifix-general-purpose-adhesive-4kg.jpg",
           "sourceUrl": "https://hardwaremart.lk/product-category/paint-sealant-adhesives/sealant-adhesives/",
           "retailer": "HardwareMart"
         },
@@ -240,7 +240,7 @@
           "description": "Adhesive for porous materials. Reference listing: HardwareMart; price in LKR. Sample inventory quantity.",
           "price": 15449,
           "quantity": 18,
-          "imageUrl": null,
+          "imageUrl": "/images/products/fevicol-chemifix-general-purpose-adhesive-10kg.jpg",
           "sourceUrl": "https://hardwaremart.lk/product-category/paint-sealant-adhesives/sealant-adhesives/",
           "retailer": "HardwareMart"
         },
@@ -249,7 +249,7 @@
           "description": "Adhesive for porous materials. Reference listing: HardwareMart; price in LKR. Sample inventory quantity.",
           "price": 29283,
           "quantity": 20,
-          "imageUrl": null,
+          "imageUrl": "/images/products/fevicol-chemifix-general-purpose-adhesive-20kg.jpg",
           "sourceUrl": "https://hardwaremart.lk/product-category/paint-sealant-adhesives/sealant-adhesives/",
           "retailer": "HardwareMart"
         },
@@ -258,7 +258,7 @@
           "description": "Five-minute epoxy; Pidilite original listing. Reference listing: HardwareMart; price in LKR. Sample inventory quantity.",
           "price": 719,
           "quantity": 22,
-          "imageUrl": null,
+          "imageUrl": "/images/products/araldite-rapid-epoxy-adhesive-2-x-17ml.jpg",
           "sourceUrl": "https://hardwaremart.lk/product-category/paint-sealant-adhesives/sealant-adhesives/",
           "retailer": "HardwareMart"
         },
@@ -267,7 +267,7 @@
           "description": "Two-component putty that sets at room temperature. Reference listing: HardwareMart; price in LKR. Sample inventory quantity.",
           "price": 451,
           "quantity": 24,
-          "imageUrl": null,
+          "imageUrl": "/images/products/fevicol-m-seal-general-purpose-epoxy-100g.jpg",
           "sourceUrl": "https://hardwaremart.lk/product-category/paint-sealant-adhesives/sealant-adhesives/",
           "retailer": "HardwareMart"
         },
@@ -276,7 +276,7 @@
           "description": "Two-component putty that sets at room temperature. Reference listing: HardwareMart; price in LKR. Sample inventory quantity.",
           "price": 234,
           "quantity": 26,
-          "imageUrl": null,
+          "imageUrl": "/images/products/fevicol-m-seal-general-purpose-epoxy-50g.jpg",
           "sourceUrl": "https://hardwaremart.lk/product-category/paint-sealant-adhesives/sealant-adhesives/",
           "retailer": "HardwareMart"
         },
@@ -285,7 +285,7 @@
           "description": "Clear silicone sealant; 300ml cartridge. Reference listing: HardwareMart; price in LKR. Sample inventory quantity.",
           "price": 753,
           "quantity": 28,
-          "imageUrl": null,
+          "imageUrl": "/images/products/hasky-clear-silicone-sealant-300ml.jpg",
           "sourceUrl": "https://hardwaremart.lk/",
           "retailer": "HardwareMart"
         }
@@ -300,7 +300,7 @@
           "description": "Concrete fixing bolt; priced per piece. Reference listing: Homemart; price in LKR. Sample inventory quantity.",
           "price": 22.5,
           "quantity": 10,
-          "imageUrl": null,
+          "imageUrl": "/images/products/anchor-bolt-1-4-inch.jpg",
           "sourceUrl": "https://www.homemart.lk/product-category/building-hardware/nails-nuts-bolts/",
           "retailer": "Homemart"
         },
@@ -309,7 +309,7 @@
           "description": "Roofing fastener; priced per piece. Reference listing: Homemart; price in LKR. Sample inventory quantity.",
           "price": 42.75,
           "quantity": 12,
-          "imageUrl": null,
+          "imageUrl": "/images/products/amano-roofing-bolt-b4-3-inch.jpg",
           "sourceUrl": "https://www.homemart.lk/product-category/building-hardware/nails-nuts-bolts/",
           "retailer": "Homemart"
         },
@@ -318,7 +318,7 @@
           "description": "Concrete fixing bolt; priced per piece. Reference listing: Homemart; price in LKR. Sample inventory quantity.",
           "price": 58.5,
           "quantity": 14,
-          "imageUrl": null,
+          "imageUrl": "/images/products/anchor-bolt-3-8-inch.png",
           "sourceUrl": "https://www.homemart.lk/product-category/building-hardware/nails-nuts-bolts/",
           "retailer": "Homemart"
         },
@@ -327,7 +327,7 @@
           "description": "Construction anchor; priced per piece. Reference listing: Homemart; price in LKR. Sample inventory quantity.",
           "price": 88.2,
           "quantity": 16,
-          "imageUrl": null,
+          "imageUrl": "/images/products/anchor-bolt-8-x-100.jpg",
           "sourceUrl": "https://www.homemart.lk/product-category/building-hardware/nails-nuts-bolts/",
           "retailer": "Homemart"
         },
@@ -336,7 +336,7 @@
           "description": "Construction fixing; priced per piece. Reference listing: Homemart; price in LKR. Sample inventory quantity.",
           "price": 130,
           "quantity": 18,
-          "imageUrl": null,
+          "imageUrl": "/images/products/normal-anchor-bolt-1-2-inch.jpg",
           "sourceUrl": "https://www.homemart.lk/product-category/building-hardware/nails-nuts-bolts/",
           "retailer": "Homemart"
         },
@@ -345,7 +345,7 @@
           "description": "Construction fixing; priced per piece. Reference listing: Homemart; price in LKR. Sample inventory quantity.",
           "price": 190,
           "quantity": 20,
-          "imageUrl": null,
+          "imageUrl": "/images/products/normal-anchor-bolt-5-8-inch.jpg",
           "sourceUrl": "https://www.homemart.lk/product-category/building-hardware/nails-nuts-bolts/",
           "retailer": "Homemart"
         },
@@ -354,7 +354,7 @@
           "description": "Construction fixing; priced per piece. Reference listing: Homemart; price in LKR. Sample inventory quantity.",
           "price": 35,
           "quantity": 22,
-          "imageUrl": null,
+          "imageUrl": "/images/products/normal-anchor-bolt-1-4-inch.jpg",
           "sourceUrl": "https://www.homemart.lk/product-category/building-hardware/nails-nuts-bolts/",
           "retailer": "Homemart"
         },
@@ -363,7 +363,7 @@
           "description": "Component joining rivet; priced per piece. Reference listing: Homemart; price in LKR. Sample inventory quantity.",
           "price": 1.8,
           "quantity": 24,
-          "imageUrl": null,
+          "imageUrl": "/images/products/atlas-pop-rivet-1-8-x-1-2-inch-3-2-x-13mm.jpg",
           "sourceUrl": "https://www.homemart.lk/product-category/building-hardware/nails-nuts-bolts/",
           "retailer": "Homemart"
         },
@@ -372,7 +372,7 @@
           "description": "Component joining rivet; priced per piece. Reference listing: Homemart; price in LKR. Sample inventory quantity.",
           "price": 2.7,
           "quantity": 26,
-          "imageUrl": null,
+          "imageUrl": "/images/products/atlas-pop-rivet-1-8-x-3-4-inch-3-2-x-19mm.jpg",
           "sourceUrl": "https://www.homemart.lk/product-category/building-hardware/nails-nuts-bolts/",
           "retailer": "Homemart"
         },
@@ -381,7 +381,7 @@
           "description": "Component joining rivet; priced per piece. Reference listing: Homemart; price in LKR. Sample inventory quantity.",
           "price": 2.7,
           "quantity": 28,
-          "imageUrl": null,
+          "imageUrl": "/images/products/atlas-pop-rivet-5-32-x-1-2-inch-4-0-x-13mm.jpg",
           "sourceUrl": "https://www.homemart.lk/product-category/building-hardware/nails-nuts-bolts/",
           "retailer": "Homemart"
         }

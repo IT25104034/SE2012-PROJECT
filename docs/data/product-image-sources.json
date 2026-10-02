@@ -1,0 +1,422 @@
+{
+  "downloadedOn": "2026-10-03",
+  "notes": "Downloaded existing photographs; no generated images. Source rights remain with their owners. Used for the personal development sample catalogue. Representative photos for generic samples can show different brands, sizes or pack contents. Retailers reuse some photographs for size variants. The normal 1/4-inch anchor listing had no photo, so its photo represents the normal anchor type. Review reuse rights before publishing a commercial catalogue. No prices or stock quantities changed.",
+  "products": [
+    {
+      "productName": "Claw Hammer 16 oz",
+      "imageUrl": "/images/products/claw-hammer-16-oz.jpg",
+      "sourcePage": "https://www.mscdirect.com/product/details/39682919",
+      "sourceImageUrl": "https://cdn.mscdirect.com/global/images/ProductImages/3968291AB-24.jpg",
+      "matchType": "representative",
+      "sha256": "323e0d2ba2b8fc49dc40d13df37f7df85fe6d59c876b024f7eefc0d56bde97ab"
+    },
+    {
+      "productName": "Screwdriver Set — 6 Pieces",
+      "imageUrl": "/images/products/screwdriver-set-6-pieces.jpg",
+      "sourcePage": "https://www.ketnoitieudung.vn/bo-tuoc-no-vit-dep-va-bake-6-cay-stanley-stmt66672_35006.html",
+      "sourceImageUrl": "https://www.ketnoitieudung.vn/data/bt7/bo-tuoc-no-vit-dep-va-bake-6-cay-stanley-stmt66672-1593754660.jpg",
+      "matchType": "representative",
+      "sha256": "5ff59d64f6b11c6c539512a7ac15fc59f9afb7e783f6f62214f4e1f301649dda"
+    },
+    {
+      "productName": "Adjustable Wrench 250 mm",
+      "imageUrl": "/images/products/adjustable-wrench-250-mm.jpg",
+      "sourcePage": "https://www.kaufmann-sa.co.za/products/kaufmann-x-wrench-adjustable-packed-150mm",
+      "sourceImageUrl": "https://www.kaufmann-sa.co.za/cdn/shop/files/HW3011028_3635e5b6-840d-485c-9a80-e281ca25e976.jpg?v=1769155243&width=1080",
+      "matchType": "representative",
+      "sha256": "03eac6943a25f1ea54c24cbde07609e299efbc3bf45ee314756cd5fbbdac0a60"
+    },
+    {
+      "productName": "Cordless Drill 18V",
+      "imageUrl": "/images/products/cordless-drill-18v.jpg",
+      "sourcePage": "https://www.leroymerlin.es/productos/marcas/black-and-decker/black-decker-bricolage/taladros-black-decker/",
+      "sourceImageUrl": "https://media.adeo.com/media/1891882/format/jpeg/.jpg?width=500",
+      "matchType": "representative",
+      "sha256": "2f60ee7bac5e7b950c90d796ab1e145ff1595eef67dd2fcdba6cf7418635cafb"
+    },
+    {
+      "productName": "Angle Grinder 115 mm",
+      "imageUrl": "/images/products/angle-grinder-115-mm.png",
+      "sourcePage": "https://www.sealey.co.uk/115mm-angle-grinder-slim-body-750w-230v-sgs115/",
+      "sourceImageUrl": "https://cdn11.bigcommerce.com/s-4koocm6ozh/images/stencil/original/products/114888/101801/SGS115_DFC1782599__36693.1749162011.png",
+      "matchType": "representative",
+      "sha256": "cb050dcc5b2436f676e489ba6e22a5a727f11cd1e362bc0c70632ae4d09a576b"
+    },
+    {
+      "productName": "Drill Bit Set — 13 Pieces",
+      "imageUrl": "/images/products/drill-bit-set-13-pieces.jpg",
+      "sourcePage": "https://www.canadiantire.ca/en/pdp/dewalt-dw1163-black-oxide-drill-bit-set-for-wood-metal-plastic-13-pc-0543911p.html",
+      "sourceImageUrl": "https://media-www.canadiantire.ca/product/fixing/tools/power-tool-accessories/0543911/dewalt-13-pc-black-ox-drill-bit-set-3a96d1fc-275a-429d-b227-2f81f10ce86b-jpgrendition.jpg",
+      "matchType": "representative",
+      "sha256": "1a0ad78e55765a59a5d62a43b235c0c74379991da89c2529cc27772ca4a6e18f"
+    },
+    {
+      "productName": "Digital Multimeter",
+      "imageUrl": "/images/products/digital-multimeter.jpg",
+      "sourcePage": "https://var-tech.com/products/m-890-full-function-digital-multimeter-true-rms",
+      "sourceImageUrl": "https://var-tech.com/cdn/shop/files/M890.jpg?v=1707202171&width=990",
+      "matchType": "representative",
+      "sha256": "9ed9dfde6ed5bcb67bb587e5728b331f0c604adf58815c225b8b7e56f3218779"
+    },
+    {
+      "productName": "Extension Lead — 4 Sockets",
+      "imageUrl": "/images/products/extension-lead-4-sockets.png",
+      "sourcePage": "https://cinemattaglx.com/products/masterplug-13-amp-4-gang-white-mains-extension-lead-pvc-cable-5m",
+      "sourceImageUrl": "https://cinemattaglx.com/cdn/shop/files/BFG5N_Masterplug_4_Gang_Basic_Extension_Lead_White_5_Metre-1_1024x1024%402x.webp?v=1736960041",
+      "matchType": "representative",
+      "sha256": "428409764dc31c46bbf01fc48b21e88fa499b8208ac6616a23232642e76d1b9e"
+    },
+    {
+      "productName": "Electrical Insulation Tape",
+      "imageUrl": "/images/products/electrical-insulation-tape.jpg",
+      "sourcePage": "https://kitronik.co.uk/products/26118-pro-black-electrical-insulation-tape-12mm-x-33m",
+      "sourceImageUrl": "https://cdn.shopify.com/s/files/1/0254/1191/1743/products/26118_large-pro-black-insulation-tape-12m-x-20m_800x.jpg?v=1585814447",
+      "matchType": "representative",
+      "sha256": "e141d4677d43accc575d0ce0478c48255a5295da7214b948dccb7fabb5f8e491"
+    },
+    {
+      "productName": "Arduino-Compatible Starter Kit",
+      "imageUrl": "/images/products/arduino-compatible-starter-kit.jpg",
+      "sourcePage": "https://www.sanborns.com.mx/producto/777654/kit-compatible-c-arduino-uno-r3-con-espanol-tutorial",
+      "sourceImageUrl": "https://resources.claroshop.com/medios-plazavip/publicidad/63675afbe1f2c_72jpg.jpg",
+      "matchType": "representative",
+      "sha256": "c7245ff45ff22e8459f63effe984208fb09a575f7f29df17ba6eeb4613d725d3"
+    },
+    {
+      "productName": "Resistor Assortment — 100 Pieces",
+      "imageUrl": "/images/products/resistor-assortment-100-pieces.jpg",
+      "sourcePage": "https://www.ebay.com/itm/314540061159",
+      "sourceImageUrl": "https://i.ebayimg.com/images/g/iM8AAOSw-IpkQLYP/s-l1200.jpg",
+      "matchType": "representative",
+      "sha256": "e775e25dbe8cdddd2e3cbcb70f90985d51ee77eb3b689a1513f01aa869687373"
+    },
+    {
+      "productName": "Solderless Breadboard 830 Points",
+      "imageUrl": "/images/products/solderless-breadboard-830-points.webp",
+      "sourcePage": "https://cartup.com/product/830_point_breadboard_full_size_solderless_white_prototyping_test_circuit_board_plug-in_830_tie_points_pin_for_arduino_project_board_cables_connectors_diy_-_multi_plug_-_multi_plug_4952255367963606_njaeoa",
+      "sourceImageUrl": "https://sl-dev-s3.s3.amazonaws.com/product/c25ef7477567960f3bcc6c157197521d-1744868378735.webp",
+      "matchType": "representative",
+      "sha256": "9b6139b296ad6db25bcf09cd4887c75fc52af02be376ab34a893bc6028176197"
+    },
+    {
+      "productName": "Hasky PVC Socketed Ball Valve 3/4 inch",
+      "imageUrl": "/images/products/hasky-pvc-socketed-ball-valve-3-4-inch.jpg",
+      "sourcePage": "https://hardwaremart.lk/product/ball-valve-3-4-pvc-socketed-ball-valve-hasky/",
+      "sourceImageUrl": "https://hardwaremart.lk/wp-content/uploads/2026/08/Pvc-threaded-ball-valve-hasky-hardwaremart-768x768.jpg",
+      "matchType": "shared-retailer-variant",
+      "sha256": "4f7869265bed52d4c5692aeda7c72feaa8a7fb0c04fb8b5a69eb25cfa136ad4f"
+    },
+    {
+      "productName": "Hasky PVC Socketed Ball Valve 1 inch",
+      "imageUrl": "/images/products/hasky-pvc-socketed-ball-valve-1-inch.jpg",
+      "sourcePage": "https://hardwaremart.lk/product/ball-valve1-pvc-socketed-ball-valve-hasky/",
+      "sourceImageUrl": "https://hardwaremart.lk/wp-content/uploads/2026/08/Pvc-threaded-ball-valve-hasky-hardwaremart-768x768.jpg",
+      "matchType": "shared-retailer-variant",
+      "sha256": "4f7869265bed52d4c5692aeda7c72feaa8a7fb0c04fb8b5a69eb25cfa136ad4f"
+    },
+    {
+      "productName": "Hasky PVC Socketed Ball Valve 1/2 inch",
+      "imageUrl": "/images/products/hasky-pvc-socketed-ball-valve-1-2-inch.jpg",
+      "sourcePage": "https://hardwaremart.lk/product/ball-valve1-2-pvc-socketed-ball-valve-hasky/",
+      "sourceImageUrl": "https://hardwaremart.lk/wp-content/uploads/2026/08/Pvc-threaded-ball-valve-hasky-hardwaremart-768x768.jpg",
+      "matchType": "shared-retailer-variant",
+      "sha256": "4f7869265bed52d4c5692aeda7c72feaa8a7fb0c04fb8b5a69eb25cfa136ad4f"
+    },
+    {
+      "productName": "Hasky PVC Socketed Ball Valve 1 1/2 inch",
+      "imageUrl": "/images/products/hasky-pvc-socketed-ball-valve-1-1-2-inch.jpg",
+      "sourcePage": "https://hardwaremart.lk/product/ball-valve-1-1-2-pvc-socketed-ball-valve-hasky/",
+      "sourceImageUrl": "https://hardwaremart.lk/wp-content/uploads/2026/08/Pvc-threaded-ball-valve-hasky-hardwaremart-768x768.jpg",
+      "matchType": "shared-retailer-variant",
+      "sha256": "4f7869265bed52d4c5692aeda7c72feaa8a7fb0c04fb8b5a69eb25cfa136ad4f"
+    },
+    {
+      "productName": "Hasky PVC Threaded Ball Valve 1 1/2 inch",
+      "imageUrl": "/images/products/hasky-pvc-threaded-ball-valve-1-1-2-inch.jpg",
+      "sourcePage": "https://hardwaremart.lk/product/ball-valve-1-1-2-pvc-threaded-ball-valve-hasky/",
+      "sourceImageUrl": "https://hardwaremart.lk/wp-content/uploads/2026/08/Pvc-threaded-ball-valve-hasky-hardwaremart-768x768.jpg",
+      "matchType": "shared-retailer-variant",
+      "sha256": "4f7869265bed52d4c5692aeda7c72feaa8a7fb0c04fb8b5a69eb25cfa136ad4f"
+    },
+    {
+      "productName": "Hasky PVC Threaded Ball Valve 1 inch",
+      "imageUrl": "/images/products/hasky-pvc-threaded-ball-valve-1-inch.jpg",
+      "sourcePage": "https://hardwaremart.lk/product/ball-valve-1-pvc-threaded-ball-valve-hasky/",
+      "sourceImageUrl": "https://hardwaremart.lk/wp-content/uploads/2026/08/Pvc-threaded-ball-valve-hasky-hardwaremart-768x768.jpg",
+      "matchType": "shared-retailer-variant",
+      "sha256": "4f7869265bed52d4c5692aeda7c72feaa8a7fb0c04fb8b5a69eb25cfa136ad4f"
+    },
+    {
+      "productName": "Hasky PVC Threaded Ball Valve 3/4 inch",
+      "imageUrl": "/images/products/hasky-pvc-threaded-ball-valve-3-4-inch.jpg",
+      "sourcePage": "https://hardwaremart.lk/product/ball-valve-3-4-pvc-threaded-ball-valve-hasky/",
+      "sourceImageUrl": "https://hardwaremart.lk/wp-content/uploads/2026/08/Pvc-threaded-ball-valve-hasky-hardwaremart-768x768.jpg",
+      "matchType": "shared-retailer-variant",
+      "sha256": "4f7869265bed52d4c5692aeda7c72feaa8a7fb0c04fb8b5a69eb25cfa136ad4f"
+    },
+    {
+      "productName": "Hasky PVC Threaded Ball Valve 1/2 inch",
+      "imageUrl": "/images/products/hasky-pvc-threaded-ball-valve-1-2-inch.jpg",
+      "sourcePage": "https://hardwaremart.lk/product/ball-valve-1-2-pvc-threaded-ball-valve-hasky/",
+      "sourceImageUrl": "https://hardwaremart.lk/wp-content/uploads/2026/08/Pvc-threaded-ball-valve-hasky-hardwaremart-768x768.jpg",
+      "matchType": "shared-retailer-variant",
+      "sha256": "4f7869265bed52d4c5692aeda7c72feaa8a7fb0c04fb8b5a69eb25cfa136ad4f"
+    },
+    {
+      "productName": "Hasky PVC Foot Valve 1 inch",
+      "imageUrl": "/images/products/hasky-pvc-foot-valve-1-inch.jpg",
+      "sourcePage": "https://hardwaremart.lk/product/water-tank-accessories-1-pvc-foot-valve-hasky/",
+      "sourceImageUrl": "https://hardwaremart.lk/wp-content/uploads/2026/07/Foot-valve-hasky-hardwaremart-300x300.jpg",
+      "matchType": "shared-retailer-variant",
+      "sha256": "c4eb42cfaece4a8aa867f36e4fd539d7f5550394c713ed71dcbc12449bdbe63e"
+    },
+    {
+      "productName": "Hasky PVC Foot Valve 1 1/2 inch",
+      "imageUrl": "/images/products/hasky-pvc-foot-valve-1-1-2-inch.jpg",
+      "sourcePage": "https://hardwaremart.lk/product/water-tank-accessories-1-1-2-pvc-foot-valve-hasky/",
+      "sourceImageUrl": "https://hardwaremart.lk/wp-content/uploads/2026/07/Foot-valve-hasky-hardwaremart-300x300.jpg",
+      "matchType": "shared-retailer-variant",
+      "sha256": "c4eb42cfaece4a8aa867f36e4fd539d7f5550394c713ed71dcbc12449bdbe63e"
+    },
+    {
+      "productName": "Hasky Paint Brush 1 inch",
+      "imageUrl": "/images/products/hasky-paint-brush-1-inch.jpg",
+      "sourcePage": "https://hardwaremart.lk/product/paint-brush-1%e2%80%b3-paint-brush-hasky/",
+      "sourceImageUrl": "https://hardwaremart.lk/wp-content/uploads/2024/02/Paint-Brush-Hasky-Hardwaremart4-768x768.jpg",
+      "matchType": "retailer-listing",
+      "sha256": "cb924790bd21e90bddb80fac9218d3b5c190ce610e8e0e1e6f0ad1f1f97d41a7"
+    },
+    {
+      "productName": "Hasky Paint Brush 2 inch",
+      "imageUrl": "/images/products/hasky-paint-brush-2-inch.jpg",
+      "sourcePage": "https://hardwaremart.lk/product/paint-brush-2%e2%80%b3-paint-brush-hasky/",
+      "sourceImageUrl": "https://hardwaremart.lk/wp-content/uploads/2024/02/Paint-Brush-Hasky-Hardwaremart10.jpg",
+      "matchType": "retailer-listing",
+      "sha256": "0f3b7aa5b8fd36854db1b3f02fcfb0b09824092063354b0f5d462c465fc929e7"
+    },
+    {
+      "productName": "Hasky Paint Brush 3 inch",
+      "imageUrl": "/images/products/hasky-paint-brush-3-inch.jpg",
+      "sourcePage": "https://hardwaremart.lk/product/paint-brush-3%e2%80%b3-paint-brush-hasky/",
+      "sourceImageUrl": "https://hardwaremart.lk/wp-content/uploads/2024/02/Paint-Brush-Hasky-Hardwaremart13.jpg",
+      "matchType": "retailer-listing",
+      "sha256": "29db62f8d39be683f3b7e4f548985134543fb5cec1552143ea106540f538607d"
+    },
+    {
+      "productName": "Hasky Interior Roller Brush 9 inch White",
+      "imageUrl": "/images/products/hasky-interior-roller-brush-9-inch-white.jpg",
+      "sourcePage": "https://hardwaremart.lk/product/roller-brush-9-interior-roller-brush-white-hasky/",
+      "sourceImageUrl": "https://hardwaremart.lk/wp-content/uploads/2024/09/Interior-Roller-Brush-Hasky-Hardwaremart.jpg",
+      "matchType": "retailer-listing",
+      "sha256": "339b96d9d5a9741a2e3387408f0bbb1eabc5ad2aee99d83d1d4e37da9afc4566"
+    },
+    {
+      "productName": "Hasky Exterior Roller Brush 9 inch Green",
+      "imageUrl": "/images/products/hasky-exterior-roller-brush-9-inch-green.jpg",
+      "sourcePage": "https://hardwaremart.lk/product/roller-brush-9-exterior-roller-brush-green-colour-hasky-2/",
+      "sourceImageUrl": "https://hardwaremart.lk/wp-content/uploads/2024/09/Exterior-Roller-Brush-Hasky-Hardwaremart1.jpg",
+      "matchType": "retailer-listing",
+      "sha256": "c9e06a26c87b7321ac956db8ea921f36e0058dd5d07750551fdf227958e7dab6"
+    },
+    {
+      "productName": "Baby Roller Handle 4 inch",
+      "imageUrl": "/images/products/baby-roller-handle-4-inch.jpg",
+      "sourcePage": "https://hardwaremart.lk/product/roller-brush-4-baby-roller-brush-handle/",
+      "sourceImageUrl": "https://hardwaremart.lk/wp-content/uploads/2026/07/Baby-roller-brush-handle-hardwaremart-500x500.jpg",
+      "matchType": "retailer-listing",
+      "sha256": "5f105842c204a6df7cf2966226ae27a901d65b9fc21bb799a60c85d882078577"
+    },
+    {
+      "productName": "Exterior Baby Roller Brush 4 inch Yellow",
+      "imageUrl": "/images/products/exterior-baby-roller-brush-4-inch-yellow.jpg",
+      "sourcePage": "https://hardwaremart.lk/product/roller-brush-9-exterior-roller-brush-green-colour-hasky/",
+      "sourceImageUrl": "https://hardwaremart.lk/wp-content/uploads/2026/07/Baby-roller-brush-4-yellow-hardwaremart-500x500.jpg",
+      "matchType": "retailer-listing",
+      "sha256": "346c6dca602b83c1044baa7f8c67d730e5a412a52049334a30ebe8e5a772bea4"
+    },
+    {
+      "productName": "Exterior Baby Roller Sponge 4 inch",
+      "imageUrl": "/images/products/exterior-baby-roller-sponge-4-inch.jpg",
+      "sourcePage": "https://hardwaremart.lk/product/roller-brush-4-exterior-baby-roller-sponge/",
+      "sourceImageUrl": "https://hardwaremart.lk/wp-content/uploads/2026/07/baby-roller-brush-sponge-yellow-hardwaremart-500x500.jpg",
+      "matchType": "retailer-listing",
+      "sha256": "8e038aaed3c4f81478a9271c5e12189e2487862d4e6a0197c91ec0fd106e6b0b"
+    },
+    {
+      "productName": "Interior Baby Roller Brush 4 inch White",
+      "imageUrl": "/images/products/interior-baby-roller-brush-4-inch-white.jpg",
+      "sourcePage": "https://hardwaremart.lk/product/roller-brush-4-interior-baby-roller-brush-white/",
+      "sourceImageUrl": "https://hardwaremart.lk/wp-content/uploads/2026/07/Baby-roller-brush-4-white-hardwaremart-500x500.jpg",
+      "matchType": "retailer-listing",
+      "sha256": "6aff6b2be427b112a57ccce20e01aa350328c1c493e24c08899210c5f6dcd4e8"
+    },
+    {
+      "productName": "Interior Baby Roller Sponge 4 inch",
+      "imageUrl": "/images/products/interior-baby-roller-sponge-4-inch.jpg",
+      "sourcePage": "https://hardwaremart.lk/product/roller-brush-4-interior-baby-roller-sponge/",
+      "sourceImageUrl": "https://hardwaremart.lk/wp-content/uploads/2026/07/Baby-roller-brush-sponge-white-hardwaremart-500x500.jpg",
+      "matchType": "retailer-listing",
+      "sha256": "418f891733e8493ed5d71ede65e25c2e3ad0141da059ac4c51c6bbf9affef565"
+    },
+    {
+      "productName": "Fevicol 1K PUR Polyurethane Adhesive 150ml",
+      "imageUrl": "/images/products/fevicol-1k-pur-polyurethane-adhesive-150ml.jpg",
+      "sourcePage": "https://hardwaremart.lk/product/adhesive-1k-pur-polyurethane-adhesive-high-tech-glue-150ml-fevicol/",
+      "sourceImageUrl": "https://hardwaremart.lk/wp-content/uploads/2023/02/Adhesive-Fevicol-Hardwaremart1.jpg",
+      "matchType": "retailer-listing",
+      "sha256": "99ba4ec96bd3f0d792b89600065d5c5458d960998d2e91cf414eebcc8169c1d1"
+    },
+    {
+      "productName": "Fevicol 1K PUR Polyurethane Adhesive 500g",
+      "imageUrl": "/images/products/fevicol-1k-pur-polyurethane-adhesive-500g.jpg",
+      "sourcePage": "https://hardwaremart.lk/product/adhesive-1k-pur-polyurethane-adhesive-high-tech-glue-500g-fevicol/",
+      "sourceImageUrl": "https://hardwaremart.lk/wp-content/uploads/2023/02/Adhesive-1k-PUR-Fevicol-Hardwaremart1.jpg",
+      "matchType": "retailer-listing",
+      "sha256": "e54b3720df361fdf391e5adae9b0cd1af5abac7bdec9abbc7bf565de5f131e52"
+    },
+    {
+      "productName": "Fevicol 1K PUR Polyurethane Adhesive 1kg",
+      "imageUrl": "/images/products/fevicol-1k-pur-polyurethane-adhesive-1kg.jpg",
+      "sourcePage": "https://hardwaremart.lk/product/adhesive-1k-pur-polyurethane-adhesive-high-tech-glue-1kg-fevicol/",
+      "sourceImageUrl": "https://hardwaremart.lk/wp-content/uploads/2023/12/1K-Pur-Fevicol-Hardwaremart.jpg",
+      "matchType": "retailer-listing",
+      "sha256": "a1f652461e954a4460bd0e7f5462f79904fc3bd18d8c140db0f80c71d6f2f55d"
+    },
+    {
+      "productName": "Fevicol Chemifix General Purpose Adhesive 4kg",
+      "imageUrl": "/images/products/fevicol-chemifix-general-purpose-adhesive-4kg.jpg",
+      "sourcePage": "https://hardwaremart.lk/product/adhesive-chemifix-general-purpose-4kg-fevicol/",
+      "sourceImageUrl": "https://hardwaremart.lk/wp-content/uploads/2025/06/Fevicol-chemifix-general-purpose-adhesive-HardwareMart4.jpg",
+      "matchType": "retailer-listing",
+      "sha256": "19d77868c805d15746a649c7c4461aa84888542ff4b12e1a210e8d3e9f37a970"
+    },
+    {
+      "productName": "Fevicol Chemifix General Purpose Adhesive 10kg",
+      "imageUrl": "/images/products/fevicol-chemifix-general-purpose-adhesive-10kg.jpg",
+      "sourcePage": "https://hardwaremart.lk/product/adhesive-chemifix-general-purpose-10kg-fevicol/",
+      "sourceImageUrl": "https://hardwaremart.lk/wp-content/uploads/2025/06/Fevicol-chemifix-general-purpose-adhesive-HardwareMart2.jpg",
+      "matchType": "retailer-listing",
+      "sha256": "367fc6cee85eaf284332817439d27b9b0e8922483122a5a6d6174d6b3a127f6c"
+    },
+    {
+      "productName": "Fevicol Chemifix General Purpose Adhesive 20kg",
+      "imageUrl": "/images/products/fevicol-chemifix-general-purpose-adhesive-20kg.jpg",
+      "sourcePage": "https://hardwaremart.lk/product/adhesive-chemifix-general-purpose-20kg-fevicol/",
+      "sourceImageUrl": "https://hardwaremart.lk/wp-content/uploads/2025/06/Fevicol-chemifix-general-purpose-adhesive-HardwareMart3.jpg",
+      "matchType": "retailer-listing",
+      "sha256": "841684b357065b50a9744642e553b8cbec4ad0f6e2963968ca8b716e32d1c44d"
+    },
+    {
+      "productName": "Araldite Rapid Epoxy Adhesive 2 x 17ml",
+      "imageUrl": "/images/products/araldite-rapid-epoxy-adhesive-2-x-17ml.jpg",
+      "sourcePage": "https://hardwaremart.lk/product/adhesive-epoxy-5-minutes-rapid-adhesive-2-x-17ml-araldite/",
+      "sourceImageUrl": "https://hardwaremart.lk/wp-content/uploads/2024/07/Araldlite-Pidilite-Original-Hardwaremart.jpg",
+      "matchType": "retailer-listing",
+      "sha256": "16a18298ce1e83676d243b5159065983dbd772c18dedfe0188a200beb79cb726"
+    },
+    {
+      "productName": "Fevicol M-Seal General Purpose Epoxy 100g",
+      "imageUrl": "/images/products/fevicol-m-seal-general-purpose-epoxy-100g.jpg",
+      "sourcePage": "https://hardwaremart.lk/product/adhesive-general-purpose-epoxy-compound-100g-m-seal-by-fevicol/",
+      "sourceImageUrl": "https://hardwaremart.lk/wp-content/uploads/2022/10/General-Purpose-Epoxy-Compound-M-Seal-768x768.jpg",
+      "matchType": "shared-retailer-variant",
+      "sha256": "5f9122d3d7155e4820039078fe2fb6bd3199bfc6be0f9ab9a0f82aa90cd7a30d"
+    },
+    {
+      "productName": "Fevicol M-Seal General Purpose Epoxy 50g",
+      "imageUrl": "/images/products/fevicol-m-seal-general-purpose-epoxy-50g.jpg",
+      "sourcePage": "https://hardwaremart.lk/product/adhesive-general-purpose-epoxy-compound-50g-m-seal-by-fevicol/",
+      "sourceImageUrl": "https://hardwaremart.lk/wp-content/uploads/2022/10/General-Purpose-Epoxy-Compound-M-Seal-768x768.jpg",
+      "matchType": "shared-retailer-variant",
+      "sha256": "5f9122d3d7155e4820039078fe2fb6bd3199bfc6be0f9ab9a0f82aa90cd7a30d"
+    },
+    {
+      "productName": "Hasky Clear Silicone Sealant 300ml",
+      "imageUrl": "/images/products/hasky-clear-silicone-sealant-300ml.jpg",
+      "sourcePage": "https://hardwaremart.lk/product/silicone-silicone-sealent-clear-300ml-hasky-2/",
+      "sourceImageUrl": "https://hardwaremart.lk/wp-content/uploads/2026/07/Silicone-clear-hasky-hardwaremart-300x300.jpg",
+      "matchType": "retailer-listing",
+      "sha256": "74f98c76b40f27b1be521d8efb2d15ec9a8bb89bb6e9ab3935b25b1b7ea83ba1"
+    },
+    {
+      "productName": "Anchor Bolt 1/4 inch",
+      "imageUrl": "/images/products/anchor-bolt-1-4-inch.jpg",
+      "sourcePage": "https://www.homemart.lk/product/achor-bolt/",
+      "sourceImageUrl": "https://www.homemart.lk/wp-content/uploads/2023/03/012755-300x300.jpg",
+      "matchType": "retailer-listing",
+      "sha256": "772355e247cbdfa4198598dc3fda28ecc48893dffb6ddd2db79fad831d542de6"
+    },
+    {
+      "productName": "Amano Roofing Bolt B4 3 inch",
+      "imageUrl": "/images/products/amano-roofing-bolt-b4-3-inch.jpg",
+      "sourcePage": "https://www.homemart.lk/product/amano-roofing-bolt/",
+      "sourceImageUrl": "https://www.homemart.lk/wp-content/uploads/2023/03/013184-300x300.jpg",
+      "matchType": "retailer-listing",
+      "sha256": "021714fe9530b75c0da6b77bdbb953ff6cf3c7ab87f7e048c95cdf03b7077b92"
+    },
+    {
+      "productName": "Anchor Bolt 3/8 inch",
+      "imageUrl": "/images/products/anchor-bolt-3-8-inch.png",
+      "sourcePage": "https://www.homemart.lk/product/anchor-bolt-2/",
+      "sourceImageUrl": "https://www.homemart.lk/wp-content/uploads/2025/08/012757.png",
+      "matchType": "retailer-listing",
+      "sha256": "4de7954736d5726a9ba31ee40d45a311589444e0ad7ac4429c4bbe3b1ef96443"
+    },
+    {
+      "productName": "Anchor Bolt 8 x 100",
+      "imageUrl": "/images/products/anchor-bolt-8-x-100.jpg",
+      "sourcePage": "https://www.homemart.lk/product/anchor-bolt-8-x-100/",
+      "sourceImageUrl": "https://www.homemart.lk/wp-content/uploads/2023/03/0128782-300x300.jpg",
+      "matchType": "retailer-listing",
+      "sha256": "08c72c810d87514b57efb6993c9463c250b677eeb881a959ef3ec9f427eb9969"
+    },
+    {
+      "productName": "Normal Anchor Bolt 1/2 inch",
+      "imageUrl": "/images/products/normal-anchor-bolt-1-2-inch.jpg",
+      "sourcePage": "https://www.homemart.lk/product/anchor-bolt-normal-4/",
+      "sourceImageUrl": "https://www.homemart.lk/wp-content/uploads/2023/03/0019854-300x300.jpg",
+      "matchType": "retailer-listing",
+      "sha256": "d573c62bb53b2f4b3ee44480c4ec65ff01294e10991641ebeda6994d4a9c6bbb"
+    },
+    {
+      "productName": "Normal Anchor Bolt 5/8 inch",
+      "imageUrl": "/images/products/normal-anchor-bolt-5-8-inch.jpg",
+      "sourcePage": "https://www.homemart.lk/product/anchor-bolt-normal-5/",
+      "sourceImageUrl": "https://www.homemart.lk/wp-content/uploads/2023/03/0019852-2-300x300.jpg",
+      "matchType": "retailer-listing",
+      "sha256": "1e30b1f0d1f4e4fdc95fc35cb32ca95725072e141bbaba5ef64f1eac6a5e2748"
+    },
+    {
+      "productName": "Normal Anchor Bolt 1/4 inch",
+      "imageUrl": "/images/products/normal-anchor-bolt-1-4-inch.jpg",
+      "sourcePage": "https://www.homemart.lk/product/anchor-bolt-normal-4/",
+      "sourceImageUrl": "https://www.homemart.lk/wp-content/uploads/2023/03/0019854-300x300.jpg",
+      "matchType": "representative-variant",
+      "sha256": "d573c62bb53b2f4b3ee44480c4ec65ff01294e10991641ebeda6994d4a9c6bbb"
+    },
+    {
+      "productName": "Atlas Pop Rivet 1/8 x 1/2 inch (3.2 x 13mm)",
+      "imageUrl": "/images/products/atlas-pop-rivet-1-8-x-1-2-inch-3-2-x-13mm.jpg",
+      "sourcePage": "https://www.homemart.lk/product/pop-rivet/",
+      "sourceImageUrl": "https://www.homemart.lk/wp-content/uploads/2023/03/0127095-300x300.jpg",
+      "matchType": "shared-retailer-variant",
+      "sha256": "4833ab2afb33b38da9038b9ec05314bfae25a993c2aa3992097778ae02e30ae0"
+    },
+    {
+      "productName": "Atlas Pop Rivet 1/8 x 3/4 inch (3.2 x 19mm)",
+      "imageUrl": "/images/products/atlas-pop-rivet-1-8-x-3-4-inch-3-2-x-19mm.jpg",
+      "sourcePage": "https://www.homemart.lk/product/pop-rivet-2/",
+      "sourceImageUrl": "https://www.homemart.lk/wp-content/uploads/2023/03/0127095-300x300.jpg",
+      "matchType": "shared-retailer-variant",
+      "sha256": "4833ab2afb33b38da9038b9ec05314bfae25a993c2aa3992097778ae02e30ae0"
+    },
+    {
+      "productName": "Atlas Pop Rivet 5/32 x 1/2 inch (4.0 x 13mm)",
+      "imageUrl": "/images/products/atlas-pop-rivet-5-32-x-1-2-inch-4-0-x-13mm.jpg",
+      "sourcePage": "https://www.homemart.lk/product/pop-rivet-3/",
+      "sourceImageUrl": "https://www.homemart.lk/wp-content/uploads/2023/03/0127095-300x300.jpg",
+      "matchType": "shared-retailer-variant",
+      "sha256": "4833ab2afb33b38da9038b9ec05314bfae25a993c2aa3992097778ae02e30ae0"
+    }
+  ]
+}
