@@ -6,7 +6,7 @@ import com.hardwarestore.hardwarestore.exception.ResourceNotFoundException;
 import com.hardwarestore.hardwarestore.model.Order;
 import com.hardwarestore.hardwarestore.model.OrderItem;
 import com.hardwarestore.hardwarestore.model.OrderStatus;
-import com.hardwarestore.hardwarestore.model.Role;
+import com.hardwarestore.hardwarestore.model.RoleName;
 import com.hardwarestore.hardwarestore.model.User;
 import com.hardwarestore.hardwarestore.repository.OrderRepository;
 import com.hardwarestore.hardwarestore.repository.UserRepository;
@@ -26,9 +26,11 @@ public class OrderController {
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
 
-    public OrderController(OrderService orderService,
-                           UserRepository userRepository,
-                           OrderRepository orderRepository) {
+    public OrderController(
+            OrderService orderService,
+            UserRepository userRepository,
+            OrderRepository orderRepository
+    ) {
         this.orderService = orderService;
         this.userRepository = userRepository;
         this.orderRepository = orderRepository;
@@ -44,7 +46,10 @@ public class OrderController {
 
         User customer = userRepository.findById(userId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("User not found with id: " + userId));
+                        new ResourceNotFoundException(
+                                "User not found with id: " + userId
+                        )
+                );
 
         return orderService.getCustomerOrders(customer)
                 .stream()
@@ -58,7 +63,7 @@ public class OrderController {
             HttpSession session
     ) {
 
-        requireAdmin(session);
+        requireStaffOrAdmin(session);
 
         return orderService.getOrdersByStatus(status)
                 .stream()
@@ -74,9 +79,15 @@ public class OrderController {
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Order not found with id: " + orderId));
+                        new ResourceNotFoundException(
+                                "Order not found with id: " + orderId
+                        )
+                );
 
-        requireSameUserOrAdmin(order.getCustomer().getId(), session);
+        requireSameUserOrAdmin(
+                order.getCustomer().getId(),
+                session
+        );
 
         return orderService.getOrderItems(order)
                 .stream()
@@ -90,14 +101,20 @@ public class OrderController {
             @RequestParam OrderStatus status,
             HttpSession session
     ) {
-        requireAdmin(session);
+
+        requireStaffOrAdmin(session);
 
         return toOrderResponse(
-                orderService.updateOrderStatus(orderId, status)
+                orderService.updateOrderStatus(
+                        orderId,
+                        status
+                )
         );
     }
 
-    private OrderResponse toOrderResponse(Order order) {
+    private OrderResponse toOrderResponse(
+            Order order
+    ) {
 
         return new OrderResponse(
                 order.getOrderId(),
@@ -108,7 +125,9 @@ public class OrderController {
         );
     }
 
-    private OrderItemResponse toOrderItemResponse(OrderItem orderItem) {
+    private OrderItemResponse toOrderItemResponse(
+            OrderItem orderItem
+    ) {
 
         return new OrderItemResponse(
                 orderItem.getOrderItemId(),
@@ -119,24 +138,56 @@ public class OrderController {
         );
     }
 
-    private void requireSameUserOrAdmin(Long requestedUserId, HttpSession session) {
-        Long authenticatedUserId = (Long) session.getAttribute("userId");
-        Role role = (Role) session.getAttribute("role");
+    private void requireSameUserOrAdmin(
+            Long requestedUserId,
+            HttpSession session
+    ) {
 
-        if (authenticatedUserId == null
-                || (!authenticatedUserId.equals(requestedUserId) && role != Role.ADMIN)) {
+        Long authenticatedUserId =
+                (Long) session.getAttribute("userId");
+
+        RoleName role =
+                (RoleName) session.getAttribute("role");
+
+        if (authenticatedUserId == null) {
+
             throw new ResponseStatusException(
                     HttpStatus.UNAUTHORIZED,
+                    "Please login first"
+            );
+        }
+
+        if (!authenticatedUserId.equals(requestedUserId)
+                && role != RoleName.ADMIN) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
                     "You cannot access another customer's orders"
             );
         }
     }
 
-    private void requireAdmin(HttpSession session) {
-        if (session.getAttribute("role") != Role.ADMIN) {
+    private void requireStaffOrAdmin(
+            HttpSession session
+    ) {
+
+        RoleName role =
+                (RoleName) session.getAttribute("role");
+
+        if (role == null) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Please login first"
+            );
+        }
+
+        if (role != RoleName.STAFF
+                && role != RoleName.ADMIN) {
+
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN,
-                    "Admin access required"
+                    "Staff or Admin access required"
             );
         }
     }

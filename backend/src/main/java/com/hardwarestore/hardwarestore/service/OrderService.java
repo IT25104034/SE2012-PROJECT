@@ -1,18 +1,19 @@
 package com.hardwarestore.hardwarestore.service;
 
+import com.hardwarestore.hardwarestore.exception.ResourceNotFoundException;
 import com.hardwarestore.hardwarestore.model.Cart;
 import com.hardwarestore.hardwarestore.model.CartItem;
+import com.hardwarestore.hardwarestore.model.Inventory;
 import com.hardwarestore.hardwarestore.model.Order;
 import com.hardwarestore.hardwarestore.model.OrderItem;
 import com.hardwarestore.hardwarestore.model.OrderStatus;
 import com.hardwarestore.hardwarestore.model.Product;
 import com.hardwarestore.hardwarestore.model.User;
-import com.hardwarestore.hardwarestore.exception.ResourceNotFoundException;
 import com.hardwarestore.hardwarestore.repository.CartItemRepository;
 import com.hardwarestore.hardwarestore.repository.CartRepository;
+import com.hardwarestore.hardwarestore.repository.InventoryRepository;
 import com.hardwarestore.hardwarestore.repository.OrderItemRepository;
 import com.hardwarestore.hardwarestore.repository.OrderRepository;
-import com.hardwarestore.hardwarestore.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,57 +28,49 @@ public class OrderService {
     private final CartItemRepository cartItemRepository;
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
-    private final ProductRepository productRepository;
+    private final InventoryRepository inventoryRepository;
 
     public OrderService(
             CartRepository cartRepository,
             CartItemRepository cartItemRepository,
             OrderRepository orderRepository,
             OrderItemRepository orderItemRepository,
-            ProductRepository productRepository
+            InventoryRepository inventoryRepository
     ) {
         this.cartRepository = cartRepository;
         this.cartItemRepository = cartItemRepository;
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
-        this.productRepository = productRepository;
+        this.inventoryRepository = inventoryRepository;
     }
 
     @Transactional
     public Order checkout(User customer) {
 
-        Cart cart = cartRepository.findByCustomer(customer)
+        Cart cart = cartRepository
+                .findByCustomer(customer)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Cart not found")
+                        new IllegalArgumentException(
+                                "Cart not found"
+                        )
                 );
 
         List<CartItem> cartItems =
                 cartItemRepository.findByCart(cart);
 
         if (cartItems.isEmpty()) {
+
             throw new IllegalArgumentException(
                     "Cannot checkout an empty cart"
             );
         }
 
-        // Validate stock before creating the order
-        for (CartItem cartItem : cartItems) {
-
-            Product product = cartItem.getProduct();
-
-            if (product.getQuantity() < cartItem.getQuantity()) {
-                throw new IllegalArgumentException(
-                        "Not enough stock for product: "
-                                + product.getName()
-                );
-            }
-        }
-
-        // Validate cart item quantity and stored unit price
+        // Validate cart item quantities and prices
         for (CartItem cartItem : cartItems) {
 
             if (cartItem.getQuantity() == null
                     || cartItem.getQuantity() <= 0) {
+
                 throw new IllegalArgumentException(
                         "Cart item quantity must be greater than zero"
                 );
@@ -86,14 +79,47 @@ public class OrderService {
             if (cartItem.getUnitPrice() == null
                     || cartItem.getUnitPrice()
                     .compareTo(BigDecimal.ZERO) < 0) {
+
                 throw new IllegalArgumentException(
                         "Cart item price cannot be negative"
                 );
             }
         }
 
+        // Validate inventory stock before creating the order
+        for (CartItem cartItem : cartItems) {
+
+            Product product =
+                    cartItem.getProduct();
+
+            Inventory inventory =
+                    inventoryRepository
+                            .findByProductProductId(
+                                    product.getProductId()
+                            )
+                            .orElseThrow(() ->
+                                    new ResourceNotFoundException(
+                                            "Inventory not found for product id: "
+                                                    + product.getProductId()
+                                    )
+                            );
+
+            if (inventory.getQuantityOnHand()
+                    < cartItem.getQuantity()) {
+
+                throw new IllegalArgumentException(
+                        "Not enough stock for product: "
+                                + product.getName()
+                                + ". Only "
+                                + inventory.getQuantityOnHand()
+                                + " units available."
+                );
+            }
+        }
+
         // Calculate total order amount
-        BigDecimal totalAmount = BigDecimal.ZERO;
+        BigDecimal totalAmount =
+                BigDecimal.ZERO;
 
         for (CartItem cartItem : cartItems) {
 
@@ -105,61 +131,99 @@ public class OrderService {
                                     )
                             );
 
-            totalAmount = totalAmount.add(itemTotal);
+            totalAmount =
+                    totalAmount.add(itemTotal);
         }
 
         // Create order
-        Order order = new Order(
-                customer,
-                LocalDateTime.now(),
-                totalAmount,
-                OrderStatus.PENDING
-        );
+        Order order =
+                new Order(
+                        customer,
+                        LocalDateTime.now(),
+                        totalAmount,
+                        OrderStatus.PENDING
+                );
 
-        order = orderRepository.save(order);
+        order =
+                orderRepository.save(order);
 
         // Create order items and reduce inventory stock
         for (CartItem cartItem : cartItems) {
 
-            Product product = cartItem.getProduct();
+            Product product =
+                    cartItem.getProduct();
 
-            OrderItem orderItem = new OrderItem(
-                    order,
-                    product,
-                    cartItem.getQuantity(),
-                    cartItem.getUnitPrice()
-            );
+            Inventory inventory =
+                    inventoryRepository
+                            .findByProductProductId(
+                                    product.getProductId()
+                            )
+                            .orElseThrow(() ->
+                                    new ResourceNotFoundException(
+                                            "Inventory not found for product id: "
+                                                    + product.getProductId()
+                                    )
+                            );
+
+            OrderItem orderItem =
+                    new OrderItem(
+                            order,
+                            product,
+                            cartItem.getQuantity(),
+                            cartItem.getUnitPrice()
+                    );
 
             orderItemRepository.save(orderItem);
 
             int newQuantity =
-                    product.getQuantity()
+                    inventory.getQuantityOnHand()
                             - cartItem.getQuantity();
 
-            product.setQuantity(newQuantity);
+            inventory.setQuantityOnHand(
+                    newQuantity
+            );
 
-            productRepository.save(product);
+            inventoryRepository.save(
+                    inventory
+            );
         }
 
         // Clear cart after successful checkout
-        cartItemRepository.deleteAll(cartItems);
+        cartItemRepository.deleteAll(
+                cartItems
+        );
 
-        cart.setTotalAmount(BigDecimal.ZERO);
+        cart.setTotalAmount(
+                BigDecimal.ZERO
+        );
+
         cartRepository.save(cart);
 
         return order;
     }
 
-    public List<Order> getCustomerOrders(User customer) {
-        return orderRepository.findByCustomer(customer);
+    public List<Order> getCustomerOrders(
+            User customer
+    ) {
+
+        return orderRepository
+                .findByCustomer(customer);
     }
 
-    public List<Order> getOrdersByStatus(OrderStatus status) {
-        return orderRepository.findByStatus(status);
+    public List<Order> getOrdersByStatus(
+            OrderStatus status
+    ) {
+
+        return orderRepository
+                .findByStatus(status);
     }
 
-    public List<OrderItem> getOrderItems(Order order) {
-        return orderItemRepository.findByOrder(order);
+    public List<OrderItem> getOrderItems(
+            Order order
+    ) {
+
+        return orderItemRepository
+                .findByOrder(order);
     }
 
     public Order updateOrderStatus(
@@ -167,12 +231,15 @@ public class OrderService {
             OrderStatus status
     ) {
 
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Order not found with id: " + orderId
-                        )
-                );
+        Order order =
+                orderRepository
+                        .findById(orderId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Order not found with id: "
+                                                + orderId
+                                )
+                        );
 
         order.setStatus(status);
 
