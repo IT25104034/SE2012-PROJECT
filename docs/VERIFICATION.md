@@ -75,3 +75,9 @@ Adapted the prominent search, department navigation and rectangular merchandisin
 - Added real department links and clearly labelled sample address, phone and reserved .example email in frontend/src/config/storeContact.js.
 - Desktop footer reviewed visually; 320px and 390px iframe checks confirm two-column links, eight departments and no horizontal overflow.
 - Frontend build, lint and whitespace checks passed.
+
+### Slightly larger text — 2026-10-04
+
+- Increased explicit UI text sizes by 1px, shared small/body text by 1px and responsive heading limits by 2px.
+- Checked desktop and 320px/390px home, catalogue and login layouts; no horizontal overflow. Footer links now render at 14px, body at 17px and desktop navigation at 14px.
+- Frontend build, lint and whitespace checks passed.
