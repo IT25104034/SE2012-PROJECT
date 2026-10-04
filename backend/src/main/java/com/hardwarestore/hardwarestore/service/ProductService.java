@@ -6,6 +6,7 @@ import com.hardwarestore.hardwarestore.model.Product;
 import com.hardwarestore.hardwarestore.repository.CategoryRepository;
 import com.hardwarestore.hardwarestore.repository.ProductRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -24,8 +25,12 @@ public class ProductService {
     }
 
     // Get all products
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    public List<Product> getAllProducts() { return getAllProducts(false); }
+
+    public List<Product> getAllProducts(boolean includeInactive) {
+        return productRepository.findAll().stream()
+                .filter(item -> includeInactive || item.isActive() && item.getCategory().isActive())
+                .toList();
     }
 
     // Get product by ID
@@ -38,25 +43,29 @@ public class ProductService {
     }
 
     // Create product
+    @Transactional
     public Product createProduct(Product product) {
 
         Category category = getProductCategory(product);
 
+        product.setProductId(null);
+        product.setQuantity(0);
         product.setCategory(category);
 
         return productRepository.save(product);
     }
 
     // Update product
+    @Transactional
     public Product updateProduct(Long id, Product updatedProduct) {
 
         Product existingProduct = getProductById(id);
 
         existingProduct.setName(updatedProduct.getName());
         existingProduct.setDescription(updatedProduct.getDescription());
+        existingProduct.setActive(updatedProduct.isActive());
         existingProduct.setPrice(updatedProduct.getPrice());
         existingProduct.setImageUrl(updatedProduct.getImageUrl());
-        existingProduct.setQuantity(updatedProduct.getQuantity());
 
         Category category = getProductCategory(updatedProduct);
 
@@ -66,11 +75,13 @@ public class ProductService {
     }
 
     // Delete product
+    @Transactional
     public void deleteProduct(Long id) {
 
         Product existingProduct = getProductById(id);
 
-        productRepository.delete(existingProduct);
+        existingProduct.setActive(false);
+        productRepository.save(existingProduct);
     }
 
     private Category getProductCategory(Product product) {

@@ -119,6 +119,9 @@ public class CartService {
     }
 
     private void validateStock(Product product, Integer requestedQuantity) {
+        if (!product.isPurchasable()) {
+            throw new IllegalArgumentException("Product is no longer available: " + product.getName());
+        }
         if (product.getQuantity() == null || product.getQuantity() < requestedQuantity) {
             throw new IllegalArgumentException(
                     "Only " + (product.getQuantity() == null ? 0 : product.getQuantity())

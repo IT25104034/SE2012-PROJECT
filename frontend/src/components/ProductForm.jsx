@@ -8,10 +8,10 @@ export default function ProductForm({ product, onClose, onSaved }) {
   const client = useQueryClient();
   const [form, setForm] = useState({
     name: product?.name ?? "", description: product?.description ?? "",
-    price: product?.price ?? "", quantity: product?.quantity ?? 0, imageUrl: product?.imageUrl ?? "",
+    price: product?.price ?? "", active: product?.active ?? true, imageUrl: product?.imageUrl ?? "",
     categoryId: product?.category?.categoryId ?? "",
   });
-  const categories = useQuery({ queryKey: ["categories"], queryFn: getCategories });
+  const categories = useQuery({ queryKey: ["categories", "management"], queryFn: () => getCategories({ includeInactive: true }) });
   const mutation = useMutation({
     mutationFn: saveProduct,
     onSuccess: async () => {
@@ -29,7 +29,7 @@ export default function ProductForm({ product, onClose, onSaved }) {
     mutation.mutate({ productId: product?.productId, product: {
       name: form.name.trim(), description: form.description.trim() || null,
       price: form.price === "" ? null : Number(form.price),
-      quantity: form.quantity === "" ? null : Number(form.quantity),
+      active: form.active,
       imageUrl: form.imageUrl.trim() || null,
       category: form.categoryId === "" ? null : { categoryId: Number(form.categoryId) },
     }});
@@ -52,16 +52,16 @@ export default function ProductForm({ product, onClose, onSaved }) {
       </p>}
       <form noValidate onSubmit={submit} className="mt-5 space-y-4">
         {field("name", "Product name *", { required: true, maxLength: 150, autoFocus: true })}
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2">
           {field("price", "Price (Rs.) *", { type: "number", step: "0.01", min: "0.01", required: true })}
-          {field("quantity", "Stock quantity *", { type: "number", step: "1", min: "0", required: true })}
+
           <div>
             <label className="field-label" htmlFor="product-category">Category *</label>
             <select id="product-category" name="categoryId" value={form.categoryId} onChange={change}
               className="field-input" required disabled={mutation.isPending || categories.isPending || categories.isError}
               aria-invalid={Boolean(errors.category)} aria-describedby={errors.category ? "category-error" : undefined}>
               <option value="">Select a category</option>
-              {(categories.data ?? []).map((category) => <option key={category.categoryId} value={category.categoryId}>{category.name}</option>)}
+              {(categories.data ?? []).map((category) => <option key={category.categoryId} value={category.categoryId}>{category.name}{category.active ? "" : " (Archived)"}</option>)}
             </select>
             {errors.category && <p id="category-error" role="alert" className="field-error">{errors.category}</p>}
             {categories.isPending && <p role="status" className="text-sm text-slate-500">Loading categories…</p>}
@@ -69,6 +69,8 @@ export default function ProductForm({ product, onClose, onSaved }) {
             {categories.isSuccess && categories.data.length === 0 && <p className="mt-2 text-sm text-slate-600">Create a category first in <Link className="text-orange-700 underline" to="/admin/categories">Category Management</Link>.</p>}
           </div>
         </div>
+        <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.active} disabled={mutation.isPending} onChange={(event) => setForm({ ...form, active: event.target.checked })} />Available in the catalogue</label>
+        <p className="text-sm text-slate-500">Stock is managed through Inventory. New products start with zero stock.</p>
         {field("imageUrl", "Image URL", { maxLength: 500, placeholder: "https://…" })}
         <div>
           <label className="field-label" htmlFor="product-description">Description</label>

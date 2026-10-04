@@ -65,6 +65,9 @@ public class OrderService {
 
             Product product = cartItem.getProduct();
 
+            if (!product.isPurchasable()) {
+                throw new IllegalArgumentException("Product is no longer available: " + product.getName());
+            }
             if (product.getQuantity() < cartItem.getQuantity()) {
                 throw new IllegalArgumentException(
                         "Not enough stock for product: "

@@ -1,7 +1,7 @@
 import apiClient from "./apiClient";
 
-export async function getProducts() {
-  return (await apiClient.get("/api/products")).data;
+export async function getProducts({ includeInactive = false } = {}) {
+  return (await apiClient.get("/api/products", { params: { includeInactive } })).data;
 }
 
 export async function getProduct(productId) {
