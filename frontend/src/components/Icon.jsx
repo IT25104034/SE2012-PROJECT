@@ -1,4 +1,5 @@
 const paths = {
+  phone: <><path d="M4 13v-2a8 8 0 0 1 16 0v2M4 13H2v5h4v-5H4Zm16 0h2v5h-4v-5h2ZM20 18v1a3 3 0 0 1-3 3h-4" /></>,
   search: <><circle cx="10" cy="10" r="6" /><path d="m15 15 6 6" /></>,
   arrow: <path d="M5 12h14m-6-6 6 6-6 6" />,
   cart: <><path d="M3 3h2l3 12h11l2-8H6" /><circle cx="9" cy="20" r="1" /><circle cx="18" cy="20" r="1" /></>,

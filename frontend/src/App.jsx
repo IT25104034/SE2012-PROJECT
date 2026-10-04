@@ -25,6 +25,7 @@ import RegisterPage from "./components/RegisterPage.jsx";
 import ProtectedRoute from "./auth/ProtectedRoute.jsx";
 import { useAuth } from "./auth/authContext.js";
 
+import StoreFooter from "./components/StoreFooter.jsx";
 import ProductImage from "./components/ProductImage.jsx";
 import Icon from "./components/Icon.jsx";
 import { getProducts } from "./services/productService.js";
@@ -73,13 +74,7 @@ function Storefront() {
       </div></div>
     </header>
     <main id="main-content" className="site-width store-main flex-1" tabIndex={-1}><Outlet /></main>
-    <footer className="store-footer">
-      <div className="site-width footer-top"><div><Brand /><p className="mt-5 max-w-sm text-sm leading-relaxed text-slate-400">From everyday repairs to your next big idea. Find the tools, components and supplies to make it happen.</p></div>
-        <div><p className="eyebrow text-orange-400">Explore the store</p><div className="mt-4 flex flex-col gap-3 text-sm text-slate-300"><Link to="/products">All products</Link><Link to="/cart">Your cart</Link><Link to="/orders">Your orders</Link></div></div>
-        <div className="footer-cta"><p className="text-2xl font-bold">Let's build something.</p><Link to="/products" className="btn-primary mt-5">Explore the catalogue <Icon name="arrow" /></Link></div>
-      </div>
-      <div className="site-width footer-bottom"><span>Mustafa Hardware</span><span>Tools for the work. Supplies for the idea.</span></div>
-    </footer>
+    <StoreFooter brand={<Brand />} categories={departments.data ?? []} user={user} />
   </div>;
 }
 

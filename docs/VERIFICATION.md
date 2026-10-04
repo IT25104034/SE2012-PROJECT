@@ -68,3 +68,10 @@ Adapted the prominent search, department navigation and rectangular merchandisin
 - Switched the shared application font to self-hosted Inter (SIL OFL license included); removed unused Source Sans 3 assets.
 - Browser confirmed Inter loads and is inherited by headings and controls; desktop/home and 390px home/catalogue have no page overflow. Catalogue still shows nine products.
 - Frontend build, lint and whitespace checks passed.
+
+### Contact footer — 2026-10-04
+
+- Adapted Banana.lk's light contact-led footer with brand/contact block, quick navigation, customer-care links and a copyright strip.
+- Added real department links and clearly labelled sample address, phone and reserved .example email in frontend/src/config/storeContact.js.
+- Desktop footer reviewed visually; 320px and 390px iframe checks confirm two-column links, eight departments and no horizontal overflow.
+- Frontend build, lint and whitespace checks passed.
