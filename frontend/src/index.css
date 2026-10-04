@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
-/* Self-hosted Source Sans 3; license included alongside the font. */
+/* Self-hosted Inter; license included alongside the font. */
 @font-face {
-  font-family: "Source Sans 3";
-  src: url("/fonts/source-sans-3/SourceSans3-Variable.ttf") format("truetype");
-  font-weight: 200 900;
+  font-family: "Inter";
+  src: url("/fonts/inter/Inter-Variable.ttf") format("truetype");
+  font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }
@@ -27,7 +27,7 @@
   --radius-xl: 2px;
   --radius-2xl: 2px;
   --radius-3xl: 2px;
-  --font-sans: "Source Sans 3", Arial, sans-serif;
+  --font-sans: "Inter", Arial, sans-serif;
   --color-border: var(--border);
   --color-background: var(--background);
   --color-foreground: var(--foreground);

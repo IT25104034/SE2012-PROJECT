@@ -61,3 +61,10 @@ Adapted the prominent search, department navigation and rectangular merchandisin
 - Browser checks: search for drill returns two products, Power Tools links to three products, pagination shows nine on both first and second pages, mobile filters expand correctly.
 - Desktop, 390px and 320px layout checks passed without page overflow; department images remain inside their allotted area. Home, catalogue and login reviewed.
 - Frontend build, lint and Git whitespace checks passed.
+
+### Banana.lk font match — 2026-10-04
+
+- Confirmed https://banana.lk/ loads Inter and renders body, department headings and product text using Inter.
+- Switched the shared application font to self-hosted Inter (SIL OFL license included); removed unused Source Sans 3 assets.
+- Browser confirmed Inter loads and is inherited by headings and controls; desktop/home and 390px home/catalogue have no page overflow. Catalogue still shows nine products.
+- Frontend build, lint and whitespace checks passed.
