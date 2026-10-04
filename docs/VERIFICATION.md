@@ -49,3 +49,15 @@ The existing store data and backend authentication rules were not changed. This 
 - Removed widely spaced uppercase labels and tight heading tracking; reduced heavy heading weights across storefront and management pages.
 - Verified the font loads, catalogue still shows nine products, and desktop catalogue plus 390px home/catalogue/login have no horizontal overflow.
 - Frontend production build and lint passed.
+
+### Retail storefront revision — 2026-10-04
+
+Design references: https://www.toolstation.com/ and https://www.screwfix.com/ .
+Adapted the prominent search, department navigation and rectangular merchandising structure using Mustafa branding and the existing local product photos.
+
+- Replaced rounded icon department cards with eight photo-led department links; added four in-stock products with actual database prices and detail links.
+- Added accessible header search that navigates to the existing catalogue filter.
+- Applied compact corners to shared panels, controls and product cards; removed the old decorative homepage styling.
+- Browser checks: search for drill returns two products, Power Tools links to three products, pagination shows nine on both first and second pages, mobile filters expand correctly.
+- Desktop, 390px and 320px layout checks passed without page overflow; department images remain inside their allotted area. Home, catalogue and login reviewed.
+- Frontend build, lint and Git whitespace checks passed.

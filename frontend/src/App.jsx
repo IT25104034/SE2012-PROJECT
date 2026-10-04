@@ -6,6 +6,7 @@ import {
   Link,
   Outlet,
   Navigate,
+  useNavigate,
 } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
@@ -24,6 +25,7 @@ import RegisterPage from "./components/RegisterPage.jsx";
 import ProtectedRoute from "./auth/ProtectedRoute.jsx";
 import { useAuth } from "./auth/authContext.js";
 
+import ProductImage from "./components/ProductImage.jsx";
 import Icon from "./components/Icon.jsx";
 import { getProducts } from "./services/productService.js";
 import { getCategories } from "./services/categoryService.js";
@@ -37,23 +39,38 @@ function Brand() {
 
 function Storefront() {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const departments = useQuery({ queryKey: ["categories"], queryFn: getCategories });
+  function searchStore(event) {
+    event.preventDefault();
+    const search = String(new FormData(event.currentTarget).get("search") ?? "").trim();
+    navigate(search ? `/products?${new URLSearchParams({ search })}` : "/products");
+  }
   return <div className="storefront flex min-h-screen flex-col">
     <a href="#main-content" className="skip-link">Skip to content</a>
-    <div className="utility-bar"><div className="site-width"><span>Hardware. Electronics. Possibilities.</span><span className="hidden sm:inline">Your next project starts here.</span></div></div>
+    <div className="utility-bar"><div className="site-width"><span>Tools, hardware & electronics</span><span className="hidden sm:inline">Mustafa Hardware online store</span></div></div>
     <header className="store-header">
       <div className="site-width header-inner">
         <Brand />
+        <form className="store-search" role="search" onSubmit={searchStore}>
+          <label htmlFor="store-search" className="sr-only">Search the store</label>
+          <input id="store-search" name="search" type="search" placeholder="Search tools, hardware and electronics" />
+          <button type="submit" aria-label="Search products"><Icon name="search" /></button>
+        </form>
+        <div className="account-nav">
+          {user ? <><span className="hidden text-sm text-slate-500 sm:inline">Hi, {user.name}</span><button type="button" className="btn-outline" onClick={logout}>Sign Out</button></>
+            : <><Link to="/login" className="nav-item">Sign In</Link><Link to="/register" className="btn-primary">Register <Icon name="arrow" /></Link></>}
+        </div>
+      </div>
+      <div className="store-navigation"><div className="site-width navigation-inner">
         <nav aria-label="Main navigation" className="store-nav">
           <NavLink to="/products" className={({ isActive }) => `nav-item ${isActive ? "is-active" : ""}`}>Products</NavLink>
           <NavLink to="/cart" className={({ isActive }) => `nav-item ${isActive ? "is-active" : ""}`}><Icon name="cart" />Cart</NavLink>
           <NavLink to="/orders" className={({ isActive }) => `nav-item ${isActive ? "is-active" : ""}`}>Orders</NavLink>
           {["ADMIN", "STAFF"].includes(user?.role) && <Link to={user.role === "ADMIN" ? "/admin/products" : "/staff/orders"} className="nav-item">Management</Link>}
         </nav>
-        <div className="account-nav">
-          {user ? <><span className="hidden text-sm text-slate-500 sm:inline">Hi, {user.name}</span><button type="button" className="btn-outline" onClick={logout}>Sign Out</button></>
-            : <><Link to="/login" className="nav-item">Sign In</Link><Link to="/register" className="btn-primary">Register <Icon name="arrow" /></Link></>}
-        </div>
-      </div>
+        <nav aria-label="Departments" className="department-nav">{(departments.data ?? []).map(category => <Link key={category.categoryId} to={`/products?categoryId=${category.categoryId}`}>{category.name}</Link>)}</nav>
+      </div></div>
     </header>
     <main id="main-content" className="site-width store-main flex-1" tabIndex={-1}><Outlet /></main>
     <footer className="store-footer">
@@ -69,28 +86,35 @@ function Storefront() {
 function Home() {
   const categories = useQuery({ queryKey: ["categories"], queryFn: getCategories });
   const products = useQuery({ queryKey: ["products"], queryFn: getProducts });
-  const categoryIcon = (name) => /paint/i.test(name) ? "paint" : /electronic/i.test(name) ? "chip" : /electrical|power/i.test(name) ? "bolt" : /sealant|plumb|fastener/i.test(name) ? "box" : "tools";
+  const items = products.data ?? [];
+  // Pick one pictured product per department rather than an invented promotion.
+  const highlights = (categories.data ?? []).map(category => items.find(product => product.category?.categoryId === category.categoryId && product.imageUrl && Number(product.quantity) > 0)).filter(Boolean).slice(0, 4);
   return <>
-    <section className="home-hero">
-      <div className="hero-copy"><p className="eyebrow"><span className="small-dot" /> Made for the way you build</p><h1>Good tools.<br />Great <span>projects.</span></h1>
-        <p className="hero-description">A quick repair. A weekend build. Your next bright idea. Find the hardware and electronics to get it done.</p>
-        <div className="hero-actions"><Link to="/products" className="btn-primary">Explore products <Icon name="arrow" /></Link><a href="#shop-categories" className="hero-secondary">Shop by category</a></div>
-        <div className="hero-facts"><span><strong>{products.isSuccess ? products.data.length : "—"}</strong> products to explore</span><span><strong>{categories.isSuccess ? categories.data.length : "—"}</strong> useful categories</span></div>
-      </div>
-      <div className="hero-display"><div className="display-topline"><span>Project essentials</span><Icon name="tools" /></div>
-        <div className="hero-tool-photo"><img src="/images/products/cordless-drill-18v.jpg" alt="Cordless drill from the sample catalogue" /><span className="tool-note">Power your next idea</span></div>
-        <div className="hero-display-bottom"><div><span className="eyebrow text-orange-300">Ready, set, create.</span><p>Small fixes.<br />Big possibilities.</p></div><Link to="/products" aria-label="Browse project essentials" className="hero-round-link"><Icon name="arrow" /></Link></div>
-      </div>
+    <section className="retail-banner" aria-labelledby="home-title">
+      <div className="retail-banner-copy"><p className="eyebrow">Your hardware store, online</p><h1 id="home-title">Tools and supplies.<br />Ready for the job.</h1><p>Shop hand tools, power tools, electrical components and everyday hardware in one place.</p><Link to="/products" className="btn-primary">Shop all products <Icon name="arrow" /></Link></div>
+      <div className="retail-banner-photo"><img src="/images/products/cordless-drill-18v.jpg" alt="18V cordless drill" /><div><span>Tools for your next project</span><a href="#shop-categories">Browse departments <Icon name="arrow" /></a></div></div>
     </section>
-    <section id="shop-categories" className="category-section">
-      <div className="section-heading"><div><p className="eyebrow">Find your starting point</p><h2>Every project has a category.</h2></div><Link to="/products" className="text-link">View all products <Icon name="arrow" /></Link></div>
-      {categories.isPending ? <p className="panel p-8 mt-6" role="status">Loading categories…</p> : categories.isError ? <p className="panel p-8 mt-6 text-red-700" role="alert">Unable to load categories. <button className="underline" onClick={() => categories.refetch()}>Retry</button></p> : categories.data.length === 0 ? <p className="panel p-8 mt-6 text-slate-500">Categories will appear here when added.</p> :
-        <div className="category-grid">{categories.data.map((category, index) => <Link key={category.categoryId} to={`/products?categoryId=${category.categoryId}`} className="category-card">
-          <div className="category-card-top"><span className="category-icon"><Icon name={categoryIcon(category.name)} /></span><span className="category-number">{String(index + 1).padStart(2, "0")}</span></div>
-          <h3>{category.name}</h3><div className="category-card-bottom"><span>{products.isSuccess ? `${products.data.filter(p => p.category?.categoryId === category.categoryId).length} products` : "Explore category"}</span><Icon name="arrow" /></div>
-        </Link>)}</div>}
+    <div className="catalogue-strip"><span><Icon name="grid" />{products.isSuccess ? `${items.length} products in the catalogue` : "Browse our catalogue"}</span><span><Icon name="tools" />Hardware & project essentials</span><Link to="/orders">Track your orders <Icon name="arrow" /></Link></div>
+    <section id="shop-categories" className="department-section">
+      <div className="section-heading"><h2>Shop by department</h2><Link to="/products" className="text-link">View all products <Icon name="arrow" /></Link></div>
+      {categories.isPending ? <p className="py-8" role="status">Loading departments…</p> : categories.isError ? <p className="py-8 text-red-700" role="alert">Unable to load departments. <button className="underline" onClick={() => categories.refetch()}>Retry</button></p> : categories.data.length === 0 ? <p className="py-8">Departments will appear here when added.</p> :
+        <div className="department-grid">{categories.data.map(category => {
+          const departmentItems = items.filter(product => product.category?.categoryId === category.categoryId);
+          const image = departmentItems.find(product => product.imageUrl);
+          return <Link key={category.categoryId} to={`/products?categoryId=${category.categoryId}`} className="department-tile">
+            <div className="department-image">{image ? <ProductImage product={image} className="h-full w-full object-contain" /> : <Icon name="tools" />}</div>
+            <div className="department-caption"><h3>{category.name}</h3><Icon name="arrow" /></div><p>{products.isSuccess ? `${departmentItems.length} products` : "Browse products"}</p>
+          </Link>;
+        })}</div>}
     </section>
-    <section className="project-banner"><Icon name="tools" /><div><p className="eyebrow">From workbench to workspace</p><h2>A little curiosity goes a long way.</h2><p>Tools, electronics and everyday essentials, all in one place.</p></div><Link to="/products" className="btn-outline">Find your next essential <Icon name="arrow" /></Link></section>
+    <section className="home-products" aria-labelledby="essentials-heading">
+      <div className="section-heading"><h2 id="essentials-heading">Explore our range</h2><Link to="/products?availability=in" className="text-link">Shop in-stock products <Icon name="arrow" /></Link></div>
+      {products.isPending ? <p className="py-8" role="status">Loading products…</p> : products.isError ? <p className="py-8 text-red-700" role="alert">Unable to load products. <button className="underline" onClick={() => products.refetch()}>Retry</button></p> : highlights.length === 0 ? <p className="py-8">Available products will appear here when added.</p> :
+        <div className="home-product-grid">{highlights.map(product => <article key={product.productId} className="product-card">
+          <Link className="product-photo" to={`/products/${product.productId}`} aria-label={`View ${product.name}`}><ProductImage product={product} className="object-contain" /></Link>
+          <div className="product-card-body"><p className="eyebrow">{product.category?.name}</p><h3><Link to={`/products/${product.productId}`}>{product.name}</Link></h3><p className="product-price">Rs. {Number(product.price).toLocaleString("en-LK", { minimumFractionDigits: 2 })}</p><p className="product-stock">In stock · {product.quantity} available</p><Link className="btn-outline" to={`/products/${product.productId}`}>View product <Icon name="arrow" /></Link></div>
+        </article>)}</div>}
+    </section>
   </>;
 }
 

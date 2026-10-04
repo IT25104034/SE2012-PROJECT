@@ -1,4 +1,5 @@
 const paths = {
+  search: <><circle cx="10" cy="10" r="6" /><path d="m15 15 6 6" /></>,
   arrow: <path d="M5 12h14m-6-6 6 6-6 6" />,
   cart: <><path d="M3 3h2l3 12h11l2-8H6" /><circle cx="9" cy="20" r="1" /><circle cx="18" cy="20" r="1" /></>,
   tools: <><path d="m14 6 4 4m-6 2-8 8-2-2 8-8" /><path d="M14 3a6 6 0 0 0-4 8l3 3a6 6 0 0 0 8-7l-4 4-4-4 4-4Z" /></>,
