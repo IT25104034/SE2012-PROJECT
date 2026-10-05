@@ -33,4 +33,10 @@ class AccountTests {
   mvc.perform(get("/api/auth/me").session(s)).andExpect(status().isOk());assertNotNull(accounts.loginUser(u.getEmail(),"NewPassword123"));
   mvc.perform(get("/api/auth/me").session(session(u))).andExpect(status().isUnauthorized());
  }
+ @Test void dashboardIsAdminOnlyAndReturnsAggregates()throws Exception {
+  var u=user();mvc.perform(get("/api/admin/dashboard")).andExpect(status().isUnauthorized());
+  mvc.perform(get("/api/admin/dashboard").session(session(u))).andExpect(status().isForbidden());
+  u.setRole(Role.ADMIN);accounts.updateRole(u.getId(),Role.ADMIN);
+  mvc.perform(get("/api/admin/dashboard").session(session(u))).andExpect(status().isOk()).andExpect(jsonPath("$.deliveredOrderValue").isNumber()).andExpect(jsonPath("$.lowStock").isArray());
+ }
 }

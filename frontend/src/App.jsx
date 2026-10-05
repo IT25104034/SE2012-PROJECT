@@ -10,6 +10,7 @@ import {
 } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
+import Dashboard from "./components/Dashboard.jsx";
 import AccountPage from "./components/AccountPage.jsx";
 import UserManagement from "./components/UserManagement.jsx";
 import AdminOrders from "./components/AdminOrders.jsx";
@@ -133,6 +134,7 @@ function Management() {
               className="mt-6 flex flex-wrap gap-2 md:flex-col"
           >
             {(staff ? [["/staff/orders", "Orders"], ["/staff/inventory", "Inventory"]] : [
+              ["/admin/dashboard", "Dashboard"],
               ["/admin/products", "Products"],
               ["/admin/categories", "Categories"],
               ["/admin/inventory", "Inventory"],
@@ -236,12 +238,13 @@ export default function App() {
                 index
                 element={
                   <Navigate
-                      to="products"
+                      to="dashboard"
                       replace
                   />
                 }
             />
 
+            <Route path="dashboard" element={<Dashboard />} />
             <Route
                 path="products"
                 element={
