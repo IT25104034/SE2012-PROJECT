@@ -69,6 +69,13 @@ Adapted the prominent search, department navigation and rectangular merchandisin
 - Browser confirmed Inter loads and is inherited by headings and controls; desktop/home and 390px home/catalogue have no page overflow. Catalogue still shows nine products.
 - Frontend build, lint and whitespace checks passed.
 
+### Registration email OTP — 2026-10-05
+
+- Added registration-only verification with hashed pending credentials, five-minute codes, retry limits, resend cooldowns and delivery-failure rollback. Existing email/password logins remain unchanged.
+- All 92 backend tests passed, including OTP expiry, failed-attempt persistence, code consumption, role/session handling and normal login after verification.
+- Frontend production build, lint and Git whitespace checks passed. Registration form reviewed in the browser at 1280px without horizontal overflow.
+- Local SMTP credentials remain ignored by Git. Live Brevo inbox delivery still requires local SMTP login, SMTP key and a verified sender.
+
 ### Contact footer — 2026-10-04
 
 - Adapted Banana.lk's light contact-led footer with brand/contact block, quick navigation, customer-care links and a copyright strip.

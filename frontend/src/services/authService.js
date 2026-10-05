@@ -15,3 +15,11 @@ export async function getCurrentUser() {
 export async function logout() {
   await apiClient.post("/api/auth/logout");
 }
+
+export async function verifyRegistration(details) {
+  return (await apiClient.post("/api/auth/register/verify", details)).data;
+}
+
+export async function resendRegistration(registrationId) {
+  return (await apiClient.post("/api/auth/register/resend", { registrationId })).data;
+}
