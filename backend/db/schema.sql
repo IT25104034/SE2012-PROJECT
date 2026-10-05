@@ -47,6 +47,11 @@ CREATE TABLE `carts` (
 CREATE TABLE `orders` (
   `order_id` bigint NOT NULL AUTO_INCREMENT,
   `order_date` datetime(6) NOT NULL,
+  fulfilment VARCHAR(20) NULL,
+  recipient_name VARCHAR(255) NULL,
+  phone VARCHAR(25) NULL,
+  address VARCHAR(500) NULL,
+  delivery_fee DECIMAL(10,2) NULL,
   `status` enum('CANCELLED','CONFIRMED','DELIVERED','PENDING','PROCESSING','SHIPPED') NOT NULL,
   `total_amount` decimal(10,2) NOT NULL,
   `user_id` bigint NOT NULL,

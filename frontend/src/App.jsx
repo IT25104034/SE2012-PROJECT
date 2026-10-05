@@ -18,6 +18,7 @@ import CategoryList from "./components/CategoryList.jsx";
 import AddCategoryForm from "./components/AddCategoryForm.jsx";
 import ProductBrowser from "./components/ProductBrowser.jsx";
 import ProductDetails from "./components/ProductDetails.jsx";
+import CheckoutPage from "./components/CheckoutPage.jsx";
 import Cart from "./components/Cart.jsx";
 import OrderList from "./components/OrderList.jsx";
 import LoginPage from "./components/LoginPage.jsx";
@@ -195,6 +196,7 @@ export default function App() {
                 element={<ProtectedRoute><OrderList /></ProtectedRoute>}
             />
 
+            <Route path="checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
             <Route path="login" element={<LoginPage />} />
             <Route path="forgot-password" element={<ForgotPasswordPage />} />
             <Route path="register" element={<RegisterPage />} />

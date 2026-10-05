@@ -1,3 +1,4 @@
+import OrderFulfilment from "./OrderFulfilment.jsx";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getCustomerOrders, getOrderItems, getOrdersByStatus, updateOrderStatus } from "../services/orderService.js";
@@ -26,6 +27,7 @@ function OrderCard({ order, onSaved }) {
       <div><h2 className="text-lg font-bold">Order #{order.orderId}</h2><p className="mt-1 text-sm text-slate-500">Customer #{order.customerId} · {new Date(order.orderDate).toLocaleString()}</p></div>
       <div className="text-right"><p className="font-bold">Rs. {Number(order.totalAmount).toFixed(2)}</p><span className="mt-2 inline-block rounded-full bg-orange-100 px-3 py-1 text-xs font-bold text-orange-800">{order.status}</span></div>
     </div>
+    <OrderFulfilment order={order} />
     <form className="mt-5 flex flex-wrap items-end gap-3" onSubmit={(event) => { event.preventDefault(); if (status !== "CANCELLED" || window.confirm("Cancel this order and restore its stock?")) update.mutate({ orderId: order.orderId, status }); }}>
       <div><label className="field-label" htmlFor={`status-${order.orderId}`}>Order status</label><select id={`status-${order.orderId}`} className="field-input" value={status} disabled={update.isPending} onChange={(event) => { setStatus(event.target.value); update.reset(); }}>{[order.status, ...transitions[order.status]].map((value) => <option key={value}>{value}</option>)}</select></div>
       <button className="btn-primary" disabled={update.isPending || status === order.status}>{update.isPending ? "Saving…" : "Update status"}</button>
