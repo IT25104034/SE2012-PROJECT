@@ -10,6 +10,7 @@ import {
 } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
+import AccountPage from "./components/AccountPage.jsx";
 import UserManagement from "./components/UserManagement.jsx";
 import AdminOrders from "./components/AdminOrders.jsx";
 import Inventory from "./components/Inventory.jsx";
@@ -61,7 +62,7 @@ function Storefront() {
           <button type="submit" aria-label="Search products"><Icon name="search" /></button>
         </form>
         <div className="account-nav">
-          {user ? <><span className="hidden text-sm text-slate-500 sm:inline">Hi, {user.name}</span><button type="button" className="btn-outline" onClick={logout}>Sign Out</button></>
+          {user ? <><Link to="/account" className="nav-item">My account</Link><span className="hidden text-sm text-slate-500 sm:inline">Hi, {user.name}</span><button type="button" className="btn-outline" onClick={logout}>Sign Out</button></>
             : <><Link to="/login" className="nav-item">Sign In</Link><Link to="/register" className="btn-primary">Register <Icon name="arrow" /></Link></>}
         </div>
       </div>
@@ -196,6 +197,7 @@ export default function App() {
                 element={<ProtectedRoute><OrderList /></ProtectedRoute>}
             />
 
+            <Route path="account" element={<ProtectedRoute><AccountPage /></ProtectedRoute>} />
             <Route path="checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
             <Route path="login" element={<LoginPage />} />
             <Route path="forgot-password" element={<ForgotPasswordPage />} />
