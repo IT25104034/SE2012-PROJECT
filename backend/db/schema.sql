@@ -82,3 +82,16 @@ CREATE TABLE `order_items` (
   CONSTRAINT `FKbioxgbv59vetrxe0ejfubep1w` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`),
   CONSTRAINT `FKocimc7dtr037rh4ls4l95nlfi` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+-- Required for existing databases using spring.jpa.hibernate.ddl-auto=validate.
+CREATE TABLE IF NOT EXISTS pending_registration (
+    id VARCHAR(255) NOT NULL PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    name VARCHAR(255) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    code_hash VARCHAR(255) NOT NULL,
+    expires_at DATETIME(6) NOT NULL,
+    created_at DATETIME(6) NOT NULL,
+    last_sent_at DATETIME(6) NOT NULL,
+    attempts INT NOT NULL,
+    send_count INT NOT NULL
+);
