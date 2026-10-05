@@ -52,7 +52,7 @@ CREATE TABLE `orders` (
   phone VARCHAR(25) NULL,
   address VARCHAR(500) NULL,
   delivery_fee DECIMAL(10,2) NULL,
-  `status` enum('CANCELLED','CONFIRMED','DELIVERED','PENDING','PROCESSING','SHIPPED') NOT NULL,
+  `status` enum('CANCELLED','CONFIRMED','DELIVERED','PENDING','PROCESSING','SHIPPED','READY_FOR_COLLECTION') NOT NULL,
   `total_amount` decimal(10,2) NOT NULL,
   `user_id` bigint NOT NULL,
   `checkout_key` varchar(36) DEFAULT NULL,
