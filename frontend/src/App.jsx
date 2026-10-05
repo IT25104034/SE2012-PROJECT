@@ -21,6 +21,7 @@ import ProductDetails from "./components/ProductDetails.jsx";
 import Cart from "./components/Cart.jsx";
 import OrderList from "./components/OrderList.jsx";
 import LoginPage from "./components/LoginPage.jsx";
+import ForgotPasswordPage from "./components/ForgotPasswordPage.jsx";
 import RegisterPage from "./components/RegisterPage.jsx";
 import ProtectedRoute from "./auth/ProtectedRoute.jsx";
 import { useAuth } from "./auth/authContext.js";
@@ -195,6 +196,7 @@ export default function App() {
             />
 
             <Route path="login" element={<LoginPage />} />
+            <Route path="forgot-password" element={<ForgotPasswordPage />} />
             <Route path="register" element={<RegisterPage />} />
 
             <Route

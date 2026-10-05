@@ -88,3 +88,10 @@ Adapted the prominent search, department navigation and rectangular merchandisin
 - Increased explicit UI text sizes by 1px, shared small/body text by 1px and responsive heading limits by 2px.
 - Checked desktop and 320px/390px home, catalogue and login layouts; no horizontal overflow. Footer links now render at 14px, body at 17px and desktop navigation at 14px.
 - Frontend build, lint and whitespace checks passed.
+
+### Forgot password — 2026-10-05
+
+- Added the sign-in recovery link, email reset code form, password confirmation, resend countdown and sign-in success message.
+- All 101 backend tests passed, including password hashing/replacement, consumed and expired codes, persisted incorrect attempts, send limits, unknown/Google-only accounts, email failures and expiry of existing sessions.
+- Frontend production build, lint and whitespace checks passed. Browser checks verified the link, code form and password mismatch feedback; desktop 1280px and mobile 390px had no page overflow.
+- Restarted the local backend successfully; existing Brevo settings are reused. Recovery UI verification used a nonexistent reserved test address and sent no real email. Password reset and confirmation delivery were verified with a mocked mail sender in integration tests.

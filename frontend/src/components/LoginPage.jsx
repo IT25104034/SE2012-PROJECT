@@ -41,6 +41,7 @@ export default function LoginPage() {
           <p className="mt-2 text-sm text-slate-300">Sign in to shop or access your store workspace.</p>
         </div>
         <form className="space-y-5 p-8" onSubmit={submit}>
+          {(location.state?.passwordReset || new URLSearchParams(location.search).get("password-reset") === "success") && <p role="status" className="bg-green-50 p-3 text-sm text-green-800">Password updated. Sign in with your new password.</p>}
           {error && <p role="alert" className="rounded-md bg-red-50 p-3 text-sm font-semibold text-red-700">{error}</p>}
           <div>
             <label className="field-label" htmlFor="login-email">Email</label>
@@ -55,6 +56,7 @@ export default function LoginPage() {
           <button className="btn-primary w-full py-3" disabled={submitting}>
             {submitting ? "Signing in…" : "Sign In"}
           </button>
+          <Link to="/forgot-password" className="block text-center text-sm font-semibold text-orange-700 hover:underline">Forgot password?</Link>
           <GoogleSignIn />
           <p className="text-center text-sm text-slate-500">
             New to Mustafa Hardware? <Link className="font-bold text-orange-700 hover:underline" to="/register">Create an account</Link>
