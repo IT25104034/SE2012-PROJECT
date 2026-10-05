@@ -16,6 +16,22 @@ public class VerificationMailer {
         this.sender = sender; this.from = from;
     }
     public void sendCode(String email, String code) {
+        send(email, code, "registration", "verify your email");
+    }
+    public void sendResetCode(String email, String code) {
+        send(email, code, "password reset", "reset your password");
+    }
+    public void sendPasswordChanged(String email) {
+        deliver(email, "Mustafa Hardware — password changed",
+                "Your Mustafa Hardware password was changed.\nIf you did not make this change, reset your password immediately and contact the store.\nYour existing store sessions have been signed out.");
+    }
+    private void send(String email, String code, String purpose, String subject) {
+        deliver(email, "Mustafa Hardware — " + subject,
+                "Your Mustafa Hardware " + purpose + " code is: " + code
+                + "\n\nThis code expires in 5 minutes. Do not share it with anyone."
+                + "\nIf you did not request this, ignore this email. Your password has not been changed.");
+    }
+    private void deliver(String email, String subject, String body) {
         if (from.isBlank() || sender.getUsername() == null || sender.getUsername().isBlank()
                 || sender.getPassword() == null || sender.getPassword().isBlank()) {
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,
@@ -23,10 +39,8 @@ public class VerificationMailer {
         }
         var message = new SimpleMailMessage();
         message.setFrom(from); message.setTo(email);
-        message.setSubject("Mustafa Hardware — verify your email");
-        message.setText("Your Mustafa Hardware registration code is: " + code
-                + "\n\nThis code expires in 5 minutes. Do not share it with anyone."
-                + "\nIf you did not request an account, you can ignore this email.");
+        message.setSubject(subject);
+        message.setText(body);
         try { sender.send(message); }
         catch (MailException exception) {
             // Never return provider credentials, SMTP errors or the OTP to clients/logs.

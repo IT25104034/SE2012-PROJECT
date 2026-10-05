@@ -92,6 +92,7 @@ public class AuthController {
         session.setAttribute("userId", user.getId());
         session.setAttribute("email", user.getEmail());
         session.setAttribute("role", user.getRole());
+        session.setAttribute("credentialVersion", user.getCredentialVersion());
     }
 
     private UserResponse toUserResponse(User user) {
