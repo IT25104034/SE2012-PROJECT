@@ -30,17 +30,20 @@ public class ProductService {
 
     // Get product by ID
     public Product getProductById(Long id) {
+
         return productRepository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
                                 "Product not found with id: " + id
-                        ));
+                        )
+                );
     }
 
     // Create product
     public Product createProduct(Product product) {
 
-        Category category = getProductCategory(product);
+        Category category =
+                getProductCategory(product);
 
         product.setCategory(category);
 
@@ -48,46 +51,73 @@ public class ProductService {
     }
 
     // Update product
-    public Product updateProduct(Long id, Product updatedProduct) {
+    public Product updateProduct(
+            Long id,
+            Product updatedProduct
+    ) {
 
-        Product existingProduct = getProductById(id);
+        Product existingProduct =
+                getProductById(id);
 
-        existingProduct.setName(updatedProduct.getName());
-        existingProduct.setDescription(updatedProduct.getDescription());
-        existingProduct.setPrice(updatedProduct.getPrice());
-        existingProduct.setImageUrl(updatedProduct.getImageUrl());
-        existingProduct.setQuantity(updatedProduct.getQuantity());
+        existingProduct.setName(
+                updatedProduct.getName()
+        );
 
-        Category category = getProductCategory(updatedProduct);
+        existingProduct.setDescription(
+                updatedProduct.getDescription()
+        );
+
+        existingProduct.setPrice(
+                updatedProduct.getPrice()
+        );
+
+        existingProduct.setImageUrl(
+                updatedProduct.getImageUrl()
+        );
+
+        Category category =
+                getProductCategory(updatedProduct);
 
         existingProduct.setCategory(category);
 
-        return productRepository.save(existingProduct);
+        return productRepository.save(
+                existingProduct
+        );
     }
 
     // Delete product
     public void deleteProduct(Long id) {
 
-        Product existingProduct = getProductById(id);
+        Product existingProduct =
+                getProductById(id);
 
-        productRepository.delete(existingProduct);
+        productRepository.delete(
+                existingProduct
+        );
     }
 
-    private Category getProductCategory(Product product) {
+    private Category getProductCategory(
+            Product product
+    ) {
 
-        if (product.getCategory() == null ||
-                product.getCategory().getCategoryId() == null) {
+        if (product.getCategory() == null
+                || product.getCategory().getCategoryId() == null) {
+
             throw new IllegalArgumentException(
                     "A valid category id is required for the product"
             );
         }
 
-        Long categoryId = product.getCategory().getCategoryId();
+        Long categoryId =
+                product.getCategory().getCategoryId();
 
-        return categoryRepository.findById(categoryId)
+        return categoryRepository
+                .findById(categoryId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
-                                "Category not found with id: " + categoryId
-                        ));
+                                "Category not found with id: "
+                                        + categoryId
+                        )
+                );
     }
 }

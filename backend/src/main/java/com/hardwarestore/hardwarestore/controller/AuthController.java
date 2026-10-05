@@ -33,21 +33,40 @@ public class AuthController {
             HttpSession session
     ) {
         try {
+
             User user = new User();
+
             user.setName(request.getName());
             user.setEmail(request.getEmail());
             user.setPassword(request.getPassword());
 
             User savedUser = userService.registerUser(user);
+
             storeUserSession(session, savedUser);
 
             return ResponseEntity
                     .status(HttpStatus.CREATED)
                     .body(toUserResponse(savedUser));
+
         } catch (IllegalArgumentException exception) {
+
             return ResponseEntity.badRequest().body(
-                    Map.of("message", exception.getMessage())
+                    Map.of(
+                            "message",
+                            exception.getMessage()
+                    )
             );
+
+        } catch (IllegalStateException exception) {
+
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(
+                            Map.of(
+                                    "message",
+                                    exception.getMessage()
+                            )
+                    );
         }
     }
 
@@ -57,53 +76,118 @@ public class AuthController {
             HttpSession session
     ) {
         try {
+
             User user = userService.loginUser(
                     request.getEmail(),
                     request.getPassword()
             );
 
             storeUserSession(session, user);
-            return ResponseEntity.ok(toUserResponse(user));
+
+            return ResponseEntity.ok(
+                    toUserResponse(user)
+            );
+
         } catch (IllegalArgumentException exception) {
+
             return ResponseEntity.badRequest().body(
-                    Map.of("message", exception.getMessage())
+                    Map.of(
+                            "message",
+                            exception.getMessage()
+                    )
             );
         }
     }
 
     @GetMapping("/me")
-    public ResponseEntity<?> currentUser(HttpSession session) {
-        Long userId = (Long) session.getAttribute("userId");
+    public ResponseEntity<?> currentUser(
+            HttpSession session
+    ) {
+
+        Long userId =
+                (Long) session.getAttribute("userId");
 
         if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                    Map.of("message", "Please login first")
-            );
+
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(
+                            Map.of(
+                                    "message",
+                                    "Please login first"
+                            )
+                    );
+        }
+
+        User user = userService.getUserById(userId);
+
+        if (!user.isActive()) {
+
+            session.invalidate();
+
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(
+                            Map.of(
+                                    "message",
+                                    "This account is inactive"
+                            )
+                    );
         }
 
         return ResponseEntity.ok(
-                toUserResponse(userService.getUserById(userId))
+                toUserResponse(user)
         );
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(HttpSession session) {
+    public ResponseEntity<Void> logout(
+            HttpSession session
+    ) {
+
         session.invalidate();
-        return ResponseEntity.noContent().build();
+
+        return ResponseEntity
+                .noContent()
+                .build();
     }
 
-    private void storeUserSession(HttpSession session, User user) {
-        session.setAttribute("userId", user.getId());
-        session.setAttribute("email", user.getEmail());
-        session.setAttribute("role", user.getRole());
+    private void storeUserSession(
+            HttpSession session,
+            User user
+    ) {
+
+        session.setAttribute(
+                "userId",
+                user.getId()
+        );
+
+        session.setAttribute(
+                "name",
+                user.getName()
+        );
+
+        session.setAttribute(
+                "email",
+                user.getEmail()
+        );
+
+        session.setAttribute(
+                "role",
+                user.getRole().getRoleName()
+        );
     }
 
-    private UserResponse toUserResponse(User user) {
+    private UserResponse toUserResponse(
+            User user
+    ) {
+
         return new UserResponse(
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
-                user.getRole()
+                user.getRole().getRoleName(),
+                user.isActive()
         );
     }
 }

@@ -1,12 +1,14 @@
 package com.hardwarestore.hardwarestore.service;
 
+import com.hardwarestore.hardwarestore.exception.ResourceNotFoundException;
 import com.hardwarestore.hardwarestore.model.Cart;
 import com.hardwarestore.hardwarestore.model.CartItem;
+import com.hardwarestore.hardwarestore.model.Inventory;
 import com.hardwarestore.hardwarestore.model.Product;
 import com.hardwarestore.hardwarestore.model.User;
-import com.hardwarestore.hardwarestore.exception.ResourceNotFoundException;
 import com.hardwarestore.hardwarestore.repository.CartItemRepository;
 import com.hardwarestore.hardwarestore.repository.CartRepository;
+import com.hardwarestore.hardwarestore.repository.InventoryRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -17,131 +19,239 @@ public class CartService {
 
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
+    private final InventoryRepository inventoryRepository;
 
-    public CartService(CartRepository cartRepository,
-                       CartItemRepository cartItemRepository) {
+    public CartService(
+            CartRepository cartRepository,
+            CartItemRepository cartItemRepository,
+            InventoryRepository inventoryRepository
+    ) {
         this.cartRepository = cartRepository;
         this.cartItemRepository = cartItemRepository;
+        this.inventoryRepository = inventoryRepository;
     }
 
     public Cart getOrCreateCart(User customer) {
-        return cartRepository.findByCustomer(customer)
-                .orElseGet(() -> cartRepository.save(new Cart(customer)));
+
+        return cartRepository
+                .findByCustomer(customer)
+                .orElseGet(() ->
+                        cartRepository.save(
+                                new Cart(customer)
+                        )
+                );
     }
 
     public List<CartItem> getCartItems(User customer) {
+
         Cart cart = getOrCreateCart(customer);
+
         return cartItemRepository.findByCart(cart);
     }
 
-    public CartItem addItem(User customer,
-                            Product product,
-                            Integer quantity) {
+    public CartItem addItem(
+            User customer,
+            Product product,
+            Integer quantity
+    ) {
 
         validateQuantity(quantity);
 
         Cart cart = getOrCreateCart(customer);
 
-        CartItem existingItem = cartItemRepository
-                .findByCartAndProduct(cart, product)
-                .orElse(null);
+        CartItem existingItem =
+                cartItemRepository
+                        .findByCartAndProduct(
+                                cart,
+                                product
+                        )
+                        .orElse(null);
 
         if (existingItem != null) {
-            int newQuantity = existingItem.getQuantity() + quantity;
+
+            int newQuantity =
+                    existingItem.getQuantity()
+                            + quantity;
+
             validateQuantity(newQuantity);
-            validateStock(product, newQuantity);
 
-            existingItem.setQuantity(newQuantity);
+            validateStock(
+                    product,
+                    newQuantity
+            );
 
-            CartItem savedItem = cartItemRepository.save(existingItem);
+            existingItem.setQuantity(
+                    newQuantity
+            );
+
+            CartItem savedItem =
+                    cartItemRepository.save(
+                            existingItem
+                    );
+
             updateCartTotal(cart);
 
             return savedItem;
         }
 
-        validateStock(product, quantity);
-
-        CartItem newItem = new CartItem(
-                cart,
+        validateStock(
                 product,
-                quantity,
-                product.getPrice()
+                quantity
         );
 
-        CartItem savedItem = cartItemRepository.save(newItem);
+        CartItem newItem =
+                new CartItem(
+                        cart,
+                        product,
+                        quantity,
+                        product.getPrice()
+                );
+
+        CartItem savedItem =
+                cartItemRepository.save(
+                        newItem
+                );
+
         updateCartTotal(cart);
 
         return savedItem;
     }
 
-    public CartItem updateQuantity(User customer,
-                                   Product product,
-                                   Integer quantity) {
+    public CartItem updateQuantity(
+            User customer,
+            Product product,
+            Integer quantity
+    ) {
 
         validateQuantity(quantity);
-        validateStock(product, quantity);
 
-        Cart cart = getOrCreateCart(customer);
+        validateStock(
+                product,
+                quantity
+        );
 
-        CartItem item = cartItemRepository
-                .findByCartAndProduct(cart, product)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Product not found in cart"));
+        Cart cart =
+                getOrCreateCart(customer);
+
+        CartItem item =
+                cartItemRepository
+                        .findByCartAndProduct(
+                                cart,
+                                product
+                        )
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Product not found in cart"
+                                )
+                        );
 
         item.setQuantity(quantity);
 
-        CartItem savedItem = cartItemRepository.save(item);
+        CartItem savedItem =
+                cartItemRepository.save(item);
+
         updateCartTotal(cart);
 
         return savedItem;
     }
 
-    public void removeItem(User customer, Product product) {
+    public void removeItem(
+            User customer,
+            Product product
+    ) {
 
-        Cart cart = getOrCreateCart(customer);
+        Cart cart =
+                getOrCreateCart(customer);
 
-        CartItem item = cartItemRepository
-                .findByCartAndProduct(cart, product)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Product not found in cart"));
+        CartItem item =
+                cartItemRepository
+                        .findByCartAndProduct(
+                                cart,
+                                product
+                        )
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Product not found in cart"
+                                )
+                        );
 
         cartItemRepository.delete(item);
 
         updateCartTotal(cart);
     }
 
-    private void validateQuantity(Integer quantity) {
-        if (quantity == null || quantity <= 0) {
+    private void validateQuantity(
+            Integer quantity
+    ) {
+
+        if (quantity == null
+                || quantity <= 0) {
+
             throw new IllegalArgumentException(
                     "Quantity must be greater than zero"
             );
         }
     }
 
-    private void validateStock(Product product, Integer requestedQuantity) {
-        if (product.getQuantity() == null || product.getQuantity() < requestedQuantity) {
+    private void validateStock(
+            Product product,
+            Integer requestedQuantity
+    ) {
+
+        Inventory inventory =
+                inventoryRepository
+                        .findByProductProductId(
+                                product.getProductId()
+                        )
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Inventory not found for product id: "
+                                                + product.getProductId()
+                                )
+                        );
+
+        int availableQuantity =
+                inventory.getQuantityOnHand();
+
+        if (availableQuantity
+                < requestedQuantity) {
+
             throw new IllegalArgumentException(
-                    "Only " + (product.getQuantity() == null ? 0 : product.getQuantity())
-                            + " units available for " + product.getName()
+                    "Only "
+                            + availableQuantity
+                            + " units available for "
+                            + product.getName()
             );
         }
     }
 
-    private void updateCartTotal(Cart cart) {
+    private void updateCartTotal(
+            Cart cart
+    ) {
 
-        List<CartItem> items = cartItemRepository.findByCart(cart);
+        List<CartItem> items =
+                cartItemRepository.findByCart(cart);
 
-        BigDecimal total = BigDecimal.ZERO;
+        BigDecimal total =
+                BigDecimal.ZERO;
 
         for (CartItem item : items) {
 
-            BigDecimal itemTotal = item.getUnitPrice()
-                    .multiply(BigDecimal.valueOf(item.getQuantity()));
+            BigDecimal itemTotal =
+                    item.getUnitPrice()
+                            .multiply(
+                                    BigDecimal.valueOf(
+                                            item.getQuantity()
+                                    )
+                            );
 
-            total = total.add(itemTotal);
+            total = total.add(
+                    itemTotal
+            );
         }
 
         cart.setTotalAmount(total);
+
         cartRepository.save(cart);
     }
 }
