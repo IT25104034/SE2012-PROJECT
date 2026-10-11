@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
     useMutation,
     useQuery,
@@ -14,6 +15,7 @@ import {
 
 export default function UserManagement() {
     const queryClient = useQueryClient();
+    const [search, setSearch] = useState("");
     const { user: loggedInUser } = useAuth();
 
     const usersQuery = useQuery({
@@ -57,12 +59,14 @@ export default function UserManagement() {
         );
     }
 
-    const users = usersQuery.data ?? [];
+    const users = (usersQuery.data ?? []).filter(account =>
+        `${account.name} ${account.email} ${account.role}`.toLowerCase().includes(search.trim().toLowerCase())
+    );
 
     const errorMessage =
         roleMutation.error?.response?.data?.message ||
         activeMutation.error?.response?.data
-            ?.message;
+            ?.message || ((roleMutation.isError || activeMutation.isError) ? "Unable to update this account. Please try again." : "");
 
     return (
         <section>
@@ -85,33 +89,38 @@ export default function UserManagement() {
                 </div>
             )}
 
-            <div className="mt-8 overflow-x-auto rounded-lg border border-slate-200 bg-white">
+            <div className="panel mt-6 flex flex-wrap items-end gap-3 p-4">
+                <div className="min-w-0 flex-1"><label htmlFor="user-search" className="field-label">Search users</label><input id="user-search" className="field-input" placeholder="Name, email or role" value={search} onChange={event => setSearch(event.target.value)} /></div>
+                <button className="btn-outline" disabled={usersQuery.isFetching} onClick={() => usersQuery.refetch()}>Refresh</button>
+            </div>
+            <div className="panel mt-5 overflow-x-auto">
                 <table className="w-full min-w-[850px] text-left">
-                    <thead className="bg-slate-900 text-white">
+                    <thead className="border-b bg-slate-50 text-slate-500">
                     <tr>
-                        <th className="px-5 py-4">
+                        <th scope="col" className="px-5 py-4">
                             Name
                         </th>
 
-                        <th className="px-5 py-4">
+                        <th scope="col" className="px-5 py-4">
                             Email
                         </th>
 
-                        <th className="px-5 py-4">
+                        <th scope="col" className="px-5 py-4">
                             Role
                         </th>
 
-                        <th className="px-5 py-4">
+                        <th scope="col" className="px-5 py-4">
                             Status
                         </th>
 
-                        <th className="px-5 py-4">
+                        <th scope="col" className="px-5 py-4">
                             Action
                         </th>
                     </tr>
                     </thead>
 
                     <tbody className="divide-y divide-slate-200">
+                    {users.length === 0 && <tr><td colSpan={5} className="p-8 text-center text-slate-500">No users found.</td></tr>}
                     {users.map((account) => {
                         const isOwnAccount =
                             loggedInUser?.id === account.id;
@@ -134,6 +143,7 @@ export default function UserManagement() {
 
                                 <td className="px-5 py-4">
                                     <select
+                                        aria-label={`Role for ${account.name}`}
                                         className="field-input"
                                         value={account.role}
                                         disabled={

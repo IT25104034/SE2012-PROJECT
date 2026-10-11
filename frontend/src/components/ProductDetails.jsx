@@ -50,9 +50,9 @@ export default function ProductDetails() {
   return (
     <div>
       <Link className="text-sm font-semibold text-orange-700" to="/products">← Back to Products</Link>
-      <article className="panel mt-6 grid overflow-hidden md:grid-cols-2">
-        <ProductImage product={product} className="h-72 w-full p-8 md:h-96" />
-        <div className="p-8">
+      <article className="detail-panel panel mt-6 grid overflow-hidden md:grid-cols-2">
+        <div className="detail-photo"><ProductImage product={product} className="h-72 w-full p-8 md:h-96" /></div>
+        <div className="detail-content">
           <Link to={`/products?categoryId=${product.category?.categoryId}`} className="eyebrow">
             {product.category?.name}
           </Link>
@@ -82,16 +82,16 @@ export default function ProductDetails() {
                 onChange={(event) => setQuantity(Math.max(1, Number(event.target.value) || 1))}
               />
             </div>
-            {user ? (
+            {user?.role === "CUSTOMER" ? (
               <button
                 type="button"
                 className="btn-primary"
-                disabled={stock === 0 || quantity > stock || add.isPending}
+                disabled={stock === 0 || !Number.isInteger(quantity) || quantity > stock || add.isPending}
                 onClick={() => add.mutate({ userId: user.id, productId: product.productId, quantity })}
               >
                 {add.isPending ? "Adding…" : "Add to Cart"}
               </button>
-            ) : (
+            ) : user ? <p className="text-sm text-slate-500">Shopping is available to customer accounts.</p> : (
               <Link className="btn-primary" to="/login" state={{ from: `/products/${product.productId}` }}>
                 Sign In to Add to Cart
               </Link>

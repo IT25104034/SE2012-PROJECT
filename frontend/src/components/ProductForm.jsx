@@ -1,3 +1,4 @@
+import ProductImage from "./ProductImage.jsx";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
@@ -72,6 +73,7 @@ export default function ProductForm({ product, onClose, onSaved }) {
         <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.active} disabled={mutation.isPending} onChange={(event) => setForm({ ...form, active: event.target.checked })} />Available in the catalogue</label>
         <p className="text-sm text-slate-500">Stock is managed through Inventory. New products start with zero stock.</p>
         {field("imageUrl", "Image URL", { maxLength: 500, placeholder: "https://…" })}
+        {form.imageUrl && <ProductImage product={{ name: form.name || "Product preview", imageUrl: form.imageUrl }} className="h-40 w-40 border p-2" />}
         <div>
           <label className="field-label" htmlFor="product-description">Description</label>
           <textarea id="product-description" name="description" value={form.description} onChange={change}

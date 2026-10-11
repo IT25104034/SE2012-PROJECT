@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react'
+import { Link } from "react-router-dom"
+import Icon from "./Icon.jsx"
+import { useEffect, useRef, useState } from 'react'
 import {
     checkoutCart,
     getCart,
@@ -10,27 +12,13 @@ import { useAuth } from '../auth/authContext.js'
 function Cart() {
     const { user } = useAuth()
     const [cart, setCart] = useState(null)
+    const [busy, setBusy] = useState(false)
+    const pending = useRef(false)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
     const [checkoutMessage, setCheckoutMessage] = useState('')
 
     const userId = user.id
-
-    const loadCart = () => {
-        setLoading(true)
-        setError('')
-
-        getCart(userId)
-            .then((data) => {
-                setCart(data)
-                setLoading(false)
-            })
-            .catch((error) => {
-                console.error('Failed to load cart:', error)
-                setError('Unable to load your cart.')
-                setLoading(false)
-            })
-    }
 
     useEffect(() => {
         let active = true
@@ -55,57 +43,46 @@ function Cart() {
         }
     }, [userId])
 
-    const updateQuantity = (productId, quantity) => {
-        if (quantity < 1) {
-            return
+    const changeCart = async (operation, fallback, isCheckout = false) => {
+        if (pending.current) return
+        pending.current = true
+        setBusy(true)
+        setError('')
+        setCheckoutMessage('')
+        try {
+            const result = await operation()
+            if (isCheckout) setCheckoutMessage(`Order #${result.orderId} created successfully.`)
+            // Reload the authoritative cart after every successful mutation.
+            setCart(await getCart(userId))
+        } catch (error) {
+            const message = error.response?.data?.message
+            setError(error.response?.status < 500 && message ? message : fallback)
+            if (isCheckout) {
+                // A failed response may follow a completed checkout. Refresh without hiding the error.
+                try { setCart(await getCart(userId)) } catch { /* Keep the current cart and error visible. */ }
+            }
+        } finally {
+            pending.current = false
+            setBusy(false)
         }
+    }
 
-        updateCartQuantity({ userId, productId, quantity })
-            .then(() => {
-                loadCart()
-            })
-            .catch((error) => {
-                console.error('Failed to update quantity:', error)
-                setError(error.response?.data?.message || 'Unable to update item quantity.')
-            })
+    const updateQuantity = (productId, quantity) => {
+        if (quantity < 1) return
+        changeCart(() => updateCartQuantity({ userId, productId, quantity }), 'Unable to update item quantity.')
     }
 
     const removeItem = (productId) => {
-        removeCartItem({ userId, productId })
-            .then(() => {
-                loadCart()
-            })
-            .catch((error) => {
-                console.error('Failed to remove item:', error)
-                setError('Unable to remove item from cart.')
-            })
+        changeCart(() => removeCartItem({ userId, productId }), 'Unable to remove item from cart.')
     }
 
     const checkout = () => {
-        setCheckoutMessage('')
-        setError('')
-
-        checkoutCart(userId)
-            .then((order) => {
-                setCheckoutMessage(
-                    `Order #${order.orderId} created successfully.`
-                )
-                loadCart()
-            })
-            .catch((error) => {
-                console.error('Checkout failed:', error)
-                const responseMessage = error.response?.data?.message
-                setError(
-                    error.response?.status < 500 && responseMessage
-                        ? responseMessage
-                        : 'Unable to complete checkout. Please try again.'
-                )
-            })
+        changeCart(() => checkoutCart(userId), 'Unable to complete checkout. Please try again.', true)
     }
 
     if (loading) {
         return (
-            <section className="mt-10 rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
+            <section className="panel p-8">
                 <p className="text-sm text-slate-500">Loading cart...</p>
             </section>
         )
@@ -113,7 +90,7 @@ function Cart() {
 
     if (error && !cart) {
         return (
-            <section className="mt-10 rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
+            <section className="panel p-8">
                 <p className="font-semibold text-red-600">{error}</p>
             </section>
         )
@@ -124,11 +101,11 @@ function Cart() {
     return (
         <section
             id="cart"
-            className="mt-10"
+            className="cart-page"
         >
-            <div className="mb-6">
-                <p className="text-sm font-bold uppercase tracking-widest text-orange-600">
-                    Member 2 Component
+            <div className="catalogue-heading mb-6">
+                <p className="eyebrow">
+                    Your project essentials
                 </p>
 
                 <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-slate-900">
@@ -142,7 +119,7 @@ function Cart() {
 
             {checkoutMessage && (
                 <div className="mb-6 rounded-lg border border-green-200 bg-green-50 px-5 py-4 text-sm font-semibold text-green-700">
-                    {checkoutMessage}
+                    {checkoutMessage} <Link to="/orders" className="ml-2 underline">View your orders</Link>
                 </div>
             )}
 
@@ -153,9 +130,9 @@ function Cart() {
             )}
 
             {items.length === 0 ? (
-                <article className="rounded-lg border border-slate-200 bg-white p-8 text-center shadow-sm">
+                <article className="panel empty-state p-10 text-center">
                     <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-orange-100 font-extrabold text-orange-600">
-                        C
+                        <Icon name="cart" />
                     </div>
 
                     <h3 className="text-xl font-bold text-slate-900">
@@ -165,10 +142,11 @@ function Cart() {
                     <p className="mt-2 text-sm text-slate-500">
                         Add products to your cart to continue shopping.
                     </p>
+                    <Link to="/products" className="btn-primary mt-6">Explore products <Icon name="arrow" /></Link>
                 </article>
             ) : (
                 <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-                    <article className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+                    <article className="panel overflow-hidden">
                         <div className="border-b border-slate-200 px-6 py-4">
                             <h3 className="font-bold text-slate-900">
                                 Cart Items
@@ -203,6 +181,7 @@ function Cart() {
                                                 <div className="flex items-center rounded-md border border-slate-200">
                                                     <button
                                                         type="button"
+                                                        aria-label={`Decrease quantity of ${item.productName}`}
                                                         onClick={() =>
                                                             updateQuantity(
                                                                 item.productId,
@@ -210,7 +189,7 @@ function Cart() {
                                                             )
                                                         }
                                                         disabled={
-                                                            item.quantity <= 1
+                                                            busy || item.quantity <= 1
                                                         }
                                                         className="px-3 py-2 font-bold text-slate-700 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
                                                     >
@@ -223,6 +202,8 @@ function Cart() {
 
                                                     <button
                                                         type="button"
+                                                        aria-label={`Increase quantity of ${item.productName}`}
+                                                        disabled={busy}
                                                         onClick={() =>
                                                             updateQuantity(
                                                                 item.productId,
@@ -242,6 +223,7 @@ function Cart() {
 
                                                 <button
                                                     type="button"
+                                                    disabled={busy}
                                                     onClick={() =>
                                                         removeItem(
                                                             item.productId
@@ -259,7 +241,7 @@ function Cart() {
                         </div>
                     </article>
 
-                    <aside className="h-fit rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+                    <aside className="panel h-fit p-6">
                         <h3 className="text-xl font-bold text-slate-900">
                             Order Summary
                         </h3>
@@ -287,10 +269,11 @@ function Cart() {
 
                         <button
                             type="button"
+                            disabled={busy}
                             onClick={checkout}
-                            className="mt-6 w-full rounded-md bg-orange-600 px-4 py-3 text-sm font-bold text-white hover:bg-orange-700"
+                            className="btn-primary mt-6 w-full py-3"
                         >
-                            Proceed to Checkout
+                            {busy ? "Please wait…" : "Proceed to Checkout"}
                         </button>
                     </aside>
                 </div>

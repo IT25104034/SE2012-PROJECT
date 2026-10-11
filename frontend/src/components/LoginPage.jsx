@@ -39,7 +39,7 @@ export default function LoginPage() {
   if (user) {
     return (
         <Navigate
-            to={routeForRole(user.role)}
+            to={location.state?.from || routeForRole(user.role)}
             replace
         />
     );
@@ -79,9 +79,9 @@ export default function LoginPage() {
   }
 
   return (
-      <section className="mx-auto max-w-md">
-        <div className="panel overflow-hidden">
-          <div className="bg-slate-900 px-8 py-8 text-white">
+      <section className="auth-section mx-auto max-w-md">
+        <div className="auth-panel panel overflow-hidden">
+          <div className="auth-heading text-white">
             <p className="eyebrow text-orange-400">
               Account Access
             </p>

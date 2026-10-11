@@ -29,3 +29,7 @@ export async function updateOrderStatus({ orderId, status }) {
         )
     ).data;
 }
+
+export async function cancelOrder(orderId) {
+    return (await apiClient.put(`/api/orders/${orderId}/cancel`)).data;
+}

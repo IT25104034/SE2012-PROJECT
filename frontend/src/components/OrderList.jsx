@@ -19,7 +19,7 @@ function OrderList() {
             const data = await getCustomerOrders(user.id);
             setOrders(data);
         } catch (err) {
-            setError(err.message || "Unable to load orders");
+            setError(err.response?.data?.message || "Unable to load orders");
         } finally {
             setLoading(false);
         }
@@ -100,12 +100,12 @@ function OrderList() {
     return (
         <section
             id="orders"
-            className="mt-10 rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
+            className="space-y-6"
         >
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <p className="text-sm font-bold uppercase tracking-widest text-orange-600">
-                        Member 2
+                        Your purchases
                     </p>
 
                     <h2 className="mt-1 text-2xl font-extrabold text-slate-900">
@@ -120,7 +120,8 @@ function OrderList() {
                 <button
                     type="button"
                     onClick={fetchOrders}
-                    className="rounded-md bg-slate-900 px-4 py-2 text-sm font-bold text-white hover:bg-orange-600"
+                    className="btn-outline"
+                    disabled={loading}
                 >
                     Refresh Orders
                 </button>
@@ -155,7 +156,7 @@ function OrderList() {
                     {orders.map((order) => (
                         <article
                             key={order.orderId}
-                            className="rounded-lg border border-slate-200 bg-slate-50 p-5"
+                            className="panel p-6"
                         >
                             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                                 <div>
