@@ -2,8 +2,13 @@ package com.hardwarestore.hardwarestore.repository;
 
 import com.hardwarestore.hardwarestore.model.Inventory;
 import org.springframework.data.jpa.repository.JpaRepository;
+
 import java.util.Optional;
 
-public interface InventoryRepository extends JpaRepository<Inventory, Long> {
+public interface InventoryRepository
+        extends JpaRepository<Inventory, Long> {
+
     Optional<Inventory> findByProductProductId(Long productId);
+
+    boolean existsByProductProductId(Long productId);
 }

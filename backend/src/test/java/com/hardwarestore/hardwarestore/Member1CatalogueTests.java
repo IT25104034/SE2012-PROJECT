@@ -26,6 +26,8 @@ class Member1CatalogueTests {
     @Autowired InventoryRepository inventories;
     @Autowired ProductRepository productRepository;
     @Autowired UserRepository users;
+    @Autowired RoleRepository roles;
+    @Autowired CartService cartService;
     @Autowired CartRepository carts;
     @Autowired CartItemRepository cartItems;
     @Autowired OrderService orders;
@@ -40,7 +42,7 @@ class Member1CatalogueTests {
     private MockHttpSession admin() {
         MockHttpSession session = new MockHttpSession();
         session.setAttribute("userId", 1L);
-        session.setAttribute("role", Role.ADMIN);
+        session.setAttribute("role", RoleName.ADMIN);
         return session;
     }
 
@@ -103,7 +105,7 @@ class Member1CatalogueTests {
         stock.updateStock(product.getProductId(), 10);
         User customer = new User();
         customer.setName("Test customer"); customer.setEmail("test@example.invalid");
-        customer.setPassword("test-only"); customer.setRole(Role.CUSTOMER);
+        customer.setPassword("test-only"); customer.setRole(roles.findByRoleName(RoleName.CUSTOMER).orElseThrow());
         users.save(customer);
         Cart cart = carts.save(new Cart(customer));
         cartItems.save(new CartItem(cart, product, 3, product.getPrice()));
@@ -119,7 +121,7 @@ class Member1CatalogueTests {
         stock.updateStock(product.getProductId(), 10);
         User customer = new User();
         customer.setName("Test customer"); customer.setEmail("archive@example.invalid");
-        customer.setPassword("test-only"); customer.setRole(Role.CUSTOMER); users.save(customer);
+        customer.setPassword("test-only"); customer.setRole(roles.findByRoleName(RoleName.CUSTOMER).orElseThrow()); users.save(customer);
         Cart cart = carts.save(new Cart(customer));
         cartItems.save(new CartItem(cart, product, 2, product.getPrice()));
         products.deleteProduct(product.getProductId());
@@ -131,7 +133,7 @@ class Member1CatalogueTests {
         String body = "{\"name\":\"Tools\",\"description\":\"Test\"}";
         mvc.perform(post("/api/categories").contentType("application/json").content(body)).andExpect(status().isUnauthorized());
         MockHttpSession customer = new MockHttpSession();
-        customer.setAttribute("userId", 2L); customer.setAttribute("role", Role.CUSTOMER);
+        customer.setAttribute("userId", 2L); customer.setAttribute("role", RoleName.CUSTOMER);
         mvc.perform(post("/api/categories").session(customer).contentType("application/json").content(body)).andExpect(status().isForbidden());
         mvc.perform(get("/api/products?includeInactive=true")).andExpect(status().isUnauthorized());
         mvc.perform(delete("/api/products/1").session(customer)).andExpect(status().isForbidden());
@@ -153,5 +155,54 @@ class Member1CatalogueTests {
         products.deleteProduct(product.getProductId());
         mvc.perform(get("/api/products/" + product.getProductId())).andExpect(status().isNotFound());
         assertThatThrownBy(() -> stock.updateStock(product.getProductId(), -1)).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test void inventoryResponseIncludesProductWithoutRecursiveInventory() throws Exception {
+        Product product = createProduct();
+        stock.updateStock(product.getProductId(), 6);
+        reload();
+        mvc.perform(get("/api/inventory/" + product.getProductId()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.quantityOnHand").value(6))
+            .andExpect(jsonPath("$.product.productId").value(product.getProductId()))
+            .andExpect(jsonPath("$.product.quantity").value(6))
+            .andExpect(jsonPath("$.product.inventory").doesNotExist());
+        assertThatThrownBy(() -> stock.createInventoryForProduct(product.getProductId(), 1, 0))
+            .isInstanceOf(IllegalArgumentException.class).hasMessageContaining("already exists");
+    }
+
+    @Test void staffStockUpdatesAreVisibleToCustomersAndCustomerUpdatesAreForbidden() throws Exception {
+        Product product = createProduct();
+        MockHttpSession staff = new MockHttpSession();
+        staff.setAttribute("userId", 3L);
+        staff.setAttribute("role", RoleName.STAFF);
+        mvc.perform(put("/api/inventory/" + product.getProductId() + "/stock")
+            .session(staff).contentType("application/json").content("{\"quantity\":11}"))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.quantityOnHand").value(11));
+        reload();
+        mvc.perform(get("/api/products/" + product.getProductId()))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.quantity").value(11));
+        MockHttpSession customer = new MockHttpSession();
+        customer.setAttribute("userId", 4L);
+        customer.setAttribute("role", RoleName.CUSTOMER);
+        mvc.perform(put("/api/inventory/" + product.getProductId() + "/stock")
+            .session(customer).contentType("application/json").content("{\"quantity\":99}"))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test void cartUsesInventoryStockAndRejectsArchivedProducts() {
+        Product product = createProduct();
+        stock.updateStock(product.getProductId(), 4);
+        User customer = new User();
+        customer.setName("Cart customer"); customer.setEmail("cart@example.invalid");
+        customer.setPassword("test-only");
+        customer.setRole(roles.findByRoleName(RoleName.CUSTOMER).orElseThrow());
+        users.save(customer);
+        assertThat(cartService.addItem(customer, product, 2).getQuantity()).isEqualTo(2);
+        assertThatThrownBy(() -> cartService.addItem(customer, product, 3))
+            .isInstanceOf(IllegalArgumentException.class).hasMessageContaining("Only 4");
+        products.deleteProduct(product.getProductId());
+        assertThatThrownBy(() -> cartService.addItem(customer, product, 1))
+            .isInstanceOf(IllegalArgumentException.class).hasMessageContaining("no longer available");
     }
 }

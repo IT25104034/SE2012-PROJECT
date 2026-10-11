@@ -1,52 +1,117 @@
 package com.hardwarestore.hardwarestore.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "inventory")
 public class Inventory {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "inventory_id")
     private Long inventoryId;
 
-    @JsonIgnore
-    @OneToOne(optional = false)
-    @JoinColumn(name = "product_id", nullable = false, unique = true)
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(
+            name = "product_id",
+            nullable = false,
+            unique = true
+    )
     private Product product;
 
-    @PositiveOrZero
-    @Column(name = "quantity_on_hand", nullable = false)
-    private Integer quantityOnHand = 0;
+    @Column(
+            name = "quantity_on_hand",
+            nullable = false
+    )
+    private int quantityOnHand = 0;
 
-    @PositiveOrZero
-    @Column(name = "reorder_level", nullable = false)
-    private Integer reorderLevel = 0;
+    @Column(
+            name = "reorder_level",
+            nullable = false
+    )
+    private int reorderLevel = 0;
 
-    @Column(name = "last_updated", nullable = false)
+    @Column(
+            name = "last_updated",
+            nullable = false
+    )
     private LocalDateTime lastUpdated;
 
-    public Inventory() {}
-    public Inventory(Product product) { this.product = product; }
-    @PrePersist @PreUpdate
-    private void touch() { lastUpdated = LocalDateTime.now(); }
-    public Long getInventoryId() { return inventoryId; }
-    public Product getProduct() { return product; }
-    public void setProduct(Product product) { this.product = product; }
-    public Integer getQuantityOnHand() { return quantityOnHand; }
-    public void setQuantityOnHand(Integer quantity) {
-        if (quantity == null || quantity < 0) {
-            throw new IllegalArgumentException("Stock quantity must be a non-negative integer");
-        }
-        quantityOnHand = quantity;
+    public Inventory() {
     }
-    public Integer getReorderLevel() { return reorderLevel; }
-    public void setReorderLevel(Integer level) {
-        if (level == null || level < 0) {
-            throw new IllegalArgumentException("Reorder level must be a non-negative integer");
-        }
-        reorderLevel = level;
+
+    public Inventory(Product product) {
+        this(product, 0, 0);
     }
-    public LocalDateTime getLastUpdated() { return lastUpdated; }
+
+    public Inventory(
+            Product product,
+            int quantityOnHand,
+            int reorderLevel
+    ) {
+        this.product = product;
+        this.quantityOnHand = quantityOnHand;
+        this.reorderLevel = reorderLevel;
+    }
+
+    @PrePersist
+    @PreUpdate
+    public void updateTimestamp() {
+        this.lastUpdated = LocalDateTime.now();
+    }
+
+    public Long getInventoryId() {
+        return inventoryId;
+    }
+
+    public void setInventoryId(Long inventoryId) {
+        this.inventoryId = inventoryId;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
+    public int getQuantityOnHand() {
+        return quantityOnHand;
+    }
+
+    public void setQuantityOnHand(int quantityOnHand) {
+
+        if (quantityOnHand < 0) {
+            throw new IllegalArgumentException(
+                    "Stock quantity cannot be negative"
+            );
+        }
+
+        this.quantityOnHand = quantityOnHand;
+    }
+
+    public int getReorderLevel() {
+        return reorderLevel;
+    }
+
+    public void setReorderLevel(int reorderLevel) {
+
+        if (reorderLevel < 0) {
+            throw new IllegalArgumentException(
+                    "Reorder level cannot be negative"
+            );
+        }
+
+        this.reorderLevel = reorderLevel;
+    }
+
+    public LocalDateTime getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(LocalDateTime lastUpdated) {
+        this.lastUpdated = lastUpdated;
+    }
 }

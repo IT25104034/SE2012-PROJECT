@@ -72,6 +72,12 @@ public class Product {
     }
 
     @JsonCreator(mode = JsonCreator.Mode.DISABLED)
+    public Product(String name, String description, BigDecimal price,
+                   String imageUrl, Category category) {
+        this(name, description, price, imageUrl, 0, category);
+    }
+
+    @JsonCreator(mode = JsonCreator.Mode.DISABLED)
     public Product(
             String name,
             String description,
