@@ -92,6 +92,10 @@ public class OrderService {
             Product product =
                     cartItem.getProduct();
 
+            if (!product.isPurchasable()) {
+                throw new IllegalArgumentException("Product is no longer available: " + product.getName());
+            }
+
             Inventory inventory =
                     inventoryRepository
                             .findByProductProductId(

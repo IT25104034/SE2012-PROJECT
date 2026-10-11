@@ -41,6 +41,10 @@ public class Inventory {
     public Inventory() {
     }
 
+    public Inventory(Product product) {
+        this(product, 0, 0);
+    }
+
     public Inventory(
             Product product,
             int quantityOnHand,

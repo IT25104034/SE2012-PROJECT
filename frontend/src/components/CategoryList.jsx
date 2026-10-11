@@ -18,7 +18,7 @@ export default function CategoryList() {
   const deleteMutation = useMutation({
     mutationFn: deleteCategory,
     onSuccess: async () => {
-      setDeleteMessage("Category deleted successfully.");
+      setDeleteMessage("Category archived successfully.");
       await queryClient.invalidateQueries({ queryKey: ["categories"] });
       await queryClient.invalidateQueries({ queryKey: ["products"] });
     },
@@ -26,7 +26,7 @@ export default function CategoryList() {
 
   function handleDelete(category) {
     if (deleteMutation.isPending) return;
-    if (window.confirm(`Permanently delete "${category.name}"?`)) {
+    if (window.confirm(`Archive "${category.name}"?`)) {
       setDeleteMessage("");
       deleteMutation.mutate(category.categoryId);
     }
@@ -40,8 +40,8 @@ export default function CategoryList() {
     refetch,
     isFetching,
   } = useQuery({
-    queryKey: ["categories"],
-    queryFn: getCategories,
+    queryKey: ["categories", "management"],
+    queryFn: () => getCategories({ includeInactive: true }),
   });
 
   return (
@@ -76,7 +76,7 @@ export default function CategoryList() {
       {deleteMutation.isError && (
         <p role="alert" className="m-6 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
           {deleteMutation.error.response?.data?.message ||
-            "Unable to delete this category. It may be linked to products, or the server may be unavailable."}
+            "Unable to archive this category. Please try again."}
         </p>
       )}
 
@@ -140,7 +140,7 @@ export default function CategoryList() {
                   </td>
 
                   <td className="px-6 py-4 font-semibold text-slate-900">
-                    {category.name}
+                    {category.name}{!category.active && <span className="ml-2 text-xs text-slate-500">(Archived)</span>}
                   </td>
 
                   <td className="px-6 py-4 text-slate-600">
@@ -168,8 +168,8 @@ export default function CategoryList() {
                       className="rounded-md bg-red-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {deleteMutation.isPending && deleteMutation.variables === category.categoryId
-                        ? "Deleting..."
-                        : "Delete"}
+                        ? "Archiving..."
+                        : "Archive"}
                     </button>
                     </div>
                   </td>

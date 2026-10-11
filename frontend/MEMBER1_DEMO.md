@@ -1,32 +1,66 @@
-# Member 1: Product and Category demo
+# Member 1: Product and Category
 
-Run Spring Boot in IntelliJ on port 8080. Run `npm run dev -- --port 5173 --strictPort` here. The backend permits browser requests from http://localhost:5173. Frontend `.env` uses `VITE_API_BASE_URL=http://localhost:8080`.
+This branch implements Member 1's revised DMS catalogue design. Category and Product
+use the report's singular table names, column names, active flags and timestamps.
+Product retains imageUrl. Stock lives in a separate Inventory row per product;
+there is no persisted Product.quantity column. JSON still returns `quantity` for
+existing catalogue, cart, checkout and inventory screens.
 
-## Screens
+## Database preparation before starting
 
-- `/`: storefront with real categories.
-- `/products`: catalogue, search, category/price filters and sorting.
-- `/products/:productId`: product details fetched by ID.
-- `/admin/products`: list, create, edit and delete products.
-- `/admin/categories`: existing category CRUD.
+Do not start against the old database expecting Hibernate to migrate it.
+`spring.jpa.hibernate.ddl-auto=validate` checks the schema and fails when it does not
+match; it does not create the new tables or discard data.
 
-## What to understand
+1. Stop the application and back up the entire database, including cart/order data.
+2. Rehearse `../backend/db/member1_dms_migration.sql` on a restored copy of the current
+   database. It targets the original `categories` and `products` tables only,
+   preserves their IDs and transfers each quantity to Inventory. It refuses
+   duplicate category names, invalid stock/prices and pre-existing target tables.
+3. Compare row counts, total stock and existing cart/order product references.
+   Test startup on that copy before approving the same migration for the real database.
+4. MySQL DDL commits implicitly. Restore the backup if any stage fails; do not rerun
+   a partially completed migration. The script is not automatically executed.
 
-`productService.js` calls the existing ProductController. GET returns an array; search, filtering and sorting run in React. This is not backend search or pagination. ProductForm sends `category: { categoryId }`, matching the JPA relationship. React Query tracks pending/errors and refreshes queries after mutations. Category renames also invalidate product data so category names stay current.
+The other entities retain their current mappings. The full nine-table DMS baseline
+still requires Member 2/3 changes, including the relational Role and future staff
+permissions. This commit does not implement those features or migrate their tables.
+Inventory's model/repository are the shared foundation needed for the Product change;
+Member 3 owns further inventory operations, reorder-level controls and role work.
 
-Product fields: name, description, price, imageUrl, category. No SKU, brand, stock, active status, authentication or cart is assumed. Management routes are directly accessible for this local progress demo; they do not enforce administrator permissions.
+## Start and screens
 
-## Demo checklist
+Use the configured Spring Boot port (currently 8081). Keep the frontend API base URL
+consistent with it. Start Vite on port 5173; that origin is permitted with session
+cookies. Log in as ADMIN for `/admin/products` and `/admin/categories`.
 
-1. Create a temporary category. Submit an empty name to demonstrate backend validation.
-2. Create a product in that category, first with an empty name/price to show field errors.
-3. Verify the nested category in the browser Network request and response.
-4. Edit the product price and description. Confirm the ID stays the same.
-5. Browse the catalogue, search by name, filter by category and price, sort prices.
-6. Open product details, including a direct URL refresh. Check a nonexistent product ID shows an error.
-7. Rename the category and revisit the catalogue to verify the refreshed name.
-8. Test Delete → Cancel, then delete the temporary product and its temporary category.
-9. Reload to confirm persistence. Do not delete existing team records for testing.
-10. Stop the backend briefly and Refresh to demonstrate the API error state; restart it and retry.
+- `/products`: public active catalogue with search, category/price/stock filters and sorting.
+- `/products/:productId`: active product details; archived records return 404.
+- `/admin/products`: list all products, create, edit, archive and restore through Edit.
+- `/admin/categories`: create/edit categories, archive, or restore through the active checkbox.
+- The existing inventory screen/API changes stock separately. Product forms cannot overwrite it.
 
-Foreign-key constraints can reject deletion of products/categories in use. The UI reports the failure; the current backend does not provide a dedicated friendly conflict response. Empty names are intentionally submitted using `noValidate` to demonstrate backend validation. Image URLs display a fallback if unavailable. Actual stock availability will be integrated with Member 3 later.
+New products have zero stock until the administrator updates Inventory. Archiving
+preserves category/product IDs, inventory and historical references. Archiving a
+category hides its products from the public catalogue without changing each product's
+own active flag. Restoring a category reveals products that are still individually active.
+Cart additions and checkout reject archived products/categories, including old cart entries.
+
+## Validation and demonstration
+
+Search, filtering and sorting run in React, not SQL pagination. ProductForm sends
+`category: { categoryId }`, plus name, description, price, imageUrl and active.
+Only ADMIN sessions may write catalogue records or request `includeInactive=true`.
+The four read-only SQL examples are in `../backend/db/member1_dms_queries.sql`.
+
+Demonstrate category/product creation and validation, separate stock update, metadata
+edit without stock changes, filters, archive/restore, and forbidden customer/anonymous
+writes. Use temporary demo records and preserve team data. The automated regression
+tests use a separate in-memory H2 database, never the configured MySQL database.
+Run backend `./mvnw test` and frontend `npm run lint` / `npm run build`.
+
+Concurrency protection for simultaneous checkout and the remaining order lifecycle
+work remain with the shared Member 2/3 implementation; this compatibility change does
+not claim to complete them. Rehearse migration and browser integration on MySQL before
+capturing final viva evidence. Do not label prepared SQL or automated H2 results as
+executed MySQL evidence in the report.

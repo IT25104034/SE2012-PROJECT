@@ -1,7 +1,7 @@
 import apiClient from "./apiClient";
 
-export async function getCategories() {
-  const response = await apiClient.get("/api/categories");
+export async function getCategories({ includeInactive = false } = {}) {
+  const response = await apiClient.get("/api/categories", { params: { includeInactive } });
   return response.data;
 }
 

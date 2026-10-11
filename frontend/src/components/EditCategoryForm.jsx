@@ -5,6 +5,7 @@ import { updateCategory } from "../services/categoryService.js";
 export default function EditCategoryForm({ category, onClose }) {
   const queryClient = useQueryClient();
 
+  const [active, setActive] = useState(category.active ?? true);
   const [name, setName] = useState(category.name);
   const [description, setDescription] = useState(
     category.description ?? ""
@@ -45,6 +46,7 @@ export default function EditCategoryForm({ category, onClose }) {
     updateMutation.mutate({
       categoryId: category.categoryId,
       category: {
+        active,
         name: name.trim(),
         description: description.trim() || null,
       },
@@ -135,6 +137,11 @@ export default function EditCategoryForm({ category, onClose }) {
           )}
         </div>
 
+        <label className="flex items-center gap-2 text-sm">
+          <input type="checkbox" checked={active} disabled={updateMutation.isPending} onChange={(event) => setActive(event.target.checked)} />
+          Available in the catalogue
+        </label>
+        <p className="text-sm text-slate-500">Archiving a category hides its products. Restore it here when needed.</p>
         <div className="flex gap-3">
           <button
             type="submit"
