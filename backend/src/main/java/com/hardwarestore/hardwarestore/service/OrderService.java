@@ -59,13 +59,11 @@ public class OrderService {
                 cartItemRepository.findByCart(cart);
 
         if (cartItems.isEmpty()) {
-
             throw new IllegalArgumentException(
                     "Cannot checkout an empty cart"
             );
         }
 
-        // Validate cart item quantities and prices
         for (CartItem cartItem : cartItems) {
 
             if (cartItem.getQuantity() == null
@@ -86,14 +84,16 @@ public class OrderService {
             }
         }
 
-        // Validate inventory stock before creating the order
         for (CartItem cartItem : cartItems) {
 
             Product product =
                     cartItem.getProduct();
 
             if (!product.isPurchasable()) {
-                throw new IllegalArgumentException("Product is no longer available: " + product.getName());
+                throw new IllegalArgumentException(
+                        "Product is no longer available: "
+                                + product.getName()
+                );
             }
 
             Inventory inventory =
@@ -121,7 +121,6 @@ public class OrderService {
             }
         }
 
-        // Calculate total order amount
         BigDecimal totalAmount =
                 BigDecimal.ZERO;
 
@@ -139,7 +138,6 @@ public class OrderService {
                     totalAmount.add(itemTotal);
         }
 
-        // Create order
         Order order =
                 new Order(
                         customer,
@@ -151,7 +149,6 @@ public class OrderService {
         order =
                 orderRepository.save(order);
 
-        // Create order items and reduce inventory stock
         for (CartItem cartItem : cartItems) {
 
             Product product =
@@ -192,7 +189,6 @@ public class OrderService {
             );
         }
 
-        // Clear cart after successful checkout
         cartItemRepository.deleteAll(
                 cartItems
         );
@@ -209,7 +205,6 @@ public class OrderService {
     public List<Order> getCustomerOrders(
             User customer
     ) {
-
         return orderRepository
                 .findByCustomer(customer);
     }
@@ -217,7 +212,6 @@ public class OrderService {
     public List<Order> getOrdersByStatus(
             OrderStatus status
     ) {
-
         return orderRepository
                 .findByStatus(status);
     }
@@ -225,19 +219,19 @@ public class OrderService {
     public List<OrderItem> getOrderItems(
             Order order
     ) {
-
         return orderItemRepository
                 .findByOrder(order);
     }
 
+    @Transactional
     public Order updateOrderStatus(
             Long orderId,
-            OrderStatus status
+            OrderStatus newStatus
     ) {
 
         Order order =
                 orderRepository
-                        .findById(orderId)
+                        .findByIdForUpdate(orderId)
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
                                         "Order not found with id: "
@@ -245,8 +239,118 @@ public class OrderService {
                                 )
                         );
 
-        order.setStatus(status);
+        OrderStatus currentStatus =
+                order.getStatus();
+
+        if (!isValidStatusTransition(
+                currentStatus,
+                newStatus
+        )) {
+
+            throw new IllegalArgumentException(
+                    "Invalid order status transition: "
+                            + currentStatus
+                            + " -> "
+                            + newStatus
+            );
+        }
+
+        order.setStatus(newStatus);
 
         return orderRepository.save(order);
+    }
+
+    @Transactional
+    public Order cancelOrder(Long orderId) {
+
+        Order order =
+                orderRepository
+                        .findByIdForUpdate(orderId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Order not found with id: "
+                                                + orderId
+                                )
+                        );
+
+        OrderStatus currentStatus =
+                order.getStatus();
+
+        if (currentStatus == OrderStatus.SHIPPED
+                || currentStatus == OrderStatus.DELIVERED
+                || currentStatus == OrderStatus.CANCELLED) {
+
+            throw new IllegalArgumentException(
+                    "Order cannot be cancelled from status: "
+                            + currentStatus
+            );
+        }
+
+        List<OrderItem> orderItems =
+                orderItemRepository
+                        .findByOrder(order);
+
+        for (OrderItem orderItem : orderItems) {
+
+            Long productId =
+                    orderItem.getProduct().getProductId();
+
+            Inventory inventory =
+                    inventoryRepository
+                            .findByProductProductIdForUpdate(
+                                    productId
+                            )
+                            .orElseThrow(() ->
+                                    new ResourceNotFoundException(
+                                            "Inventory not found for product id: "
+                                                    + productId
+                                    )
+                            );
+
+            int restoredQuantity =
+                    inventory.getQuantityOnHand()
+                            + orderItem.getQuantity();
+
+            inventory.setQuantityOnHand(
+                    restoredQuantity
+            );
+
+            inventoryRepository.save(
+                    inventory
+            );
+        }
+
+        order.setStatus(OrderStatus.CANCELLED);
+
+        return orderRepository.save(order);
+    }
+
+    private boolean isValidStatusTransition(
+            OrderStatus currentStatus,
+            OrderStatus newStatus
+    ) {
+
+        if (currentStatus == null
+                || newStatus == null) {
+            return false;
+        }
+
+        return switch (currentStatus) {
+
+            case PENDING ->
+                    newStatus == OrderStatus.CONFIRMED;
+
+            case CONFIRMED ->
+                    newStatus == OrderStatus.PROCESSING;
+
+            case PROCESSING ->
+                    newStatus == OrderStatus.SHIPPED;
+
+            case SHIPPED ->
+                    newStatus == OrderStatus.DELIVERED;
+
+            case DELIVERED, CANCELLED ->
+                    false;
+        };
     }
 }
