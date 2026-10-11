@@ -19,7 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class OrderService {
@@ -47,8 +50,15 @@ public class OrderService {
     @Transactional
     public Order checkout(User customer) {
 
+        /*
+         * Lock the customer's cart for the duration of checkout.
+         *
+         * If two checkout requests arrive at the same time for the
+         * same customer, the second request waits for the first
+         * transaction to finish before reading the cart.
+         */
         Cart cart = cartRepository
-                .findByCustomer(customer)
+                .findByCustomerForUpdate(customer)
                 .orElseThrow(() ->
                         new IllegalArgumentException(
                                 "Cart not found"
@@ -64,6 +74,9 @@ public class OrderService {
             );
         }
 
+        /*
+         * Validate the cart first.
+         */
         for (CartItem cartItem : cartItems) {
 
             if (cartItem.getQuantity() == null
@@ -84,7 +97,25 @@ public class OrderService {
             }
         }
 
-        for (CartItem cartItem : cartItems) {
+        /*
+         * Lock inventory rows in a deterministic product-id order.
+         *
+         * This prevents two customers from consuming the same stock
+         * simultaneously and reduces the chance of deadlocks when
+         * multiple products are being purchased.
+         */
+        List<CartItem> sortedCartItems = cartItems.stream()
+                .sorted(
+                        Comparator.comparing(
+                                item -> item.getProduct().getProductId()
+                        )
+                )
+                .toList();
+
+        Map<Long, Inventory> lockedInventory =
+                new HashMap<>();
+
+        for (CartItem cartItem : sortedCartItems) {
 
             Product product =
                     cartItem.getProduct();
@@ -98,7 +129,7 @@ public class OrderService {
 
             Inventory inventory =
                     inventoryRepository
-                            .findByProductProductId(
+                            .findByProductProductIdForUpdate(
                                     product.getProductId()
                             )
                             .orElseThrow(() ->
@@ -107,6 +138,15 @@ public class OrderService {
                                                     + product.getProductId()
                                     )
                             );
+
+            /*
+             * Keep the locked entity so we do not perform another
+             * non-locking inventory lookup later in the transaction.
+             */
+            lockedInventory.put(
+                    product.getProductId(),
+                    inventory
+            );
 
             if (inventory.getQuantityOnHand()
                     < cartItem.getQuantity()) {
@@ -121,6 +161,9 @@ public class OrderService {
             }
         }
 
+        /*
+         * Calculate the complete order total.
+         */
         BigDecimal totalAmount =
                 BigDecimal.ZERO;
 
@@ -138,6 +181,9 @@ public class OrderService {
                     totalAmount.add(itemTotal);
         }
 
+        /*
+         * Create the order.
+         */
         Order order =
                 new Order(
                         customer,
@@ -149,22 +195,13 @@ public class OrderService {
         order =
                 orderRepository.save(order);
 
+        /*
+         * Create order items and deduct the already-locked inventory.
+         */
         for (CartItem cartItem : cartItems) {
 
             Product product =
                     cartItem.getProduct();
-
-            Inventory inventory =
-                    inventoryRepository
-                            .findByProductProductId(
-                                    product.getProductId()
-                            )
-                            .orElseThrow(() ->
-                                    new ResourceNotFoundException(
-                                            "Inventory not found for product id: "
-                                                    + product.getProductId()
-                                    )
-                            );
 
             OrderItem orderItem =
                     new OrderItem(
@@ -175,6 +212,11 @@ public class OrderService {
                     );
 
             orderItemRepository.save(orderItem);
+
+            Inventory inventory =
+                    lockedInventory.get(
+                            product.getProductId()
+                    );
 
             int newQuantity =
                     inventory.getQuantityOnHand()
@@ -189,6 +231,17 @@ public class OrderService {
             );
         }
 
+        /*
+         * Clear the cart only after the order and stock changes
+         * have been successfully processed.
+         *
+         * Because the entire method is transactional, an exception
+         * anywhere before commit rolls back:
+         * - the order
+         * - order items
+         * - inventory deductions
+         * - cart changes
+         */
         cartItemRepository.deleteAll(
                 cartItems
         );
