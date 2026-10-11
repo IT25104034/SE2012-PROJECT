@@ -112,13 +112,40 @@ public class OrderController {
         );
     }
 
+    @PutMapping("/{orderId}/cancel")
+    public OrderResponse cancelOrder(
+            @PathVariable Long orderId,
+            HttpSession session
+    ) {
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Order not found with id: " + orderId
+                        )
+                );
+
+        requireOrderAccess(
+                order.getCustomer().getId(),
+                session
+        );
+
+        return toOrderResponse(
+                orderService.cancelOrder(orderId)
+        );
+    }
+
     private OrderResponse toOrderResponse(
             Order order
     ) {
 
+        User customer = order.getCustomer();
+
         return new OrderResponse(
                 order.getOrderId(),
-                order.getCustomer().getId(),
+                customer.getId(),
+                customer.getName(),
+                customer.getEmail(),
                 order.getOrderDate(),
                 order.getTotalAmount(),
                 order.getStatus()

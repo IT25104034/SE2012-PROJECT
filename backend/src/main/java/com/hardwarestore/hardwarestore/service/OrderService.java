@@ -19,7 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class OrderService {
@@ -47,8 +50,15 @@ public class OrderService {
     @Transactional
     public Order checkout(User customer) {
 
+        /*
+         * Lock the customer's cart for the duration of checkout.
+         *
+         * If two checkout requests arrive at the same time for the
+         * same customer, the second request waits for the first
+         * transaction to finish before reading the cart.
+         */
         Cart cart = cartRepository
-                .findByCustomer(customer)
+                .findByCustomerForUpdate(customer)
                 .orElseThrow(() ->
                         new IllegalArgumentException(
                                 "Cart not found"
@@ -59,13 +69,14 @@ public class OrderService {
                 cartItemRepository.findByCart(cart);
 
         if (cartItems.isEmpty()) {
-
             throw new IllegalArgumentException(
                     "Cannot checkout an empty cart"
             );
         }
 
-        // Validate cart item quantities and prices
+        /*
+         * Validate the cart first.
+         */
         for (CartItem cartItem : cartItems) {
 
             if (cartItem.getQuantity() == null
@@ -86,19 +97,39 @@ public class OrderService {
             }
         }
 
-        // Validate inventory stock before creating the order
-        for (CartItem cartItem : cartItems) {
+        /*
+         * Lock inventory rows in a deterministic product-id order.
+         *
+         * This prevents two customers from consuming the same stock
+         * simultaneously and reduces the chance of deadlocks when
+         * multiple products are being purchased.
+         */
+        List<CartItem> sortedCartItems = cartItems.stream()
+                .sorted(
+                        Comparator.comparing(
+                                item -> item.getProduct().getProductId()
+                        )
+                )
+                .toList();
+
+        Map<Long, Inventory> lockedInventory =
+                new HashMap<>();
+
+        for (CartItem cartItem : sortedCartItems) {
 
             Product product =
                     cartItem.getProduct();
 
             if (!product.isPurchasable()) {
-                throw new IllegalArgumentException("Product is no longer available: " + product.getName());
+                throw new IllegalArgumentException(
+                        "Product is no longer available: "
+                                + product.getName()
+                );
             }
 
             Inventory inventory =
                     inventoryRepository
-                            .findByProductProductId(
+                            .findByProductProductIdForUpdate(
                                     product.getProductId()
                             )
                             .orElseThrow(() ->
@@ -107,6 +138,15 @@ public class OrderService {
                                                     + product.getProductId()
                                     )
                             );
+
+            /*
+             * Keep the locked entity so we do not perform another
+             * non-locking inventory lookup later in the transaction.
+             */
+            lockedInventory.put(
+                    product.getProductId(),
+                    inventory
+            );
 
             if (inventory.getQuantityOnHand()
                     < cartItem.getQuantity()) {
@@ -121,7 +161,9 @@ public class OrderService {
             }
         }
 
-        // Calculate total order amount
+        /*
+         * Calculate the complete order total.
+         */
         BigDecimal totalAmount =
                 BigDecimal.ZERO;
 
@@ -139,7 +181,9 @@ public class OrderService {
                     totalAmount.add(itemTotal);
         }
 
-        // Create order
+        /*
+         * Create the order.
+         */
         Order order =
                 new Order(
                         customer,
@@ -151,23 +195,13 @@ public class OrderService {
         order =
                 orderRepository.save(order);
 
-        // Create order items and reduce inventory stock
+        /*
+         * Create order items and deduct the already-locked inventory.
+         */
         for (CartItem cartItem : cartItems) {
 
             Product product =
                     cartItem.getProduct();
-
-            Inventory inventory =
-                    inventoryRepository
-                            .findByProductProductId(
-                                    product.getProductId()
-                            )
-                            .orElseThrow(() ->
-                                    new ResourceNotFoundException(
-                                            "Inventory not found for product id: "
-                                                    + product.getProductId()
-                                    )
-                            );
 
             OrderItem orderItem =
                     new OrderItem(
@@ -178,6 +212,11 @@ public class OrderService {
                     );
 
             orderItemRepository.save(orderItem);
+
+            Inventory inventory =
+                    lockedInventory.get(
+                            product.getProductId()
+                    );
 
             int newQuantity =
                     inventory.getQuantityOnHand()
@@ -192,7 +231,17 @@ public class OrderService {
             );
         }
 
-        // Clear cart after successful checkout
+        /*
+         * Clear the cart only after the order and stock changes
+         * have been successfully processed.
+         *
+         * Because the entire method is transactional, an exception
+         * anywhere before commit rolls back:
+         * - the order
+         * - order items
+         * - inventory deductions
+         * - cart changes
+         */
         cartItemRepository.deleteAll(
                 cartItems
         );
@@ -209,7 +258,6 @@ public class OrderService {
     public List<Order> getCustomerOrders(
             User customer
     ) {
-
         return orderRepository
                 .findByCustomer(customer);
     }
@@ -217,7 +265,6 @@ public class OrderService {
     public List<Order> getOrdersByStatus(
             OrderStatus status
     ) {
-
         return orderRepository
                 .findByStatus(status);
     }
@@ -225,19 +272,19 @@ public class OrderService {
     public List<OrderItem> getOrderItems(
             Order order
     ) {
-
         return orderItemRepository
                 .findByOrder(order);
     }
 
+    @Transactional
     public Order updateOrderStatus(
             Long orderId,
-            OrderStatus status
+            OrderStatus newStatus
     ) {
 
         Order order =
                 orderRepository
-                        .findById(orderId)
+                        .findByIdForUpdate(orderId)
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
                                         "Order not found with id: "
@@ -245,8 +292,118 @@ public class OrderService {
                                 )
                         );
 
-        order.setStatus(status);
+        OrderStatus currentStatus =
+                order.getStatus();
+
+        if (!isValidStatusTransition(
+                currentStatus,
+                newStatus
+        )) {
+
+            throw new IllegalArgumentException(
+                    "Invalid order status transition: "
+                            + currentStatus
+                            + " -> "
+                            + newStatus
+            );
+        }
+
+        order.setStatus(newStatus);
 
         return orderRepository.save(order);
+    }
+
+    @Transactional
+    public Order cancelOrder(Long orderId) {
+
+        Order order =
+                orderRepository
+                        .findByIdForUpdate(orderId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Order not found with id: "
+                                                + orderId
+                                )
+                        );
+
+        OrderStatus currentStatus =
+                order.getStatus();
+
+        if (currentStatus == OrderStatus.SHIPPED
+                || currentStatus == OrderStatus.DELIVERED
+                || currentStatus == OrderStatus.CANCELLED) {
+
+            throw new IllegalArgumentException(
+                    "Order cannot be cancelled from status: "
+                            + currentStatus
+            );
+        }
+
+        List<OrderItem> orderItems =
+                orderItemRepository
+                        .findByOrder(order);
+
+        for (OrderItem orderItem : orderItems) {
+
+            Long productId =
+                    orderItem.getProduct().getProductId();
+
+            Inventory inventory =
+                    inventoryRepository
+                            .findByProductProductIdForUpdate(
+                                    productId
+                            )
+                            .orElseThrow(() ->
+                                    new ResourceNotFoundException(
+                                            "Inventory not found for product id: "
+                                                    + productId
+                                    )
+                            );
+
+            int restoredQuantity =
+                    inventory.getQuantityOnHand()
+                            + orderItem.getQuantity();
+
+            inventory.setQuantityOnHand(
+                    restoredQuantity
+            );
+
+            inventoryRepository.save(
+                    inventory
+            );
+        }
+
+        order.setStatus(OrderStatus.CANCELLED);
+
+        return orderRepository.save(order);
+    }
+
+    private boolean isValidStatusTransition(
+            OrderStatus currentStatus,
+            OrderStatus newStatus
+    ) {
+
+        if (currentStatus == null
+                || newStatus == null) {
+            return false;
+        }
+
+        return switch (currentStatus) {
+
+            case PENDING ->
+                    newStatus == OrderStatus.CONFIRMED;
+
+            case CONFIRMED ->
+                    newStatus == OrderStatus.PROCESSING;
+
+            case PROCESSING ->
+                    newStatus == OrderStatus.SHIPPED;
+
+            case SHIPPED ->
+                    newStatus == OrderStatus.DELIVERED;
+
+            case DELIVERED, CANCELLED ->
+                    false;
+        };
     }
 }
