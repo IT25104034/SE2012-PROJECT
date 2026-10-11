@@ -116,9 +116,13 @@ public class OrderController {
             Order order
     ) {
 
+        User customer = order.getCustomer();
+
         return new OrderResponse(
                 order.getOrderId(),
-                order.getCustomer().getId(),
+                customer.getId(),
+                customer.getName(),
+                customer.getEmail(),
                 order.getOrderDate(),
                 order.getTotalAmount(),
                 order.getStatus()

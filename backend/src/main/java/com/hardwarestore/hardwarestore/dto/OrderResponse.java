@@ -9,6 +9,8 @@ public class OrderResponse {
 
     private Long orderId;
     private Long customerId;
+    private String customerName;
+    private String customerEmail;
     private LocalDateTime orderDate;
     private BigDecimal totalAmount;
     private OrderStatus status;
@@ -16,13 +18,33 @@ public class OrderResponse {
     public OrderResponse() {
     }
 
-    public OrderResponse(Long orderId,
-                         Long customerId,
-                         LocalDateTime orderDate,
-                         BigDecimal totalAmount,
-                         OrderStatus status) {
+    public OrderResponse(
+            Long orderId,
+            Long customerId,
+            LocalDateTime orderDate,
+            BigDecimal totalAmount,
+            OrderStatus status
+    ) {
         this.orderId = orderId;
         this.customerId = customerId;
+        this.orderDate = orderDate;
+        this.totalAmount = totalAmount;
+        this.status = status;
+    }
+
+    public OrderResponse(
+            Long orderId,
+            Long customerId,
+            String customerName,
+            String customerEmail,
+            LocalDateTime orderDate,
+            BigDecimal totalAmount,
+            OrderStatus status
+    ) {
+        this.orderId = orderId;
+        this.customerId = customerId;
+        this.customerName = customerName;
+        this.customerEmail = customerEmail;
         this.orderDate = orderDate;
         this.totalAmount = totalAmount;
         this.status = status;
@@ -42,6 +64,22 @@ public class OrderResponse {
 
     public void setCustomerId(Long customerId) {
         this.customerId = customerId;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public String getCustomerEmail() {
+        return customerEmail;
+    }
+
+    public void setCustomerEmail(String customerEmail) {
+        this.customerEmail = customerEmail;
     }
 
     public LocalDateTime getOrderDate() {

@@ -5,6 +5,7 @@ import {
 } from "@tanstack/react-query";
 
 import {
+    getOrderItems,
     getOrdersByStatus,
     updateOrderStatus,
 } from "../services/orderService.js";
@@ -32,6 +33,90 @@ async function loadAllOrders() {
                 new Date(second.orderDate) -
                 new Date(first.orderDate)
         );
+}
+
+function OrderItems({ orderId }) {
+    const itemsQuery = useQuery({
+        queryKey: ["staff-order-items", orderId],
+        queryFn: () => getOrderItems(orderId),
+    });
+
+    if (itemsQuery.isLoading) {
+        return (
+            <div className="mt-5 rounded-md bg-slate-50 p-4 text-sm text-slate-500">
+                Loading order items...
+            </div>
+        );
+    }
+
+    if (itemsQuery.isError) {
+        return (
+            <div className="mt-5 rounded-md bg-red-50 p-4 text-sm font-semibold text-red-700">
+                Unable to load order items.
+            </div>
+        );
+    }
+
+    const items = itemsQuery.data ?? [];
+
+    if (items.length === 0) {
+        return (
+            <div className="mt-5 rounded-md bg-slate-50 p-4 text-sm text-slate-500">
+                No items found for this order.
+            </div>
+        );
+    }
+
+    return (
+        <div className="mt-5 overflow-hidden rounded-md border border-slate-200">
+            <div className="grid grid-cols-[2fr_1fr_1fr_1fr] gap-4 bg-slate-50 px-4 py-3 text-xs font-bold uppercase tracking-wide text-slate-500">
+                <span>Product</span>
+                <span>Quantity</span>
+                <span>Unit Price</span>
+                <span>Line Total</span>
+            </div>
+
+            {items.map((item) => (
+                <div
+                    key={item.orderItemId}
+                    className="grid grid-cols-[2fr_1fr_1fr_1fr] gap-4 border-t border-slate-200 px-4 py-4 text-sm"
+                >
+                    <div>
+                        <p className="font-bold text-slate-900">
+                            {item.productName}
+                        </p>
+
+                        <p className="mt-1 text-xs text-slate-500">
+                            Product #{item.productId}
+                        </p>
+                    </div>
+
+                    <span>
+                        {item.quantity}
+                    </span>
+
+                    <span>
+                        Rs.{" "}
+                        {Number(
+                            item.unitPrice ?? 0
+                        ).toFixed(2)}
+                    </span>
+
+                    <span className="font-semibold">
+                        Rs.{" "}
+                        {(
+                            Number(
+                                item.unitPrice ?? 0
+                            ) *
+                            Number(
+                                item.quantity ?? 0
+                            )
+                        ).toFixed(2)}
+                    </span>
+                </div>
+            ))}
+        </div>
+    );
 }
 
 export default function StaffOrders() {
@@ -81,8 +166,8 @@ export default function StaffOrders() {
             </h1>
 
             <p className="mt-2 text-slate-500">
-                View incoming orders, process them and
-                update order status.
+                View incoming orders, customer details,
+                order items and update order status.
             </p>
 
             {statusMutation.isError && (
@@ -99,17 +184,28 @@ export default function StaffOrders() {
                         key={order.orderId}
                         className="panel p-6"
                     >
-                        <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
+                        <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-start">
                             <div>
                                 <p className="text-sm font-bold text-orange-700">
                                     Order #{order.orderId}
                                 </p>
 
                                 <h2 className="mt-1 text-xl font-extrabold">
-                                    Customer #{order.customerId}
+                                    {order.customerName ||
+                                        `Customer #${order.customerId}`}
                                 </h2>
 
-                                <p className="mt-2 text-sm text-slate-500">
+                                {order.customerEmail && (
+                                    <p className="mt-1 text-sm text-slate-500">
+                                        {order.customerEmail}
+                                    </p>
+                                )}
+
+                                <p className="mt-1 text-xs text-slate-400">
+                                    Customer #{order.customerId}
+                                </p>
+
+                                <p className="mt-3 text-sm text-slate-500">
                                     {order.orderDate
                                         ? new Date(
                                             order.orderDate
@@ -158,6 +254,16 @@ export default function StaffOrders() {
                                 </select>
                             </div>
                         </div>
+
+                        <details className="mt-6">
+                            <summary className="cursor-pointer text-sm font-bold text-orange-700">
+                                View order details
+                            </summary>
+
+                            <OrderItems
+                                orderId={order.orderId}
+                            />
+                        </details>
                     </article>
                 ))}
             </div>
