@@ -84,7 +84,7 @@ public class OrderController {
                         )
                 );
 
-        requireSameUserOrAdmin(
+        requireOrderAccess(
                 order.getCustomer().getId(),
                 session
         );
@@ -163,6 +163,40 @@ public class OrderController {
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN,
                     "You cannot access another customer's orders"
+            );
+        }
+    }
+
+    private void requireOrderAccess(
+            Long customerId,
+            HttpSession session
+    ) {
+
+        Long authenticatedUserId =
+                (Long) session.getAttribute("userId");
+
+        RoleName role =
+                (RoleName) session.getAttribute("role");
+
+        if (authenticatedUserId == null) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Please login first"
+            );
+        }
+
+        if (role == RoleName.ADMIN
+                || role == RoleName.STAFF) {
+
+            return;
+        }
+
+        if (!authenticatedUserId.equals(customerId)) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "You cannot access this order"
             );
         }
     }

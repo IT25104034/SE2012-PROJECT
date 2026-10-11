@@ -16,7 +16,11 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(
-        origins = {"http://localhost:5173","http://localhost:5174", "http://localhost:5175"},
+        origins = {
+                "http://localhost:5173",
+                "http://localhost:5174",
+                "http://localhost:5175"
+        },
         allowCredentials = "true"
 )
 public class AuthController {
@@ -134,6 +138,11 @@ public class AuthController {
                             )
                     );
         }
+
+        // Keep the session synchronized with the latest user data.
+        // Example: if an admin changes this user's role in the database,
+        // the session role is refreshed here.
+        storeUserSession(session, user);
 
         return ResponseEntity.ok(
                 toUserResponse(user)
